@@ -19,9 +19,8 @@ import thread
 
 signal = 1
 import email_form as email
-import ClassSend_Email
-from email_form import send_warnmail
-#import email_form as se
+#from email_form import send_warnmail
+
 from send_email_alltime import send_warn_mail
 
 if signal == 0:
@@ -501,11 +500,11 @@ def get_HAAP_status_list():
                 #emailSend_warnmail(warnlist,warnlevel)
     #print('dsd',lstHAAPstatus,warnlist,warnlevel)
     # return lstHAAPstatus
-    if warnlist != []:
-        #print(warnlist)
-        #print(type(warnlist))
-        print('send..................')
-        email.Timely_send(warnlist,warnlevel)
+    # if warnlist != []:
+    #     #print(warnlist)
+    #     #print(type(warnlist))
+    #     print('send..................')
+    #     email.Timely_send(warnlist,warnlevel)
     return [lstHAAPstatus, warnlist, warnlevel]
 
 ###########################分割线##################################################
@@ -706,10 +705,10 @@ def get_Switch_Total():
 
             #print("lstSwitchstatus:", lst_total, " ",sw_warnlist," ",sw_warnlevel)
             
-    if warnlist != []:
-        #print(warnlist)
-        #print(type(warnlist))
-        email.Timely_send(sw_warnlist,sw_warnlevel)
+    # if warnlist != []:
+    #     #print(warnlist)
+    #     #print(type(warnlist))
+    #     email.Timely_send(sw_warnlist,sw_warnlevel)
     return lst_total, sw_warnlist, sw_warnlevel
 
 ################################分割线######################################################
@@ -1034,15 +1033,19 @@ def job_update_interval2(intInterval):
         #print(get_HAAP_status_list()[2])
 
         a = get_HAAP_status_list()
-        do_update = db.haap_insert(n, a[0])
-        
+        #do_update = db.haap_insert(n, a[0])
+        db.haap_insert(n, a[0])
         if a[2] != []:
             for i in range(len(a[2])):
 
-                do_update = db.haap2_insert(n, a[2][i], a[1][i], confirm_status)
+                #do_update = db.haap2_insert(n, a[2][i], a[1][i], confirm_status)
+                db.haap2_insert(n, a[2][i], a[1][i], confirm_status)
                 # print('update complately...@ %s' % n)
+            warnlist = a[1]
+            warnlevel = a[2]
+            email.Timely_send(warnlist, warnlevel)
 
-    t.add_interval(do_it, intInterval)
+    t.add_interval(do_it, 10)
     t.stt()
 
 
@@ -1054,14 +1057,19 @@ def job_update_interval3(intInterval):
     def do_it():
         n = datetime.datetime.now()
         a = get_Switch_Total()
-        do_update_Switch = db.Switch_insert(n, get_Switch_IP(), get_Switch_status_list(), a[0])
+        #do_update_Switch = db.Switch_insert(n, get_Switch_IP(), get_Switch_status_list(), a[0])
+        db.Switch_insert(n, get_Switch_IP(), get_Switch_status_list(), a[0])
         if a[1] != []:
             for i in range(len(a[2])):
-                do_update = db.haap2_insert(n, a[2][i], a[1][i], confirm_status)
+                #do_update = db.haap2_insert(n, a[2][i], a[1][i], confirm_status)
+                db.haap2_insert(n, a[2][i], a[1][i], confirm_status)
                 # print('update complately...@ %s' % n)
-                return do_update_Switch, do_update
+                #return do_update_Switch, do_update
+            warnlist = a[1]
+            warnlevel = a[2]
+            email.Timely_send(warnlist, warnlevel)
 
-    t.add_interval(do_it, intInterval)
+    t.add_interval(do_it, 600)
     t.stt()
 
 # def DB_Update_interval(intSec):
@@ -1083,7 +1091,7 @@ def job_update_interval4(intInterval):
     t = s.Timing()
     db = DB_collHAAP()
     def do_it():
-        warninfo = send_warnmail(mailto_list, sub,get_all_recond())
+        warninfo = email.send_warnmail(mailto_list, sub,get_all_recond())
         print('ddf',warninfo)
         return warninfo
     t.add_interval(do_it, intInterval)
@@ -1125,7 +1133,7 @@ def thrd_web_db():
 def start_warn_check():
     t1 = Thread(target=start_web, args=('db',))
     t2 = Thread(target=job_update_interval2, args=(10,))
-    t3 = Thread(target=job_update_interval3, args=(20,))
+    t3 = Thread(target=job_update_interval3, args=(600,))
     t4 = Thread(target=job_update_interval4, args=(20*360,))
 
     t1.setDaemon(True)
