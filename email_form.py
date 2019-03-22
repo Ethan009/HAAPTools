@@ -5,6 +5,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
+from email.header import Header
 from email import encoders
 import sys
 import os
@@ -98,11 +99,60 @@ def send_warnmail(mailto_list, sub,warninfo_email):
         except  send_smtp.SMTPException:
             print "Send mail failed!"
 
-   
 
-if __name__ == '__main__':
-    # 设置服务器名称、用户名、密码以及邮件后缀
-    send_warnmail(mailto_list, sub,warninfo_email)
+#Klay
+def Timely_send(warn_message, warn_level):
+    objCFG = cp.ConfigParser(allow_no_value=True)
+    objCFG.read('Conf.ini')
+    # << SMTP server >>
+    mail_host = objCFG.get('EmailSetting', 'host')
+    mail_user = objCFG.get('EmailSetting', 'sender')
+    mail_password = objCFG.get('EmailSetting', 'password')
+
+    sender = mail_user
+    receivers = objCFG.get('EmailSetting', 'receiver')
+    receivers = receivers.split(',')  # Converting receivers（str） to list
+    s = ''
+    for i in range(len(warn_message)):
+        s += str(warn_message[i]) + '********' + 'Warning level is ' + str(warn_level[i]) +'\n'
+    # print receivers
+
+    message = MIMEText('This is HA Appliance emailing for getting help.' + '\n' + \
+                       'status is : ' + '\n' + s, 'plain', 'utf-8')
+    # message['From'] = Header(objCFG.get('General','company'), 'utf-8')
+    # message['To'] = Header((','.join(receivers)), 'utf-8')
+    #print type(receivers)
+    message['From'] = objCFG.get('General', 'company')
+    # message['To'] = objCFG.get('General', 'company')
+    message['To'] = ','.join(receivers)
+    #print message['To']
+
+
+    # subject = 'SAN Warning......'
+    message['Subject'] = Header(
+        'Location: ' + objCFG.get('General', 'location') + '.' + 'SAN Warning......' + '\n ' ,'utf-8')  # status 之后从数据库拿
+
+    try:
+        smtpObj = smtplib.SMTP()
+
+        smtpObj.connect(mail_host)  # 25 为 SMTP 端口号
+        print '2'
+        smtpObj.ehlo()
+        smtpObj.starttls()
+        smtpObj.login(mail_user, mail_password)
+        print '3'
+        print type(receivers)
+        smtpObj.sendmail(sender, receivers, message.as_string())
+        #smtpObj.sendmail(sender, To, message.as_string())
+        print "邮件发送成功"
+    except smtplib.SMTPException:
+        print "Error: 无法发送邮件"
+
+
+#if __name__ == '__main__':
+
+  #main()    # 设置服务器名称、用户名、密码以及邮件后缀
+    #send_warnmail(mailto_list, sub,warninfo_email)
 '''    
     mail_host = "smtp.qq.com"  # 设置服务器
     mail_user = "657097710@qq.com"  # 用户名3

@@ -17,13 +17,15 @@ from mongoengine import *
 from threading import Thread
 import thread
 
-signal = 0
+signal = 1
+import email_form as email
 import ClassSend_Email
 from email_form import send_warnmail
+#import email_form as se
+from send_email_alltime import send_warn_mail
 
-if signal == 1:
-    t = ClassSend_Email.SEmail
-    t.send_email()
+if signal == 0:
+    email.Timely_send([1,1,1],[2,2,2])
 
 from flask import Flask, render_template, redirect, request
 
@@ -113,7 +115,8 @@ for i in objCFG.items('SWPorts'):
     # print(oddSWPort)
 # print(oddSWPort)
 # for i in oddSWPort.items():
-    # print(type(i))
+    # print(type(i)) 
+    
 
 lstSW = list(oddSWPort.keys())
 lstSWPorts = list(oddSWPort.values())
@@ -163,6 +166,7 @@ else:
 oddHAAPErrorDict = Odd()
 for i in objCFG.items('TraceRegular'):
     oddHAAPErrorDict[i[0]] = eval(i[1])
+
 # <<<HAAP Config>>>
 
 # <<<Folder Config>>>
@@ -170,6 +174,7 @@ for i in objCFG.items('TraceRegular'):
 strSWPEFolder = objCFG.get('FolderSetting', 'swporterr')
 # TCFolder = HAAP Get Trace Folder
 strTCFolder = objCFG.get('FolderSetting', 'trace')
+
 # TCAFolder = HAAP Trace Analyse Folder
 strTCAFolder = objCFG.get('FolderSetting', 'traceanalyse')
 # CFGFolder = HAAP Config Backup Folder
@@ -428,7 +433,7 @@ def get_HAAP_status_list():
         xxx = last_update[1]
         print(xxx)
     except:
-        print('ddddddddddddd')
+        print('get_HAAP_status_list')
     lstHAAPstatus = []
     warnlist = []
     warnlevel = []
@@ -440,12 +445,13 @@ def get_HAAP_status_list():
         t = {}
         t[lstHAAPAlias[i]] = _HAAP_Status(lstHAAP[i]).infoEngine_lst()[1]
         lstHAAPstatus.append(t)
-        print('lstHAAPstatus',t)
+        #print('lstHAAPstatus',t)
         try:
             items_db = xxx[i].values()[0]
         except:
             pass
         for items in t.values():
+
             #print(items)
             #print(xxx[i])
             eglevel = 0
@@ -453,7 +459,7 @@ def get_HAAP_status_list():
             if items['Status'] == 'ONLINE':
                 try:
                     if items_db['Status'] == 'ONLINE':  # xxx is engine status from DB's first record
-                        print('okokok')
+                        #print('okokok')
                         warnlist.append('Engine' + lstHAAP[i] + '\'s status is ' + items['Status'])
                         warnlevel.append('3')
                 except:
@@ -468,8 +474,7 @@ def get_HAAP_status_list():
             s = 0
             s1 = 0
             uptime = items['Uptime']
-            print ('uptime',uptime)
-
+            #print ('uptime',uptime)
             s += int(uptime[-2:])
             s += int(uptime[-5:-3]) * 60
             s += int(uptime[-8:-6]) * 3600
@@ -492,11 +497,16 @@ def get_HAAP_status_list():
             except:
                 pass
                 # print(warnlist)
-    # print(lstHAAPstatus,warnlist,warnlevel)
+            #if warnlist != []:
+                #emailSend_warnmail(warnlist,warnlevel)
+    #print('dsd',lstHAAPstatus,warnlist,warnlevel)
     # return lstHAAPstatus
-
+    if warnlist != []:
+        #print(warnlist)
+        #print(type(warnlist))
+        print('send..................')
+        email.Timely_send(warnlist,warnlevel)
     return [lstHAAPstatus, warnlist, warnlevel]
-
 
 ###########################分割线##################################################
 '''
@@ -532,8 +542,6 @@ def get_Switch_status_list():
 
 # --错误总数--#
 def get_Switch_Total():
-    
-
 
     try:
         db = DB_collHAAP()
@@ -619,7 +627,7 @@ def get_Switch_Total():
                     b[6] = (float(b[6][0:-1])) * 1000
             losssg += int(b[6])
             
-            ALLtotal = framtx + framrx + encout + discc3 + linkfl + losssc + losssg
+            ALLtotal = encout + discc3 + linkfl + losssc + losssg
                     
             # print("losssg:", losssg) 
             # s = str(lstSW[i]) + ':' + ' '
@@ -642,8 +650,8 @@ def get_Switch_Total():
             LossSG.append(s6)
             ALLTOTAL.append(s7)
          
-            lstSwitchstatus.update(FramTX=framtx)
-            lstSwitchstatus.update(FramRX=framrx)
+            #lstSwitchstatus.update(FramTX=framtx)
+            #lstSwitchstatus.update(FramRX=framrx)
             lstSwitchstatus.update(ENCOUT=encout)
             lstSwitchstatus.update(Discc3=discc3)
             lstSwitchstatus.update(LinkFL=linkfl)
@@ -655,34 +663,34 @@ def get_Switch_Total():
         # print ('switch_name',switchname)
         sname = switchname[i]
 
-        print("sname:",sname)
+        #print("sname:",sname)
            
         lst_total[sname] = (lstSwitchstatus)
-        print('lst_total[sname]',lst_total[sname])
+        #print('lst_total[sname]',lst_total[sname])
 
         # print(i,'   sd  ',Alltotal)
         
         try:
             a = lstStatusdict[sname]
-            print("123131313:",a)
-            print ('count ', ALLTOTAL)
+            #print("123131313:",a)
+            #print ('count ', ALLTOTAL)
             # print('2222')
             # 运行不到
-            print('333333', a['ALLTOTAL'])
+            #print('333333', a['ALLTOTAL'])
 
             a = ALLtotal - a['ALLTOTAL']
 
-            print("axxxxxxxxxxxxxxxxxxxxxxxxxxxxxx:", a)
+            #print("axxxxxxxxxxxxxxxxxxxxxxxxxxxxxx:", a)
             if a == 0:
-                print('aaaaaa=======000000')
+                #print('aaaaaa=======000000')
                 # sw_warnlist.append('llllllllllll')
-                print('4444444444')
-                print("a:", a)
-                print("sdsdsdswwww:", 'Switch' + lstSW[i] + '\' s port error has reached ' + str(a))
+                #print('4444444444')
+                #print("a:", a)
+                #print("sdsdsdswwww:", 'Switch' + lstSW[i] + '\' s port error has reached ' + str(a))
                 sw_warnlist.append('Switch' + lstSW[i] + '\' s port error has reached ')
-                print('hgjhsgdjhsgjhsgfjhsdgfjs')
+                #print('hgjhsgdjhsgjhsgfjhsdgfjs')
                 sw_warnlevel.append('3')
-                print('                    ', sw_warnlevel, sw_warnlist)
+                #print('                    ', sw_warnlevel, sw_warnlist)
 
             else:
                 if a > 10000:
@@ -693,11 +701,15 @@ def get_Switch_Total():
                         sw_warnlist.append('Switch' + lstSW[i] + '\'s port error has reached '+str(a))
                         sw_warnlevel.append('1')
         except:
-            #pass 
+            pass 
 
 
-            print("lstSwitchstatus:", lst_total, " ",sw_warnlist," ",sw_warnlevel)
-
+            #print("lstSwitchstatus:", lst_total, " ",sw_warnlist," ",sw_warnlevel)
+            
+    if warnlist != []:
+        #print(warnlist)
+        #print(type(warnlist))
+        email.Timely_send(sw_warnlist,sw_warnlevel)
     return lst_total, sw_warnlist, sw_warnlevel
 
 ################################分割线######################################################
@@ -706,10 +718,8 @@ def get_Switch_Total():
 '''
 def email_send():
     email_info = []
-    engine_info = get_HAAP_status_list()
-    print ('engine_info',engine_info)
-    enginelevel= engine_info[2]
-    enginelist = engine_info[1]
+    
+    enginelist = engine_info[0]
     switch_info = get_Switch_Total()
     sw_warnlist = switch_info[1]
     sw_warnlevel = switch_info[0]
@@ -723,8 +733,23 @@ def email_send():
     print('dfsd', enginelist)
 
 '''
+'''
+def email_send_engine():
+    engine_info = get_HAAP_status_list()
+    print ('engine_info',engine_info)
+    enginelevel= engine_info[2]
+    time = _get_TimeNow_Human()
+    for g in enginelevel:
+        pass
 
 
+
+
+    warninfo = send_warn_mail(mailto_list, sub,)
+    print('ddf',warninfo)
+    return warninfo
+
+'''
 
 
 
@@ -825,6 +850,7 @@ class DB_collHAAP(object):
 def get_all_recond():
     db = DB_collHAAP()
     last_update = db.get_recond()
+    #print(last_update)
     return last_update
 
 def upconfirm_stuta():
@@ -847,6 +873,7 @@ def get_engine_from_db():
         b = [a['IP'],a['Status'],a['Uptime'],a['Master'],a['Mirror']]
         lstStatus.append(b)
     #print('C',lstStatus)
+    #print("999999999")
     return refresh_time, lstStatus
 
 
@@ -854,13 +881,13 @@ def get_engine_from_db():
 def get_Switch_from_db():
     db = DB_collHAAP()
     last_update = db.get_last_record_Switch()
-
     refresh_time = last_update[0]
     lstSwitch_ip = last_update[1]
     lstSwitch_status = last_update[2]
     lstSwitch_total = last_update[3]
-    lstSwitch_totals = []
-
+    
+    # print(lstSwitch_total)
+    '''lstSwitch_totals = []
     for i in lstSwitch_total:
         lstswitch_totals = [lstSwitch_ip[i]]
         for o in lstSwitch_total[i]:
@@ -869,10 +896,13 @@ def get_Switch_from_db():
             else:
                 lstswitch_totals.append(lstSwitch_total[i][o])
         lstswitch_totals.append(lstSwitch_total[i]["ALLTOTAL"])
-        lstSwitch_totals.append(lstswitch_totals)
+        lstSwitch_totals.append(lstswitch_totals)'''
 
-    lstall = [refresh_time,lstSwitch_ip,lstSwitch_status,lstSwitch_totals]
+    lstall = [refresh_time,lstSwitch_ip,lstSwitch_status,lstSwitch_total]
+    #print("lstall:",lstall)
     return lstall
+
+
 
 
 def start_web(mode):
@@ -882,20 +912,12 @@ def start_web(mode):
     @app.route("/", methods=['GET', 'POST'])
     def home():
         lstDesc = ('EngineIP', 'Status', 'Uptime', 'Master', 'Mirror')
-        lstDesc_switches = ('SwitchIP', 'FramTX', 'Discc3', 'LinkFL', 'LossSC', 'LossSG', 'FramRX', 'ENCOUT', 'ALLTOTAL')
+        lstDesc_switches = ('SwitchIP', 'Encout', 'Discc3', 'Link fail', 'Loss sigle', 'Loss sync')
+    
+        # swich的IP地址
         Switches_ip = []
         for ip in objCFG.options("Switches"):
             Switches_ip.append(objCFG.get("Switches",(ip)))
-
-        # 预警提示弹出为0，不弹出为1
-        if request.method == 'GET' and get_all_recond():
-            error = 1
-        else:
-            upconfirm_stuta()
-            error = 0
-        
-        # 刷新时间
-        timeup=5
 
         if mode == 'rt':
             refresh_time = _get_TimeNow_Human()
@@ -918,23 +940,59 @@ def start_web(mode):
             if tuplSWITCH:
                 switch_refresh_time = tuplSWITCH[0]
                 Status_Switch = tuplSWITCH[3]
+                Status_switch = []
+                for i in Status_Switch:
+                    total = []
+                    total.append(objCFG.get("Switches",(i)))
+                    total.append(Status_Switch[i]['ENCOUT'])
+                    total.append(Status_Switch[i]['Discc3'])
+                    total.append(Status_Switch[i]['LinkFL'])
+                    total.append(Status_Switch[i]['LossSG'])
+                    total.append(Status_Switch[i]['LossSC'])
+                    Status_switch.append(total)
             else:
                 switch_refresh_time = _get_TimeNow_Human()
                 Status_Switch = None
 
+        # 未确认错误信息
+        error_message = get_all_recond()
+        warns = {}
+        try:
+            for i in Status:
+                warns[i[0]] = 1
+            for i in Status_switch:
+                warns[i[0]] = 1
+            for i in error_message:
+                for j in warns:
+                    if j in i['message'] and warns[j] < int(i['level']):
+                        warns[j] = int(i['level'])
+                    else:
+                        pass
+        except:
+            pass
 
+        # 预警提示弹出为0，不弹出为1
+        if request.method == 'GET' and error_message:
+            error = 1
+        else:
+            upconfirm_stuta()
+            error = 0
+
+        # 刷新时间
+        timeup=5
+        
         return render_template("monitor.html",
                                Title = lstDesc,
                                Title_switches = lstDesc_switches,
                                engine_refresh_time = engine_refresh_time,
                                switch_refresh_time = switch_refresh_time,
                                Status = Status,
-                               Status_switch = Status_Switch,
+                               Status_switch = Status_switch,
                                Switches_ip = Switches_ip,
                                timeup = timeup,
-                               error = error)
-
-
+                               error = error,
+                               error_message = error_message,
+                               warns = warns)
 
     # 错误信息显示页面
     @app.route("/warning/")
@@ -944,7 +1002,7 @@ def start_web(mode):
         return render_template("warning.html",
                                error_message=error_message)
 
-    app.run(debug=False, use_reloader=False, host='0.0.0.0', port=5000)
+    app.run(debug=False, use_reloader=False, host='127.0.0.1', port=5000)
 
 
 def job_update_interval(intInterval):
@@ -956,6 +1014,7 @@ def job_update_interval(intInterval):
         n = datetime.datetime.now()
         do_update = db.haap_insert(n, get_HAAP_status_list())
         # print('update complately...@ %s' % n)
+
         return do_update
 
     t.add_interval(do_it, intInterval)
@@ -972,17 +1031,16 @@ def job_update_interval2(intInterval):
 
     def do_it():
         n = datetime.datetime.now()
-        print(get_HAAP_status_list()[2])
+        #print(get_HAAP_status_list()[2])
 
+        a = get_HAAP_status_list()
+        do_update = db.haap_insert(n, a[0])
+        
+        if a[2] != []:
+            for i in range(len(a[2])):
 
-        do_update = db.haap_insert(n, get_HAAP_status_list()[0])
-
-        if get_HAAP_status_list()[2] != []:
-            for i in range(len(get_HAAP_status_list()[2])):
-
-                do_update = db.haap2_insert(n, get_HAAP_status_list()[2][i], get_HAAP_status_list()[1][i], confirm_status)
+                do_update = db.haap2_insert(n, a[2][i], a[1][i], confirm_status)
                 # print('update complately...@ %s' % n)
-        return do_update
 
     t.add_interval(do_it, intInterval)
     t.stt()
@@ -995,10 +1053,11 @@ def job_update_interval3(intInterval):
 
     def do_it():
         n = datetime.datetime.now()
-        do_update_Switch = db.Switch_insert(n, get_Switch_IP(), get_Switch_status_list(), get_Switch_Total()[0])
-        if get_Switch_Total()[1] != []:
-            for i in range(len(get_Switch_Total()[2])):
-                do_update = db.haap2_insert(n, get_Switch_Total()[2][i], get_Switch_Total()[1][i], confirm_status)
+        a = get_Switch_Total()
+        do_update_Switch = db.Switch_insert(n, get_Switch_IP(), get_Switch_status_list(), a[0])
+        if a[1] != []:
+            for i in range(len(a[2])):
+                do_update = db.haap2_insert(n, a[2][i], a[1][i], confirm_status)
                 # print('update complately...@ %s' % n)
                 return do_update_Switch, do_update
 
@@ -1066,8 +1125,8 @@ def thrd_web_db():
 def start_warn_check():
     t1 = Thread(target=start_web, args=('db',))
     t2 = Thread(target=job_update_interval2, args=(10,))
-    t3 = Thread(target=job_update_interval3, args=(10,))
-    t4 = Thread(target=job_update_interval4, args=(10*360,))
+    t3 = Thread(target=job_update_interval3, args=(20,))
+    t4 = Thread(target=job_update_interval4, args=(20*360,))
 
     t1.setDaemon(True)
     t2.setDaemon(True)
@@ -1447,5 +1506,7 @@ if __name__ == '__main__':
     #get_HAAP_status_list()
     main()
     #email_send()
-    #job_update_interval2(10,)
+    #job_update_interva(10,)
     #job_update_interval4(10,)P't't
+    #start_web('db')
+    #get_all_recond()

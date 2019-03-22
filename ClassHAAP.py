@@ -846,6 +846,7 @@ class HAAP_Status(HAAP):
                 strabts_qf = self._TN_Conn.exctCMD(portcmd)
             else:
                 self._telnet_connect()
+                
                 if self._TN_Conn:
                     strabts_qf = self._TN_Conn.exctCMD(portcmd)
                     #print(strabts_qf)

@@ -12,10 +12,10 @@
 
 <div class="container">
 
-	<div class="row clearfix">
-		<div class="col-md-12 column">
+    <div class="row clearfix">
+        <div class="col-md-12 column">
 
-			<nav class="navbar navbar-default" role="navigation">
+            <nav class="navbar navbar-default" role="navigation">
                 <div class="navbar-header">
                      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button> <a class="navbar-brand" href="#">Loxoll</a>
                 </div>
@@ -85,16 +85,16 @@
 
             {% if error == 1 %}
             <div class="alert alert-warning">
-	            <a href="{{ url_for('warning') }}" target="" class="close" data-dismiss="alert">
+                <a href="{{ url_for('warning') }}" target="" class="close" data-dismiss="alert">
                     Check the details
-	            </a>
-	            <strong>Warning!</strong>Appear error messages, please deal with it immediately.
+                </a>
+                <strong>Warning!</strong>Appear error messages, please deal with it immediately.
             </div>
             {% endif %}
 
             <div class="row clearfix">
-				<div class="col-md-12 column">
-					<table class="table">
+                <div class="col-md-12 column">
+                    <table class="table">
                         <thead>
                             <tr>
                                 <th>
@@ -109,8 +109,8 @@
                             </tr>
                         </thead>
                     </table>
-				</div>
-			</div>
+                </div>
+            </div>
 
             <div class="row clearfix">
                 <div class="col-md-12 column">
@@ -125,12 +125,24 @@
                             </thead>
                             <tbody>
                             {% for i in Status %}
-                                {% if i %}
+                                {% if warns[i[0]]==1 %}
                                     <tr class="success">
                                         {% for s in i %}
-                                         <td>{{s}}</td>
-                                         {% endfor %}
-                                     </tr>
+                                            <td>{{ s }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                {% elif warns[i[0]]==2 %}
+                                    <tr class="warning">
+                                        {% for s in i %}
+                                            <td>{{ s }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                {% else %}
+                                    <tr class="danger">
+                                        {% for s in i %}
+                                            <td>{{ s }}</td>
+                                        {% endfor %}
+                                    </tr>
                                 {% endif %}
                             {% endfor %}
                             </tbody>
@@ -148,7 +160,7 @@
                         <thead>
                             <tr>
                                 <th>
-                                    <h3 class="text-left text-info">Engine Status</h3>
+                                    <h3 class="text-left text-info">Switch Status</h3>
                                 </th>
                                 <th>
                                     <h3>Last Update:&nbsp; {{ switch_refresh_time }} </h3>
@@ -175,11 +187,25 @@
                             </thead>
                             <tbody>
                                 {% for i in Status_switch %}
-                                    <tr class="success">
-                                        {% for s in i %}
-                                            <td>{{ s }}</td>
-                                        {% endfor %}
-                                    </tr>
+                                    {% if warns[i[0]]==1 %}
+                                        <tr class="success">
+                                            {% for s in i %}
+                                                <td>{{ s }}</td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% elif warns[i[0]]==2 %}
+                                        <tr class="warning">
+                                            {% for s in i %}
+                                                <td>{{ s }}</td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% else %}
+                                        <tr class="danger">
+                                            {% for s in i %}
+                                                <td>{{ s }}</td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% endif %}
                                 {% endfor %}
                             </tbody>
                         </table>
@@ -190,52 +216,52 @@
             </div>
 
 
-			<div class="progress progress-striped">
-				<div class="progress-bar progress-success">
-				</div>
-			</div>
-			<p>
-				 Engine Status shows that Status & Uptime of every engine.<br>
-				 Mirror Alarm means that one or more mirror degrade or rebuilding; Path Warning means that one or more path of drive（or engine） missing.<br>
-				 Color Description：
-			</p>
-			<table class="table">
-				<thead>
-					<tr>
-						<th class="success">
-							Green
-						</th>
-						<th class="danger">
-							Red
-						</th>
-						<th class="warning">
-							Yellow
-						</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr class="info">
-						<td>
-							Normal
-						</td>
-						<td>
-							Alarm
-						</td>
-						<td>
-						 	Warning
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			<div class="progress progress-striped">
-				<div class="progress-bar progress-success">
-					
-				</div>
-			</div> 
-		</div>
-	</div>
+            <div class="progress progress-striped">
+                <div class="progress-bar progress-success">
+                </div>
+            </div>
+            <p>
+                 Engine Status shows that Status & Uptime of every engine.<br>
+                 Mirror Alarm means that one or more mirror degrade or rebuilding; Path Warning means that one or more path of drive（or engine） missing.<br>
+                 Color Description：
+            </p>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="success">
+                            Green
+                        </th>
+                        <th class="danger">
+                            Red
+                        </th>
+                        <th class="warning">
+                            Yellow
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="info">
+                        <td>
+                            Normal
+                        </td>
+                        <td>
+                            Alarm
+                        </td>
+                        <td>
+                            Warning
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="progress progress-striped">
+                <div class="progress-bar progress-success">
+                    
+                </div>
+            </div> 
+        </div>
+    </div>
 </div>
-			 
+             
         </tbody>
         </table>
 </div>
@@ -246,11 +272,4 @@
     </div>
 </footer>
 </body>
-<script>
-    window.onload = function () {
-        let ajaxObj = new XMLHttpRequest();
-        ajaxObj.open('get', '');
-
-    }
-</script>
 </html>
