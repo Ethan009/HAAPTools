@@ -59,7 +59,7 @@ strHelp = '''
         sancheck       : san check
         swc            : start warning check
         '''
-strPTCLhahah = '''
+strPTCLhahahheheheheheheh = '''
     ptcl <Switch_IP> <Port_Num>
 '''    
 
