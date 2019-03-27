@@ -21,7 +21,7 @@ signal = 1
 import email_form as email
 #from email_form import send_warnmail
 
-from send_email_alltime import send_warn_mail
+#from send_email_alltime import send_warn_mail
 
 if signal == 0:
     email.Timely_send([1,1,1],[2,2,2])
@@ -296,12 +296,12 @@ def _periodic_sw_check(strSWIP, ports):
     # lstSWCheckCMD.insert('aaa1')
     for i in ports:
         i = str(i)
-        print(i, type(i))
+        #print(i, type(i))
         cmd += i
-        print(cmd)
+        #print(cmd)
         lstSWCheckCMD.insert(-1, cmd)
         cmd = 'portshow '
-    print(lstSWCheckCMD)
+    #print(lstSWCheckCMD)
     _SW(strSWIP, lstSWPorts).periodic_sw_check(lstSWCheckCMD,
                                                strPCFolder,
                                                'PC_{}_{}.log'.format(
@@ -332,7 +332,7 @@ def _EngineHealth(strEngineIP):
             al_st = "AH"
         else:
             al_st = "OK"
-        print("{}: {}".format(strEngineIP, al_st))
+        #print("{}: {}".format(strEngineIP, al_st))
 
 # def _ShowEngineInfo(strEngineIP):
 #     engineIns = _HAAP(strEngineIP)
@@ -430,7 +430,7 @@ def get_HAAP_status_list():
         last_update = db.get_last_record()
         #print(last_update[1])
         xxx = last_update[1]
-        print(xxx)
+        #print(xxx)
     except:
         print('get_HAAP_status_list')
     lstHAAPstatus = []
@@ -546,7 +546,7 @@ def get_Switch_Total():
         db = DB_collHAAP()
         last_update = db.get_last_record_Switch()
         lstStatusdict = last_update[3]
-        print(lstStatusdict)
+        #print(lstStatusdict)
 
     except:
         pass
@@ -1092,7 +1092,7 @@ def job_update_interval4(intInterval):
     db = DB_collHAAP()
     def do_it():
         warninfo = email.send_warnmail(mailto_list, sub,get_all_recond())
-        print('ddf',warninfo)
+        #print('ddf',warninfo)
         return warninfo
     t.add_interval(do_it, intInterval)
     t.stt()
@@ -1249,11 +1249,11 @@ def get_wc():
             for k, v in items.items():  # for key,value in dict
                 if v == 0:
                     items.pop(k)
-        print(t)
-        print(t.values()[0])
+        #print(t)
+        #print(t.values()[0])
         if t.values() != [{}]:
             a = t.values()[0]
-            print('aaaaa', a)
+           #print('aaaaa', a)
             # print(type(a))
             for k, v in a.items():
                 if k == 'Reboot':
@@ -1279,9 +1279,9 @@ def get_wc():
                         lvlist.append(qlv)
 
             lstwarnstatus.append(t)
-        print(eglevel, lvlist)
+        #print(eglevel, lvlist)
     eglevel = max(lvlist)
-    print(eglevel)
+    #print(eglevel)
 
 
 def wc_tdb():
