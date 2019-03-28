@@ -4,6 +4,7 @@
 from __future__ import print_function
 import ClassSW as sw
 import ClassHAAP as haap
+from haap import HAAP_Status as haapstatus
 import Source as s
 from collections import OrderedDict as Odd
 from apscheduler.schedulers.blocking import BlockingScheduler
@@ -422,52 +423,60 @@ def _isPort(s):
 
 # by klay
 def get_HAAP_status_list():
-
+    a=0
     try:
         db = DB_collHAAP()
         last_update = db.get_last_record()
         # print(last_update[1])
         xxx = last_update[1]
-        # print(xxx)
+        #print('xxx:',xxx)
     except:
-        print('get_HAAP_status_list')
+        a=1
+        print('MongoDB not link')
     lstHAAPstatus = []
     warnlist = []
     warnlevel = []
     for i in range(len(lstHAAP)):
-        # print('kkkkkkkk')
-        # print(xxx[i])
-        # print(i)
-        # print(lstHAAPAlias)
+
         t = {}
         t[lstHAAPAlias[i]] = _HAAP_Status(lstHAAP[i]).infoEngine_lst()[1]
         lstHAAPstatus.append(t)
-        # print('lstHAAPstatus',t)
+        #print('lstHAAPstatus',t)
         try:
             items_db = xxx[i].values()[0]
+            #print ('items_db:',items_db)
         except:
             pass
         for items in t.values():
 
-            # print(items)
-            # print(xxx[i])
+            
             eglevel = 0
             # print(items['Status'])
-            if items['Status'] == 'ONLINE':
-                try:
-                    if items_db['Status'] == 'ONLINE':  # xxx is engine status from DB's first record
-                        # print('okokok')
-                        warnlist.append('Engine' + lstHAAP[i] + '\'s status is ' + items['Status'])
-                        warnlevel.append('3')
-                except:
-                    pass
-            if items['Mirror'] == 'All OK':
-                try:
-                    if items_db['Mirror'] == 'All OK':  # xxx is engine status from DB's first record
-                        warnlist.append('Engine' + lstHAAP[i] + '\'s mirror is ' + 'not ok')
-                        warnlevel.append('3')
-                except:
-                    pass
+            if items['Status'] != 'ONLINE':
+                if a==1:
+
+                    warnlist.append('Engine' + lstHAAP[i] + '\'s status is ' + items['Status'])
+                    warnlevel.append('3')
+                else:
+
+                    try:
+                        if items_db['Status'] == 'ONLINE':  # xxx is engine status from DB's first record
+                            # print('okokok')
+                            warnlist.append('Engine' + lstHAAP[i] + '\'s status is ' + items['Status'])
+                            warnlevel.append('3')
+                    except:
+                        pass
+            if items['Mirror'] != 'All OK':
+                if a == 1:
+                    warnlist.append('Engine' + lstHAAP[i] + '\'s mirror is ' + 'not ok')
+                    warnlevel.append('3')
+                else:
+                    try:
+                        if items_db['Mirror'] == 'All OK':  # xxx is engine status from DB's first record
+                            warnlist.append('Engine' + lstHAAP[i] + '\'s mirror is ' + 'not ok')
+                            warnlevel.append('3')
+                    except:
+                        pass
             s = 0
             s1 = 0
             uptime = items['Uptime']
@@ -488,7 +497,7 @@ def get_HAAP_status_list():
                     patt = re.compile(r'(\d*)')
                     day = patt.match(uptime1).group()
                     s1 += int(day) * 24 * 60 * 60
-                if uptime1 < uptime:
+                if uptime1 > uptime:
                     warnlist.append('Engine' + lstHAAP[i] + ' had reboot')
                     warnlevel.append('2')
             except:
@@ -613,8 +622,8 @@ def get_Switch_Total():
                 else:
                     b[6] = (float(b[6][0:-1])) * 1000
             losssg += int(b[6])
-            
             ALLtotal = encout + discc3 + linkfl + losssc + losssg
+            
             s = str(framtx)
             s1 = str(framrx)
             s2 = str(encout)
@@ -647,15 +656,16 @@ def get_Switch_Total():
         try:
             a = lstStatusdict[sname]
             a = ALLtotal - a['ALLTOTAL']
+           
             if a > level_three:
                 sw_warnlist.append('Switch' + lstSW[i] + '\' s port error has reached ')
                 sw_warnlevel.append('3')
             else:
-                if a < level_two:
+                if a > level_two:
                     sw_warnlist.append('Switch' + lstSW[i] + '\'s port error has reached ' + str(a))
                     sw_warnlevel.append('2')
                 else:
-                    if a < level_one:
+                    if a > level_one:
                         sw_warnlist.append('Switch' + lstSW[i] + '\'s port error has reached ' + str(a))
                         sw_warnlevel.append('1')
         except:
@@ -798,7 +808,6 @@ def get_Switch_from_db():
     lstSwitch_ip = last_update[1]
     lstSwitch_status = last_update[2]
     lstSwitch_total = last_update[3]
-    
     # print(lstSwitch_total)
     lstall = [refresh_time, lstSwitch_ip, lstSwitch_status, lstSwitch_total]
     # print("lstall:",lstall)
@@ -964,12 +973,13 @@ def job_update_interval_switch(intInterval):
             for i in range(len(a[2])):
                 # do_update = db.haap2_insert(n, a[2][i], a[1][i], confirm_status)
                 db.haap2_insert(n, a[2][i], a[1][i], confirm_status)
+                print("qqq",qqq)
                 # print('update complately...@ %s' % n)
             warnlist = a[1]
             warnlevel = a[2]
             email.Timely_send(warnlist, warnlevel)
 
-    t.add_interval(do_it, 600)
+    t.add_interval(do_it,10)
     t.stt()
 
 
@@ -1003,7 +1013,7 @@ def stopping_web(intSec):
 def start_warn_check():
     t1 = Thread(target=start_web, args=('db',))
     t2 = Thread(target=job_update_interval_haap, args=(10,))
-    t3 = Thread(target=job_update_interval_switch, args=(600,))
+    t3 = Thread(target=job_update_interval_switch, args=(10,))
     t4 = Thread(target=job_update_interval_email, args=(20 * 360,))
 
     t1.setDaemon(True)
@@ -1289,10 +1299,14 @@ def main():
         thrd_web_db()
 
     elif sys.argv[1] == 'swc':
-        start_warn_check()
+        ah = haapstatus.get_engine_AH()
+        if ah == 0:
+            start_warn_check()
+        else:
+            print('ahahahahahaha')
 
     elif sys.argv[1] == 'test':
-
+        get_HAAP_status_list()
         # timing_clct_to_db(15)
         # show_N_record(3)
         pass
@@ -1318,7 +1332,7 @@ if __name__ == '__main__':
     # get_HAAP_status_list()
     # get_all_recond()sb
     # get_Switch_from_db()
-    # get_Switch_Total()
+    #get_Switch_Total()
     # get_HAAP_status_list()
     main()
     # email_send()

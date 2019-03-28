@@ -144,9 +144,9 @@ def Timely_send(warn_message, warn_level):
         print type(receivers)
         smtpObj.sendmail(sender, receivers, message.as_string())
         #smtpObj.sendmail(sender, To, message.as_string())
-        print "邮件发送成功"
+        print "Email Send Success"
     except smtplib.SMTPException:
-        print "Error: 无法发送邮件"
+        print "Error: NOT SEND Email"
 
 
 #if __name__ == '__main__':
