@@ -4,7 +4,7 @@
 from __future__ import print_function
 import ClassSW as sw
 import ClassHAAP as haap
-from haap import HAAP_Status as haapstatus
+
 import Source as s
 from collections import OrderedDict as Odd
 from apscheduler.schedulers.blocking import BlockingScheduler
@@ -554,26 +554,10 @@ def get_Switch_Total():
     
     for i in range(len(lstSW)): 
         lstSwitchstatus = {}
-        FramTX = []
-        FramRX = []
-        ENCOUT = []
-        Discc3 = []
-        LinkFL = []
-        LossSC = []
-        LossSG = []
-        ALLTOTAL = []
-        ALLTOTAL_change = []
-        
-        ALLtotal = 0
-        ALLtotal_change = 0
-        
-        framtx = 0
-        framrx = 0 
-        encout = 0
-        discc3 = 0
-        linkfl = 0
-        losssc = 0
-        losssg = 0
+        FramTX = FramRX = ENCOUT = Discc3 = LinkFL = []
+        LossSC = LossSG = LossSG = ALLTOTAL = ALLTOTAL = []
+        ALLtotal = ALLtotal_change = framtx = framrx = encout = 0
+        discc3 = linkfl = losssc = losssg = 0
         a = {}
         for h in range(len(lstSWPorts[i])):
             q = lstSWPorts[i][h]
@@ -1299,14 +1283,15 @@ def main():
         thrd_web_db()
 
     elif sys.argv[1] == 'swc':
-        ah = haapstatus.get_engine_AH()
-        if ah == 0:
-            start_warn_check()
-        else:
-            print('ahahahahahaha')
+        for i in range(len(lstHAAP)):
+            ah = _HAAP_Status(lstHAAP[i]).get_engine_AH()
+            if ah == 0:
+                start_warn_check()
+            else:
+                print('Alert Halt Exists (Engine %s)!',%lstHAAP[i])
 
     elif sys.argv[1] == 'test':
-        get_HAAP_status_list()
+        
         # timing_clct_to_db(15)
         # show_N_record(3)
         pass
