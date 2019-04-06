@@ -1,9 +1,9 @@
 # coding:utf-8
 
 from ftplib import FTP
-import paramiko
 import telnetlib
 import sys
+import paramiko
 import Source as s
 
 
@@ -224,7 +224,8 @@ class SSHConn(object):
             if output:
                 return output
         else:
-            print('Please Check SSH Connection to "{}" \n\n'.format(self._host))
+            print('Please Check SSH Connection to "{}" \n\n'.format(
+                self._host))
 
     def close(self):
         if self._client:
@@ -316,9 +317,10 @@ class HAAPConn(object):
         if self._Connection:
             self._Connection.close()
 
-    connection = property(_get_connection, doc="Get HAAPConn instance's connection")
+    connection = property(
+        _get_connection, doc="Get HAAPConn instance's connection")
+
 
 if __name__ == '__main__':
-    
-    pass
 
+    pass
