@@ -1288,7 +1288,7 @@ def main():
             if ah == 0:
                 start_warn_check()
             else:
-                print('Alert Halt Exists (Engine %s)!',%lstHAAP[i])
+                print('Alert Halt Exists (Engine %s)!' % lstHAAP[i])
 
     elif sys.argv[1] == 'test':
         
