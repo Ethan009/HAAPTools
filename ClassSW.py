@@ -218,40 +218,6 @@ class SANSW(object):
                     # print(strErr)
                     f.write(strErr)
 
-    # def SWstatus(self,ip,SAN_status):
-    #     #ports=['a1','a2','b1','b2']
-    #     #for ip in ips:
-    #     SAN_status.update({ip: {'ABTS': '0', 'Qfull': '0', 'Mirror': '0', 'EgReboot': '0'}})
-    #     #print(SAN_status)
-    #     abts = []
-    #     qf = []
-    #     #for port in ports:
-    #
-    #         #print port
-    #         portcmd='aborts_and_q_full '
-    #         #portcmd+=port
-    #         if self._TN_Conn:
-    #             strabts_qf = self._TN_Conn.exctCMD(portcmd)
-    #         else:
-    #             self._telnet_connect()
-    #             if self._TN_Conn:
-    #                 strabts_qf = self._TN_Conn.exctCMD(portcmd)
-    #         listabts_qf = strabts_qf.split('\r')
-    #         #print 'asasasasasasa',listabts_qf[8][13]
-    #         abts.append(listabts_qf[2][7])
-    #         qf.append(listabts_qf[8][13])
-    #     print( abts, qf)
-    #     #print (SAN_status[ip])
-    #     for i in abts:
-    #         if i != '0' :
-    #             SAN_status[ip]['ABTS']= i
-    #             break
-    #     for i in qf:
-    #         if i != '0' :
-    #             SAN_status[ip]['Qfull'] = i
-    #             break
-    #     print(SAN_status)
-
 
 if __name__ == '__main__':
     pass

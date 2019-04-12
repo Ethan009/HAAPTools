@@ -7,21 +7,6 @@ import paramiko
 import Source as s
 
 
-def deco_Exception(func):
-    def _deco(self, *args, **kwargs):
-        try:
-            return func(self, *args, **kwargs)
-        except Exception as E:
-            print('''
--------------------------------------------------------------------
-|    Class Name:     {38}|
-|    Function Name:  {38}|
-|    Error Message:  {38}|
--------------------------------------------------------------------\
-'''.format(self.__class__.__name__, func.__name__, E))
-    return _deco
-
-
 class FTPConn(object):
     def __init__(self, strIP, intPort, strUser, strPWD, intTO):
         self._host = strIP
@@ -241,11 +226,11 @@ class HAAPConn(object):
         self._strLoginPrompt = 'Enter password'
         self._strMainMenuPrompt = 'Coredump Menu'
         self._strCLIPrompt = 'CLI>'
+        self._strAHPrompt = 'AH_CLI>'
         self._strCLIConflict = 'Another session owns the CLI'
         self._Connection = None
         # self._connect()
 
-    # @deco_Exception
     def _connect(self):
         try:
             objTelnetConnect = telnetlib.Telnet(
@@ -273,8 +258,14 @@ class HAAPConn(object):
         else:
             return False
 
-    def exctCMD(self, strCommand):
+    def is_AH(self):
+        if self._strAHPrompt in self.exctCMD(''):
+            strVPD = self.exctCMD('vpd')
+            reNumOfAH = re.compile(r'Alert:\s*(\d*)')
+            objReNumOfAH = reNumOfAH.search(strVPD)
+            return objReNumOfAH.group(1)
 
+    def exctCMD(self, strCommand):
         CLI = self._strCLIPrompt.encode(encoding="utf-8")
         CLI_Conflict = self._strCLIConflict.encode(encoding="utf-8")
 
