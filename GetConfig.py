@@ -48,3 +48,23 @@ class EngineConfig(object):
 
     def trace_level(self):
         return self.cfg.getint('EngineSetting', 'trace_level')
+
+
+
+class DBConfig(object):
+    """docstring for DBConfig"""
+    def __init__(self):
+        # super(DBConfig, self).__init__()
+        self.cfg = read_config_file()
+
+    def host(self):
+        return self.cfg.get('DBSetting', 'host')
+
+    def port(self):
+        return self.cfg.getint('DBSetting', 'port')
+
+    def name(self):
+        return self.cfg.get('DBSetting', 'name')
+
+
+        
