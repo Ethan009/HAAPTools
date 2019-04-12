@@ -19,8 +19,30 @@ objCFG.read('Conf.ini')
 error_level = int(objCFG.get('MessageLogging', 'msgLevel'))
 
 
-# def ShowErr_level3(_class, _func, _Msg, _Error=''):
-#     pass
+def is_Warning(intValue, data):
+    '''
+    data is int or a tuple
+    '''
+    # def judge_level(intValue, tupData):
+    #     if intValue >= tupData[2]:
+    #         return '3'
+    #     elif intValue >= tupData[1]:
+    #         return 2
+    #     elif intValue >= tupData[0]:
+    #         return 1
+
+    if isinstance(data, int):
+        print('<>')
+        if intValue > data:
+            return True
+    else:
+        if intValue >= data[2]:
+            return 3
+        elif intValue >= data[1]:
+            return 2
+        elif intValue >= data[0]:
+            return 1
+        # return judge_level(intValue, data)
 
 def ShowErr(*argvs):
     '''
@@ -196,6 +218,9 @@ def TraceAnalyse(oddHAAPErrorDict, strTraceFolder):
 
 
 if __name__ == '__main__':
+
+    w = (1,3,5)
+    print(is_Warning(2,w))
     pass
 
 
