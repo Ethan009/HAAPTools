@@ -1,6 +1,9 @@
 # test.py
 import re
-
+import HAAP as h
+import GetConfig as gc
+hconf = gc.EngineConfig()
+from collections import OrderedDict as Odd
 # str = '''
 # Alert: 913 - Unknown Error
 # '''
@@ -11,8 +14,20 @@ import re
 # print(objReNumOfAH.group(1))
 
 
-import Source as s
+# import Source as s
 
-print(s.is_Warning(8, (2, 7, 6)))
+# print(s.is_Warning(8, (2, 7, 6)))
 
-# print(isinstance((2,7,9), int))
+# # print(isinstance((2,7,9), int))
+
+lstEngine = hconf.list_engines_IP()
+intTNPort = hconf.telnet_port()
+intFTPPort = hconf.FTP_port()
+strPassword = hconf.password()
+
+oddEngineInstance = Odd()
+for engine in lstEngine:
+    oddEngineInstance[engine] = h.HAAP(engine,
+        strPassword,
+        intTNPort,
+        intFTPPort)

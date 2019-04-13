@@ -259,11 +259,13 @@ class HAAPConn(object):
             return False
 
     def is_AH(self):
-        if self._strAHPrompt in self.exctCMD(''):
-            strVPD = self.exctCMD('vpd')
-            reNumOfAH = re.compile(r'Alert:\s*(\d*)')
-            objReNumOfAH = reNumOfAH.search(strVPD)
-            return objReNumOfAH.group(1)
+        strPrompt = self.exctCMD('')
+        if strPrompt:
+            if self._strAHPrompt in strPrompt:
+                strVPD = self.exctCMD('vpd')
+                reAHNum = re.compile(r'Alert:\s*(\d*)')
+                objReAHNum = reAHNum.search(strVPD)
+                return objReAHNum.group(1)
 
     def exctCMD(self, strCommand):
         CLI = self._strCLIPrompt.encode(encoding="utf-8")

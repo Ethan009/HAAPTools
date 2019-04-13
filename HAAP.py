@@ -34,7 +34,7 @@ def deco_Exception(func):
     return _deco
 
 
-class HAAP():
+class Action():
     def __init__(self, strIP, intTNPort, strPassword,
                  intFTPPort, intTimeout=3):
         self._host = strIP
@@ -45,7 +45,7 @@ class HAAP():
         self._TN_Conn = None
         self._FTP_Conn = None
         self._telnet_connect()
-        self.AHStatus = _TN_Conn.is_AH()
+        self.AHStatus = self._TN_Conn.is_AH()
 
     def _telnet_connect(self):
         self._TN_Conn = ClassConnect.HAAPConn(self._host,
@@ -100,6 +100,10 @@ class HAAP():
     @deco_Exception
     def execute_multi_command(self, strCMDFile):
         tn = self._TN_Conn
+        if self.AHStatus:
+            print("Engine '%s' is at AH Status(AH Code %d)"
+                % (self.host, self.AHStatus))
+            return
         with open(strCMDFile, 'r') as f:
             lstCMD = f.readlines()
             for strCMD in lstCMD:
@@ -114,6 +118,10 @@ class HAAP():
 
     @deco_OutFromFolder
     def get_trace(self, strBaseFolder, intTraceLevel):
+        if self.AHStatus:
+            print("Engine '%s' is at AH Status(AH Code %d)"
+                % (self.host, self.AHStatus))
+            return
         tn = self._TN_Conn
         connFTP = self._ftp()
         def _get_oddCommand(intTraceLevel):
@@ -179,6 +187,10 @@ class HAAP():
 
     @deco_OutFromFolder
     def periodic_check(self, lstCommand, strResultFolder, strResultFile):
+        if self.AHStatus:
+            print("Engine '%s' is at AH Status(AH Code %d)"
+                % (self.host, self.AHStatus))
+            return
         tn = self._TN_Conn
         s.GotoFolder(strResultFolder)
         if tn.exctCMD('\n'):
@@ -195,59 +207,62 @@ class HAAP():
                         # print(strErr)
                         f.write(strErr)
 
-    def infoEngine_lst(self):
-        # return: [IP, uptime, AH, FW version, status, master, mirror status]
-        strVPD = self.get_vpd()
+    ### replaced by Class Status
+    # def infoEngine_lst(self):
+    #     # return: [IP, uptime, AH, FW version, status, master, mirror status]
+    #     strVPD = self.get_vpd()
 
-        ip = self._host
+    #     ip = self._host
 
-        uptime = self.get_uptime(strVPD_Info=strVPD)
-        ah = self.get_engine_AH()
-        if ah == 0:
-            ah = "None"
-        elif ah != 0:
-            ah = str(ah)
+    #     uptime = self.get_uptime(strVPD_Info=strVPD)
+    #     ah = self.get_engine_AH()
+    #     if ah == 0:
+    #         ah = "None"
+    #     elif ah != 0:
+    #         ah = str(ah)
 
-        version = self.get_version(strVPD_Info=strVPD)
-        if version is not None:
-            version = version[9:]
+    #     version = self.get_version(strVPD_Info=strVPD)
+    #     if version is not None:
+    #         version = version[9:]
 
-        # status = self.get_engine_status()
-        status = self.get_engine_health()
-        master = self.is_master_engine()
-        if master is not None:
-            if master:
-                master = "M"
-            else:
-                master = ""
+    #     # status = self.get_engine_status()
+    #     status = self.get_engine_health()
+    #     master = self.is_master_engine()
+    #     if master is not None:
+    #         if master:
+    #             master = "M"
+    #         else:
+    #             master = ""
 
-        mr_st = self.get_mirror_status()
-        if mr_st == 0:
-            mr_st = "All OK"
-        elif mr_st == -1:
-            mr_st = "No Mirror"
-        else:
-            if mr_st is not None and mr_st != 'RBL':
-                mr_st = "NOT ok"
+    #     mr_st = self.get_mirror_status()
+    #     if mr_st == 0:
+    #         mr_st = "All OK"
+    #     elif mr_st == -1:
+    #         mr_st = "No Mirror"
+    #     else:
+    #         if mr_st is not None and mr_st != 'RBL':
+    #             mr_st = "NOT ok"
 
-        abts = str(self.get_abts())
-        qf = str(self.get_qf())
-        a = [ip, uptime, ah, version, status, master, mr_st, abts, qf]
-        b = {'IP': ip, 'Uptime': uptime, 'AH': ah, 'Version': version, 'Status': status,
-            'Master': master, 'Mirror': mr_st, 'ABTs': abts, 'Qfull': qf}
-        return [a, b]
-        # return [ip,uptime,ah,version,status,master,mr_st,abts,qf]
-        # return {'IP':ip, 'Uptime':uptime, 'AH':ah, 'Version':version, 'Status':status,'Master': master, 'Mirror':mr_st,'ABTs': abts, 'Qfull':qf}
+    #     abts = str(self.get_abts())
+    #     qf = str(self.get_qf())
+    #     a = [ip, uptime, ah, version, status, master, mr_st, abts, qf]
+    #     b = {'IP': ip, 'Uptime': uptime, 'AH': ah, 'Version': version, 'Status': status,
+    #         'Master': master, 'Mirror': mr_st, 'ABTs': abts, 'Qfull': qf}
+    #     return [a, b]
+    #     # return [ip,uptime,ah,version,status,master,mr_st,abts,qf]
+    #     # return {'IP':ip, 'Uptime':uptime, 'AH':ah, 'Version':version, 'Status':status,'Master': master, 'Mirror':mr_st,'ABTs': abts, 'Qfull':qf}
 
     def set_time(self):
+        if self.AHStatus:
+            print("Engine '%s' is at AH Status(AH Code %d)"
+                % (self.host, self.AHStatus))
+            return
         def _exct_cmd():
             t = s.TimeNow()
-
             def complete_print(strDesc):
                 print('    Set  %-13s for Engine "%s" Completely...\
                         ' % ('"%s"' % strDesc, self._host))
                 time.sleep(0.25)
-
             try:
                 # Set Time
                 if self._TN_Conn.exctCMD('rtc set time %d %d %d' % (
@@ -277,6 +292,10 @@ class HAAP():
             print('\nSetting Time for Engine %s Failed...' % self._host)
 
     def show_engine_time(self):
+        if self.AHStatus:
+            print("Engine '%s' is at AH Status(AH Code %d)"
+                % (self.host, self.AHStatus))
+            return
         print('Time of Engine "%s":' % self._host)
         if self._TN_Conn:
             try:
@@ -286,13 +305,12 @@ class HAAP():
                 print('Get Time of Engine "%s" Failed' % self._host)
 
 
-class HAAP_Status(HAAP):
+class Status(Action):
     def __init__(self, strIP, intTNPort, strPassword,
                  intFTPPort, intTimeout=3):
         HAAP.__init__(self, strIP, intTNPort, strPassword,
                       intFTPPort, intTimeout)
         self.dictInfo = _get_info_to_dict()
-        self.AHStatus = 
 
         # cmd_dict = {'vpd': 'vpd', 'engine': 'engine',
         #             'mirror': 'mirror', 'enter': ''}
@@ -301,6 +319,10 @@ class HAAP_Status(HAAP):
         #     time.sleep(0.1)
 
     def _get_info_to_dict(self):
+        if self.AHStatus:
+            print("Engine '%s' is at AH Status(AH Code %d)"
+                % (self.host, self.AHStatus))
+            return
         lstCommand = ['vpd', 'engine', 'mirror', 'abts', 'qfull']
         dictInfo = {}
         for command in lstCommand:
@@ -308,130 +330,173 @@ class HAAP_Status(HAAP):
             time.sleep(0.2)
         return dictInfo
 
-    def get_engine_AH(self):
-        if self._TN_Conn:
-            strvpd = self._TN_Conn.exctCMD('vpd')
-        else:
-            self._telnet_connect()
-            strvpd = self._TN_Conn.exctCMD('vpd')
-        if strvpd is None:
-            print("Get vpd Failed for Engine {}".format(self._host))
-        else:
+#Matt replaced by is_AH
+    # def get_engine_AH(self):
+    #     if self._TN_Conn:
+    #         strvpd = self._TN_Conn.exctCMD('vpd')
+    #     else:
+    #         self._telnet_connect()
+    #         strvpd = self._TN_Conn.exctCMD('vpd')
+    #     if strvpd is None:
+    #         print("Get vpd Failed for Engine {}".format(self._host))
+    #     else:
 
-            strvpd = self._TN_Conn.exctCMD('vpd')
-            listvpd = strvpd.split('\r')
-            # print 'lklkl', listvpd
-            for i in listvpd:
-                if 'Alert' in i:
-                    # print i
-                    if i == '\nAlert: None':
-                        return 0
-                        print 'There has no AH in this engine'
-                    else:
-                        return i[7:] + 'egAH'
-                        print "There has some AH in this engine", i
+    #         strvpd = self._TN_Conn.exctCMD('vpd')
+    #         listvpd = strvpd.split('\r')
+    #         # print 'lklkl', listvpd
+    #         for i in listvpd:
+    #             if 'Alert' in i:
+    #                 # print i
+    #                 if i == '\nAlert: None':
+    #                     return 0
+    #                     print 'There has no AH in this engine'
+    #                 else:
+    #                     return i[7:] + 'egAH'
+    #                     print "There has some AH in this engine", i
 
-    @deco_Exception
-    def get_vpd(self):
-        if self._TN_Conn:
-            return self._TN_Conn.exctCMD('vpd')
-        else:
-            self._telnet_connect()
-            if self._TN_Conn:
-                return self._TN_Conn.exctCMD('vpd')
+#Matt replaced by _get_info_to_dict
+    # @deco_Exception
+    # def get_vpd(self):
+    #     if self._TN_Conn:
+    #         return self._TN_Conn.exctCMD('vpd')
+    #     else:
+    #         self._telnet_connect()
+    #         if self._TN_Conn:
+    #             return self._TN_Conn.exctCMD('vpd')
 
-    def get_engine_health(self):
-        # if self.get_engine_status() == "ONLINE":
-        if self._TN_Conn:
-            strEnter = self._TN_Conn.exctCMD('')
-        else:
-            self._telnet_connect()
-            strEnter = self._TN_Conn.exctCMD('')
-        if strEnter is None:
-            print("Get Health Status Failed for Engine {}".format(self._host))
-        else:
-            reAL = re.compile('AH_CLI')
-            if reAL.search(strEnter):
-                return 'AH_CLI'  # 1 means engine is not healthy (AH)
-            else:
-                # return 0  # 0 means engine is healthy
-                if self._TN_Conn:
-                    strEngine = self._TN_Conn.exctCMD('engine')
-                else:
-                    self._telnet_connect()
-                    strEngine = self._TN_Conn.exctCMD('engine')
-                if strEngine is None:
-                    print "Get Online Status Failed for Engine {}".format(self._host)
-                else:
-                    reCLI = re.compile(r'>>\s*\d*\s*(\(M\))*\s*Online')
-                    if reCLI.search(strEngine):
-                        return "ONLINE"
-                    else:
-                        return "offline"
+#Matt replaced by is_AH
+    # def get_engine_health(self):
+    #     # if self.get_engine_status() == "ONLINE":
+    #     if self._TN_Conn:
+    #         strEnter = self._TN_Conn.exctCMD('')
+    #     else:
+    #         self._telnet_connect()
+    #         strEnter = self._TN_Conn.exctCMD('')
+    #     if strEnter is None:
+    #         print("Get Health Status Failed for Engine {}".format(self._host))
+    #     else:
+    #         reAL = re.compile('AH_CLI')
+    #         if reAL.search(strEnter):
+    #             return 'AH_CLI'  # 1 means engine is not healthy (AH)
+    #         else:
+    #             # return 0  # 0 means engine is healthy
+    #             if self._TN_Conn:
+    #                 strEngine = self._TN_Conn.exctCMD('engine')
+    #             else:
+    #                 self._telnet_connect()
+    #                 strEngine = self._TN_Conn.exctCMD('engine')
+    #             if strEngine is None:
+    #                 print "Get Online Status Failed for Engine {}".format(self._host)
+    #             else:
+    #                 reCLI = re.compile(r'>>\s*\d*\s*(\(M\))*\s*Online')
+    #                 if reCLI.search(strEngine):
+    #                     return "ONLINE"
+    #                 else:
+    #                     return "offline"
 
-    def _uptime_list(self, vpd)
-    reUpTime = re.compile(
-         r'Uptime\s*:\s*((\d*)d*\s*(\d{2}):(\d{2}):(\d{2}))')
-     objReUpTime = reUpTime.search(vpd)
-      lsUpTime = []
+    def cluster_status(self):
+        if 'offline' in self.dictInfo['engine']:
+            return True
+
+    def over_all():
+        '''list of over all'''
+        lstOverAll = []
+        lstOverAll.append(self.host)
+        lstOverAll.append(self.AHStatus)
+        if self.AHStatus:
+            lstOverAll.append('--' for i in range(3))
+
+        else:
+            lstOverAll.append(self.uptime_to_show())
+            lstOverAll.append(self.is_master())
+            lstOverAll.append(self.get_version())
+            lstOverAll.append(self.cluster_status())
+
+        return lstOverAll
+
+    def _uptime_list(self, strVPD):
+        reUpTime = re.compile(
+             r'Uptime\s*:\s*((\d*)d*\s*(\d{2}):(\d{2}):(\d{2}))')
+        objReUpTime = reUpTime.search(strVPD)
+        lstUpTime = []
        # add day to list
-       try:
-            lsUpTime.append(int(result_reUptTime.group(2)))
+        try:
+            lstUpTime.append(int(result_reUptTime.group(2)))
         except ValueError:
-            lsUpTime.append(0)
+            lstUpTime.append(0)
         # add hr, min, sec to list
         for i in range(3, 6):
-            lsUpTime.append(int(result_reUptTime.group(i)))
-        return lsUpTime
+            lstUpTime.append(int(result_reUptTime.group(i)))
+        return lstUpTime
 
     def uptime(self):
-        return _uptime_list(self.vpd)
+        return _uptime_list(self.dictInfo['vpd'])
+
+    def uptime_to_show(self):
+        lstUpTime = uptime()
+        # d, h, m, s means days hours minutes seconds
+        d = lstUpTime[0]
+        h = lstUpTime[1]
+        m = lstUpTime[2]
+        s = lstUpTime[3]
+        if d:
+            return '%d Days %d Hours %d Minutes' % d, h, m
+        elif h:
+            return '%d Hours %d Minutes %d Seconds' % h, m, s
+        elif m:
+            return '%d Minutes %d Seconds' % m, s
+        else:
+            return '%d Seconds' % s
 
     @deco_Exception
-    def _is_master_engine(self, strEngine):
-        if re.search(r'>>', strEngine):
+    def _is_master_engine(self):
+        if re.search(r'>>', self.dictInfo['engine']):
             reMaster = re.compile(r'(>>)\s*\d*\s*(\(M\))')
-            objReMaster = reMaster.search(strEngine)
+            objReMaster = reMaster.search(self.dictInfo['engine'])
             if objReMaster is None:
                 return False
             else:
                 return True
 
-    def master(self):
+    def is_master(self):
         return _is_master_engine(self.dictInfo[engine])
 
-    def is_master_engine(self):
-        if self._TN_Conn:
-            strEngine_info = self._TN_Conn.exctCMD('engine')
-        else:
-            self._telnet_connect()
-            strEngine_info = self._TN_Conn.exctCMD('engine')
+#Matt replaced by master
+    # def is_master_engine(self):
+    #     if self._TN_Conn:
+    #         strEngine_info = self._TN_Conn.exctCMD('engine')
+    #     else:
+    #         self._telnet_connect()
+    #         strEngine_info = self._TN_Conn.exctCMD('engine')
 
-        if strEngine_info is None:
-            print("Get Master Info Failed for Engine {}".format(self._host))
-        else:
-            if re.search(r'>>', strEngine_info) is None:
-                print("Get Master Info Failed for Engine {}".format(self._host))
-            else:
-                # e.g. ">> 1  (M)" means current engine is master
-                reMaster = re.compile(r'(>>)\s*\d*\s*(\(M\))')
-                result_reMaster = reMaster.search(strEngine_info)
-                if result_reMaster is None:
-                    return False
-                else:
-                    return True
+    #     if strEngine_info is None:
+    #         print("Get Master Info Failed for Engine {}".format(self._host))
+    #     else:
+    #         if re.search(r'>>', strEngine_info) is None:
+    #             print("Get Master Info Failed for Engine {}".format(self._host))
+    #         else:
+    #             # e.g. ">> 1  (M)" means current engine is master
+    #             reMaster = re.compile(r'(>>)\s*\d*\s*(\(M\))')
+    #             result_reMaster = reMaster.search(strEngine_info)
+    #             if result_reMaster is None:
+    #                 return False
+    #             else:
+    #                 return True
 
-    @deco_Exception
-    def get_mirror_info(self):
-        if self._TN_Conn:
-            return self._TN_Conn.exctCMD('mirror')
-        else:
-            self._telnet_connect()
-            return self._TN_Conn.exctCMD('mirror')
+#Matt no need
+    # @deco_Exception
+    # def get_mirror_info(self):
+    #     if self._TN_Conn:
+    #         return self._TN_Conn.exctCMD('mirror')
+    #     else:
+    #         self._telnet_connect()
+    #         return self._TN_Conn.exctCMD('mirror')
 
+    
+# ## Matt Need to be optimise...
     @deco_Exception
     def get_mirror_status(self):
-        strMirror = self.get_mirror_info()
+        strMirror = self.dictInfo['mirror']
         if strMirror is None:
             print("Get Mirror Status Failed for Engine {}".format(self._host))
         else:
@@ -465,130 +530,132 @@ class HAAP_Status(HAAP):
 
     @deco_Exception
     def get_version(self, strVPD_Info=None):
-        if strVPD_Info is None:
-            strVPD_Info = self.get_vpd()
-        if strVPD_Info is None:
+# Matt No Need...
+        # if strVPD_Info is None:
+        #     strVPD_Info = self.get_vpd()
+        # if strVPD_Info is None:
+        #     print("Get Firmware Version Failed for Engine {}".format(self._host))
+
+        # else:
+        reFirmWare = re.compile(r'Firmware\sV\d+(.\d+)*')
+        resultFW = reFirmWare.search(strVPD_Info)
+        if resultFW:
+            return resultFW.group()
+        else:
             print("Get Firmware Version Failed for Engine {}".format(self._host))
 
-        else:
-            reFirmware = re.compile(r'Firmware\sV\d+(.\d+)*')
-            resultFW = reFirmware.search(strVPD_Info)
-            if resultFW:
-                return resultFW.group()
-            else:
-                print("Get Firmware Version Failed for Engine {}".format(self._host))
+### Matt 暂时先不考虑这一部分内容
+    # def has_abts_qfull(self, SAN_status, ip):
+    #     strVPD = self.get_vpd()
+    #     ports = ['a1', 'a2', 'b1', 'b2']
+    #     # for ip in ips:
+    #     SAN_status[0].update(
+    #         {ip: {'ABTS': '0', 'Qfull': '0', 'Mirror': '0', 'EgReboot': '0'}})
+    #     # print(SAN_status)
+    #     abts = 0
+    #     qf = 0
+    #     for port in ports:
 
-    def has_abts_qfull(self, SAN_status, ip):
-        strVPD = self.get_vpd()
-        ports = ['a1', 'a2', 'b1', 'b2']
-        # for ip in ips:
-        SAN_status[0].update(
-            {ip: {'ABTS': '0', 'Qfull': '0', 'Mirror': '0', 'EgReboot': '0'}})
-        # print(SAN_status)
-        abts = 0
-        qf = 0
-        for port in ports:
+    #         # print port
+    #         portcmd = 'aborts_and_q_full '
+    #         portcmd += port
+    #         if self._TN_Conn:
+    #             strabts_qf = self._TN_Conn.exctCMD(portcmd)
+    #         else:
+    #             self._telnet_connect()
 
-            # print port
-            portcmd = 'aborts_and_q_full '
-            portcmd += port
-            if self._TN_Conn:
-                strabts_qf = self._TN_Conn.exctCMD(portcmd)
-            else:
-                self._telnet_connect()
+    #             if self._TN_Conn:
+    #                 strabts_qf = self._TN_Conn.exctCMD(portcmd)
+    #                 # print(strabts_qf)
+    #         if strabts_qf:
+    #             listabts_qf = strabts_qf.split('\r')
+    #             # print 'asasasasasasa',listabts_qf[8][13]
+    #             abts += int(listabts_qf[2][7])
+    #             qf += int(listabts_qf[8][13])
+    #         else:
+    #             print('default to get abts and qfull')
+    #     #print( abts, qf)
+    #     uptime = self.get_uptime(strVPD_Info=strVPD)
+    #     if uptime:
+    #         #print(uptime, uptime[0], uptime[-2])
+    #         a = uptime.split(':')
+    #         if a[0] == '00' and int(a[-2]) < 30:
+    #             SAN_status[0][ip]['EgReboot'] = '1'
 
-                if self._TN_Conn:
-                    strabts_qf = self._TN_Conn.exctCMD(portcmd)
-                    # print(strabts_qf)
-            if strabts_qf:
-                listabts_qf = strabts_qf.split('\r')
-                # print 'asasasasasasa',listabts_qf[8][13]
-                abts += int(listabts_qf[2][7])
-                qf += int(listabts_qf[8][13])
-            else:
-                print('default to get abts and qfull')
-        #print( abts, qf)
-        uptime = self.get_uptime(strVPD_Info=strVPD)
-        if uptime:
-            #print(uptime, uptime[0], uptime[-2])
-            a = uptime.split(':')
-            if a[0] == '00' and int(a[-2]) < 30:
-                SAN_status[0][ip]['EgReboot'] = '1'
+    #     # print(SAN_status)
 
-        # print(SAN_status)
+    # def get_abts(self):
 
-    def get_abts(self):
+    #     ports = ['a1', 'a2', 'b1', 'b2']
 
-        ports = ['a1', 'a2', 'b1', 'b2']
+    #     abts = 0
+    #     qf = 0
+    #     for port in ports:
 
-        abts = 0
-        qf = 0
-        for port in ports:
+    #         # print port
+    #         portcmd = 'aborts_and_q_full '
+    #         portcmd += port
+    #         if self._TN_Conn:
+    #             strabts_qf = self._TN_Conn.exctCMD(portcmd)
+    #         else:
+    #             self._telnet_connect()
+    #             if self._TN_Conn:
+    #                 strabts_qf = self._TN_Conn.exctCMD(portcmd)
+    #                 print(strabts_qf)
+    #         if strabts_qf:
+    #             listabts_qf = strabts_qf.split('\r')
+    #             abts += int(listabts_qf[2][7])
+    #         else:
+    #             print('default to get abts ')
+    #     #print( abts, qf)
+    #     return abts
 
-            # print port
-            portcmd = 'aborts_and_q_full '
-            portcmd += port
-            if self._TN_Conn:
-                strabts_qf = self._TN_Conn.exctCMD(portcmd)
-            else:
-                self._telnet_connect()
-                if self._TN_Conn:
-                    strabts_qf = self._TN_Conn.exctCMD(portcmd)
-                    print(strabts_qf)
-            if strabts_qf:
-                listabts_qf = strabts_qf.split('\r')
-                abts += int(listabts_qf[2][7])
-            else:
-                print('default to get abts ')
-        #print( abts, qf)
-        return abts
+    # def get_qf(self):
 
-    def get_qf(self):
+    #     ports = ['a1', 'a2', 'b1', 'b2']
 
-        ports = ['a1', 'a2', 'b1', 'b2']
+    #     abts = 0
+    #     qf = 0
+    #     for port in ports:
 
-        abts = 0
-        qf = 0
-        for port in ports:
+    #         # print port
+    #         portcmd = 'aborts_and_q_full '
+    #         portcmd += port
+    #         if self._TN_Conn:
+    #             strabts_qf = self._TN_Conn.exctCMD(portcmd)
+    #         else:
+    #             self._telnet_connect()
+    #             if self._TN_Conn:
+    #                 strabts_qf = self._TN_Conn.exctCMD(portcmd)
+    #                 print(strabts_qf)
+    #         if strabts_qf:
+    #             listabts_qf = strabts_qf.split('\r')
+    #             qf += int(listabts_qf[8][13])
+    #         else:
+    #             print('default to get qfull')
+    #     return qf
 
-            # print port
-            portcmd = 'aborts_and_q_full '
-            portcmd += port
-            if self._TN_Conn:
-                strabts_qf = self._TN_Conn.exctCMD(portcmd)
-            else:
-                self._telnet_connect()
-                if self._TN_Conn:
-                    strabts_qf = self._TN_Conn.exctCMD(portcmd)
-                    print(strabts_qf)
-            if strabts_qf:
-                listabts_qf = strabts_qf.split('\r')
-                qf += int(listabts_qf[8][13])
-            else:
-                print('default to get qfull')
-        return qf
-
-    def get_egw(self):
-        # utlist=[0,0]
-        abts = self.get_abts()
-        qf = self.get_qf()
-        mirror = self.get_mirror_status()
-        ut = self.get_uptime()
-        '''
-        if uta >utb:
-            ut = 0
-        else:
-            ut = 1
-        utb = uta
-        '''
-        if ut:
-            # print(uptime,uptime[0],uptime[-2])
-            a = ut.split(':')
-            if a[0] == '00' and int(a[-2]) < 30:
-                ut = 1
-            else:
-                ut = 0
-        return {'ABTs': abts, 'Qfull': qf, 'Mirror':mirror,'Reboot':ut}
+    # def get_egw(self):
+    #     # utlist=[0,0]
+    #     abts = self.get_abts()
+    #     qf = self.get_qf()
+    #     mirror = self.get_mirror_status()
+    #     ut = self.get_uptime()
+    #     '''
+    #     if uta >utb:
+    #         ut = 0
+    #     else:
+    #         ut = 1
+    #     utb = uta
+    #     '''
+    #     if ut:
+    #         # print(uptime,uptime[0],uptime[-2])
+    #         a = ut.split(':')
+    #         if a[0] == '00' and int(a[-2]) < 30:
+    #             ut = 1
+    #         else:
+    #             ut = 0
+    #     return {'ABTs': abts, 'Qfull': qf, 'Mirror':mirror,'Reboot':ut}
 
 
 if __name__ == '__main__':
