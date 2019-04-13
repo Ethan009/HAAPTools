@@ -1,9 +1,11 @@
+# coding:utf8
 import ClassConnect
 import re
 from collections import OrderedDict
 import os
 import sys
 import time
+import re
 import Source as s
 
 import GetConfig as gc
@@ -35,6 +37,16 @@ def deco_Exception(func):
 
 
 class Action():
+    '''
+get_trace
+pc
+backup
+change_FW
+emc
+stt
+st
+
+    '''
     def __init__(self, strIP, intTNPort, strPassword,
                  intFTPPort, intTimeout=3):
         self._host = strIP
@@ -90,7 +102,7 @@ class Action():
             time.sleep(0.25)
 
     @deco_Exception
-    def updateFW(self, strFWFile):
+    def changeFW(self, strFWFile):
         connFTP = self._ftp()
         time.sleep(0.25)
         connFTP.PutFile('/mbflash', './', 'fwimage', strFWFile)
@@ -291,7 +303,7 @@ class Action():
         else:
             print('\nSetting Time for Engine %s Failed...' % self._host)
 
-    def show_engine_time(self):
+    def show_time(self):
         if self.AHStatus:
             print("Engine '%s' is at AH Status(AH Code %d)"
                 % (self.host, self.AHStatus))
@@ -308,9 +320,9 @@ class Action():
 class Status(Action):
     def __init__(self, strIP, intTNPort, strPassword,
                  intFTPPort, intTimeout=3):
-        HAAP.__init__(self, strIP, intTNPort, strPassword,
+        Action.__init__(self, strIP, intTNPort, strPassword,
                       intFTPPort, intTimeout)
-        self.dictInfo = _get_info_to_dict()
+        self.dictInfo = self._get_info_to_dict()
 
         # cmd_dict = {'vpd': 'vpd', 'engine': 'engine',
         #             'mirror': 'mirror', 'enter': ''}
@@ -321,7 +333,7 @@ class Status(Action):
     def _get_info_to_dict(self):
         if self.AHStatus:
             print("Engine '%s' is at AH Status(AH Code %d)"
-                % (self.host, self.AHStatus))
+                % (self._host, self.AHStatus))
             return
         lstCommand = ['vpd', 'engine', 'mirror', 'abts', 'qfull']
         dictInfo = {}
@@ -398,13 +410,17 @@ class Status(Action):
         if 'offline' in self.dictInfo['engine']:
             return True
 
-    def over_all():
+    def over_all(self):
         '''list of over all'''
         lstOverAll = []
-        lstOverAll.append(self.host)
+        lstOverAll.append(self._host)
         lstOverAll.append(self.AHStatus)
         if self.AHStatus:
-            lstOverAll.append('--' for i in range(3))
+            for i in range(3):
+                lstOverAll.append('--')
+            # lstOverAll.append('--')
+            # lstOverAll.append('--')
+            # lstOverAll.append('--')
 
         else:
             lstOverAll.append(self.uptime_to_show())
@@ -421,45 +437,46 @@ class Status(Action):
         lstUpTime = []
        # add day to list
         try:
-            lstUpTime.append(int(result_reUptTime.group(2)))
+            lstUpTime.append(int(objReUpTime.group(2)))
         except ValueError:
             lstUpTime.append(0)
         # add hr, min, sec to list
         for i in range(3, 6):
-            lstUpTime.append(int(result_reUptTime.group(i)))
+            lstUpTime.append(int(objReUpTime.group(i)))
         return lstUpTime
 
     def uptime(self):
-        return _uptime_list(self.dictInfo['vpd'])
+        return self._uptime_list(self.dictInfo['vpd'])
 
     def uptime_to_show(self):
-        lstUpTime = uptime()
+        lstUpTime = self.uptime()
         # d, h, m, s means days hours minutes seconds
         d = lstUpTime[0]
         h = lstUpTime[1]
         m = lstUpTime[2]
         s = lstUpTime[3]
         if d:
-            return '%d Days %d Hours %d Minutes' % d, h, m
+            return '%d Days %d Hours %d Minutes' % (d, h, m)
         elif h:
-            return '%d Hours %d Minutes %d Seconds' % h, m, s
+            return '%d Hours %d Minutes %d Seconds' % (h, m, s)
         elif m:
-            return '%d Minutes %d Seconds' % m, s
+            return '%d Minutes %d Seconds' % (m, s)
         else:
             return '%d Seconds' % s
 
     @deco_Exception
-    def _is_master_engine(self):
-        if re.search(r'>>', self.dictInfo['engine']):
+    def _is_master_engine(self, strEngine):
+        if strEngine is None:
+            return
+        if re.search(r'>>', strEngine):
             reMaster = re.compile(r'(>>)\s*\d*\s*(\(M\))')
-            objReMaster = reMaster.search(self.dictInfo['engine'])
-            if objReMaster is None:
-                return False
-            else:
-                return True
+            objReMaster = reMaster.search(strEngine)
+            if objReMaster: 
+                return 'M'
 
     def is_master(self):
-        return _is_master_engine(self.dictInfo[engine])
+        if self.dictInfo:
+            return self._is_master_engine(self.dictInfo['engine'])
 
 #Matt replaced by master
     # def is_master_engine(self):
@@ -529,7 +546,7 @@ class Status(Action):
                     print("Get Mirror Status Failed for Engine {}".format(self._host))
 
     @deco_Exception
-    def get_version(self, strVPD_Info=None):
+    def get_version(self):
 # Matt No Need...
         # if strVPD_Info is None:
         #     strVPD_Info = self.get_vpd()
@@ -537,10 +554,11 @@ class Status(Action):
         #     print("Get Firmware Version Failed for Engine {}".format(self._host))
 
         # else:
+        strVPD = self.dictInfo['vpd']
         reFirmWare = re.compile(r'Firmware\sV\d+(.\d+)*')
-        resultFW = reFirmWare.search(strVPD_Info)
+        resultFW = reFirmWare.search(strVPD)
         if resultFW:
-            return resultFW.group()
+            return resultFW.group().replace('Firmware ', '')
         else:
             print("Get Firmware Version Failed for Engine {}".format(self._host))
 
@@ -660,4 +678,17 @@ class Status(Action):
 
 if __name__ == '__main__':
     # HAAP('10.203.1.111','23','21','password').has_abts_qfull()
+    host = objHAAPConfig.list_engines_IP()[1]
+    telnet_port = objHAAPConfig.telnet_port()
+    ftp_port = objHAAPConfig.FTP_port()
+    password = objHAAPConfig.password()
+
+    e1 = Action(host,telnet_port,password,ftp_port)
+    # e1_status = Status(host,telnet_port,password,ftp_port)
+    # print(e1_status.is_master())
+    # print(e1_status.over_all())
+    e1.get_trace('abc', 2)
+    e1.show_time()
+    e1.set_time()
+    e1.periodic_check(['vpd','engine','mirror'], 'pc', 'hahahah')
     pass

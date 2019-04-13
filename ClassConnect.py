@@ -4,6 +4,7 @@ from ftplib import FTP
 import telnetlib
 import sys
 import paramiko
+import re
 import Source as s
 
 
@@ -265,7 +266,7 @@ class HAAPConn(object):
                 strVPD = self.exctCMD('vpd')
                 reAHNum = re.compile(r'Alert:\s*(\d*)')
                 objReAHNum = reAHNum.search(strVPD)
-                return objReAHNum.group(1)
+                return int(objReAHNum.group(1))
 
     def exctCMD(self, strCommand):
         CLI = self._strCLIPrompt.encode(encoding="utf-8")
