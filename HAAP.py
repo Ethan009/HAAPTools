@@ -445,27 +445,51 @@ class Status(Action):
             lstUpTime.append(int(objReUpTime.group(i)))
         return lstUpTime
 
-    def uptime(self):
-        return self._uptime_list(self.dictInfo['vpd'])
+    def uptime_list(self):
+        if self.dictInfo:
+            strVPD = self.dictInfo['vpd']
+            if strVPD:
+                return self._uptime_list()
+
+    def uptime_second(self):
+        uptime_list: = self.uptime_list()
+        if uptime_list:
+            intSecond = 0
+            # d, h, m, s means days hours minutes seconds
+            d = lstUpTime[0]
+            h = lstUpTime[1]
+            m = lstUpTime[2]
+            s = lstUpTime[3]
+            if d:
+                intSecond += d * 24 * 3600
+            if h:
+                intSecond += h * 3600
+            if m:
+                intSecond += m * 60
+            if s:
+                intSecond += s
+            return intSecond
 
     def uptime_to_show(self):
-        lstUpTime = self.uptime()
-        # d, h, m, s means days hours minutes seconds
-        d = lstUpTime[0]
-        h = lstUpTime[1]
-        m = lstUpTime[2]
-        s = lstUpTime[3]
-        if d:
-            return '%d Days %d Hours %d Minutes' % (d, h, m)
-        elif h:
-            return '%d Hours %d Minutes %d Seconds' % (h, m, s)
-        elif m:
-            return '%d Minutes %d Seconds' % (m, s)
-        else:
-            return '%d Seconds' % s
+        lstUpTime = self.uptime_list()
+        if uptime_list:
+            # d, h, m, s means days hours minutes seconds
+            d = lstUpTime[0]
+            h = lstUpTime[1]
+            m = lstUpTime[2]
+            s = lstUpTime[3]
+            if lstUpTime:
+                if d:
+                    return '%d Days %d Hours %d Minutes' % (d, h, m)
+                elif h:
+                    return '%d Hours %d Minutes %d Seconds' % (h, m, s)
+                elif m:
+                    return '%d Minutes %d Seconds' % (m, s)
+                else:
+                    return '%d Seconds' % s
 
     @deco_Exception
-    def _is_master_engine(self, strEngine):
+    def _is_master(self, strEngine):
         if strEngine is None:
             return
         if re.search(r'>>', strEngine):
@@ -476,7 +500,7 @@ class Status(Action):
 
     def is_master(self):
         if self.dictInfo:
-            return self._is_master_engine(self.dictInfo['engine'])
+            return self._is_master(self.dictInfo['engine'])
 
 #Matt replaced by master
     # def is_master_engine(self):
@@ -554,6 +578,8 @@ class Status(Action):
         #     print("Get Firmware Version Failed for Engine {}".format(self._host))
 
         # else:
+        if self.dictInfo is None:
+            return
         strVPD = self.dictInfo['vpd']
         reFirmWare = re.compile(r'Firmware\sV\d+(.\d+)*')
         resultFW = reFirmWare.search(strVPD)
@@ -687,8 +713,8 @@ if __name__ == '__main__':
     # e1_status = Status(host,telnet_port,password,ftp_port)
     # print(e1_status.is_master())
     # print(e1_status.over_all())
-    e1.get_trace('abc', 2)
-    e1.show_time()
-    e1.set_time()
-    e1.periodic_check(['vpd','engine','mirror'], 'pc', 'hahahah')
+    # e1.get_trace('abc', 2)
+    # e1.show_time()
+    # e1.set_time()
+    # e1.periodic_check(['vpd','engine','mirror'], 'pc', 'hahahah')
     pass

@@ -44,6 +44,33 @@ def is_Warning(intValue, data):
             return 1
         # return judge_level(intValue, data)
 
+def is_IP(strIP):
+    reIP = re.compile(
+        '^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$')
+    if reIP.match(strIP):
+        return True
+    else:
+        return False
+
+def is_IP_list(lstIP):
+    return all(map(is_IP, lstIP))
+
+def is_file(strFileName):
+    if os.path.isfile(strFileName):
+        return True
+    else:
+        return False
+
+def is_port(intPortNum):
+    if type(intPortNum) == int:
+        return True
+    if type(intPortNum) == str:
+        if intPortNum.isdigit():
+            if type(eval(intPortNum)) == int:
+                return True
+    return False
+
+
 def ShowErr(*argvs):
     '''
     Four argv:
@@ -219,8 +246,6 @@ def TraceAnalyse(oddHAAPErrorDict, strTraceFolder):
 
 if __name__ == '__main__':
 
-    w = (1,3,5)
-    print(is_Warning(2,w))
     pass
 
 

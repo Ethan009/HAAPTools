@@ -28,6 +28,12 @@ strPassword = hconf.password()
 oddEngineInstance = Odd()
 for engine in lstEngine:
     oddEngineInstance[engine] = h.HAAP(engine,
-        strPassword,
         intTNPort,
+        strPassword,
         intFTPPort)
+
+ditEngineStatus = {}
+for engine in lstEngine:
+     ditEngineStatus[engine] = oddEngineInstance[engine]
+
+print ditEngineStatus

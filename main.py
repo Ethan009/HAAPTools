@@ -266,9 +266,8 @@ def _sw_switchshow(strSWIP):
 
 def _get_HAAPInstance():
     oddTNInst = Odd()
-    for i in range(len(lstHAAP)):
-        oddTNInst[lstHAAP[i]] = _HAAP_Status(lstHAAP[i])
-        # print('aaaaaa:'), lstHAAP
+    for i in lstHAAP:
+        oddTNInst[i] = _HAAP_Status(i)
     return oddTNInst
 
 # analyze trace files under DesFolder, results saved in .xsl files
@@ -323,14 +322,14 @@ def _AutoCLI(strEngineIP, CMDFile):
 def _FWUpdate(strEngineIP, strFWFile):
     _HAAP(strEngineIP).updateFW(strFWFile)
 
-
-def _EngineHealth(strEngineIP):
-    alert = _HAAP(strEngineIP).get_engine_health()
-    if alert is not None:
-        if alert:
-            al_st = "AH"
-        else:
-            al_st = "OK"
+# Matt no need ....
+# def _EngineHealth(strEngineIP):
+#     alert = _HAAP(strEngineIP).get_engine_health()
+#     if alert is not None:
+#         if alert:
+#             al_st = "AH"
+#         else:
+#             al_st = "OK"
         # print("{}: {}".format(strEngineIP, al_st))
 
 # def _ShowEngineInfo(strEngineIP):
@@ -356,153 +355,146 @@ def _EngineHealth(strEngineIP):
 #     else:
 #         print "{:<17s}: \n".format("Mirror status"), mirror_status, "\n"
 
+# Matt Need to optimise....
+# def _ShowEngineInfo():
+#     dictEngines = _get_HAAPInstance()
+#     info_lst = []
+#     for i in lstHAAP:
+#         info_lst.append(dictEngines[i].infoEngine_lst()[0])
 
-def _ShowEngineInfo():
+#     def general_info():
+#         lstDesc = ('EngineIP', 'Uptime', 'AH', 'Firm_Version',
+#                    'Status', 'Master', 'Mirror', 'ABTs', 'Qfull')
+#         for strDesc in lstDesc:
+#             print(strDesc.center(14), end=''),
+#         print()
+#         for i in info_lst:
+#             for s in i:
+#                 if s is not None:
+#                     print(s.center(14), end=''),
+#                 else:
+#                     print("None".center(14), end=''),
+#             print()
+
+#     def mirror_info():  # needs optimization
+#         print("\nMirror Error")
+#         for i in lstHAAP:
+#             print(i, ":")
+#             mirror_status = dictEngines[i].get_mirror_status()
+#             if mirror_status != 0 and mirror_status != -1:
+#                 print(mirror_status)
+#             else:
+#                 print("None")
+
+#     general_info()
+#     mirror_info()
+def show_engine_status():
     dictEngines = _get_HAAPInstance()
-    info_lst = []
-    for i in lstHAAP:
-        info_lst.append(dictEngines[i].infoEngine_lst()[0])
+    tupDesc = ('Engine', 'AH', 'Uptime', 'FirmWare', 'Master', 'Mirror')
+    tupWidth = (18, 16, 20, 13, 9, 12)
 
-    def general_info():
-        lstDesc = ('EngineIP', 'Uptime', 'AH', 'Firm_Version',
-                   'Status', 'Master', 'Mirror', 'ABTs', 'Qfull')
-        for strDesc in lstDesc:
-            print(strDesc.center(14), end=''),
+    def _print_description():
+        for i in range(len(tupDesc)):
+            print(tupDesc[i].center(tupWidth[i]), end='')
         print()
-        for i in info_lst:
-            for s in i:
-                if s is not None:
-                    print(s.center(14), end=''),
-                else:
-                    print("None".center(14), end=''),
-            print()
+         
+    def _print_status_in_line(lstStatus):
+        for i in range(len(lstStatus)):
+            print(lstStatus[i].center(tupWidth[i]), end='')
+        print()
 
-    def mirror_info():  # needs optimization
-        print("\nMirror Error")
-        for i in lstHAAP:
-            print(i, ":")
-            mirror_status = dictEngines[i].get_mirror_status()
-            if mirror_status != 0 and mirror_status != -1:
-                print(mirror_status)
-            else:
-                print("None")
+    def _print_status_in_table():
+        for engine in lstHAAP:
+            lstStatus = dictEngines[engine].over_all()
+            _print_status_in_line(lstStatus)
 
-    general_info()
-    mirror_info()
+    _print_description()
+    _print_status_in_table()
 
 
-def _isIP(s):
-    p = re.compile(
-        '^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$')
-    if p.match(s):
-        return True
-    else:
-        return False
-
-
-def _checkIPlst(lstIP):
-    return all(map(_isIP, lstIP))
-
-
-def _isFile(s):
-    if os.path.isfile(s):
-        return True
-    else:
-        return False
-
-
-def _isPort(s):
-    if type(s) == int:
-        return True
-    if type(s) == str:
-        if s.isdigit():
-            if type(eval(s)) == int:
-                return True
-    return False
-
-
+# Matt ### Need to be optimise...
 # by klay
-def get_HAAP_status_list():
-    a=0
-    try:
-        db = DB_collHAAP()
-        last_update = db.get_last_record()
-        # print(last_update[1])
-        xxx = last_update[1]
-        #print('xxx:',xxx)
-    except:
-        a=1
-        print('MongoDB not link')
-    lstHAAPstatus = []
-    warnlist = []
-    warnlevel = []
-    for i in range(len(lstHAAP)):
+# def get_HAAP_status_list():
+#     a=0
+#     try:
+#         db = DB_collHAAP()
+#         last_update = db.get_last_record()
+#         # print(last_update[1])
+#         xxx = last_update[1]
+#         #print('xxx:',xxx)
+#     except:
+#         a=1
+#         print('MongoDB not link')
+#     lstHAAPstatus = []
+#     warnlist = []
+#     warnlevel = []
+#     for i in range(len(lstHAAP)):
 
-        t = {}
-        t[lstHAAPAlias[i]] = _HAAP_Status(lstHAAP[i]).infoEngine_lst()[1]
-        lstHAAPstatus.append(t)
-        #print('lstHAAPstatus',t)
-        try:
-            items_db = xxx[i].values()[0]
-            #print ('items_db:',items_db)
-        except:
-            pass
-        for items in t.values():
+#         t = {}
+#         t[lstHAAPAlias[i]] = _HAAP_Status(lstHAAP[i]).infoEngine_lst()[1]
+#         lstHAAPstatus.append(t)
+#         #print('lstHAAPstatus',t)
+#         try:
+#             items_db = xxx[i].values()[0]
+#             #print ('items_db:',items_db)
+#         except:
+#             pass
+#         for items in t.values():
 
             
-            eglevel = 0
-            # print(items['Status'])
-            if items['Status'] != 'ONLINE':
-                if a==1:
+#             eglevel = 0
+#             # print(items['Status'])
+#             if items['Status'] != 'ONLINE':
+#                 if a==1:
 
-                    warnlist.append('Engine' + lstHAAP[i] + '\'s status is ' + items['Status'])
-                    warnlevel.append('3')
-                else:
+#                     warnlist.append('Engine' + lstHAAP[i] + '\'s status is ' + items['Status'])
+#                     warnlevel.append('3')
+#                 else:
 
-                    try:
-                        if items_db['Status'] == 'ONLINE':  # xxx is engine status from DB's first record
-                            # print('okokok')
-                            warnlist.append('Engine' + lstHAAP[i] + '\'s status is ' + items['Status'])
-                            warnlevel.append('3')
-                    except:
-                        pass
-            if items['Mirror'] != 'All OK':
-                if a == 1:
-                    warnlist.append('Engine' + lstHAAP[i] + '\'s mirror is ' + 'not ok')
-                    warnlevel.append('3')
-                else:
-                    try:
-                        if items_db['Mirror'] == 'All OK':  # xxx is engine status from DB's first record
-                            warnlist.append('Engine' + lstHAAP[i] + '\'s mirror is ' + 'not ok')
-                            warnlevel.append('3')
-                    except:
-                        pass
-            s = 0
-            s1 = 0
-            uptime = items['Uptime']
-            # print ('uptime',uptime)
-            s += int(uptime[-2:])
-            s += int(uptime[-5:-3]) * 60
-            s += int(uptime[-8:-6]) * 3600
-            if 'd' in uptime:
-                patt = re.compile(r'(\d*)')
-                day = patt.match(uptime).group()
-                s += int(day) * 24 * 60 * 60
-            try:
-                uptime1 = items_db['Uptime']
-                s1 += int(uptime1[-2:])
-                s1 += int(uptime1[-5:-3]) * 60
-                s1 += int(uptime1[-8:-6]) * 3600
-                if 'd' in uptime1:
-                    patt = re.compile(r'(\d*)')
-                    day = patt.match(uptime1).group()
-                    s1 += int(day) * 24 * 60 * 60
-                if uptime1 > uptime:
-                    warnlist.append('Engine' + lstHAAP[i] + ' had reboot')
-                    warnlevel.append('2')
-            except:
-                pass
-    return [lstHAAPstatus, warnlist, warnlevel]
+#                     try:
+#                         if items_db['Status'] == 'ONLINE':  # xxx is engine status from DB's first record
+#                             # print('okokok')
+#                             warnlist.append('Engine' + lstHAAP[i] + '\'s status is ' + items['Status'])
+#                             warnlevel.append('3')
+#                     except:
+#                         pass
+#             if items['Mirror'] != 'All OK':
+#                 if a == 1:
+#                     warnlist.append('Engine' + lstHAAP[i] + '\'s mirror is ' + 'not ok')
+#                     warnlevel.append('3')
+#                 else:
+#                     try:
+#                         if items_db['Mirror'] == 'All OK':  # xxx is engine status from DB's first record
+#                             warnlist.append('Engine' + lstHAAP[i] + '\'s mirror is ' + 'not ok')
+#                             warnlevel.append('3')
+#                     except:
+#                         pass
+#             s = 0
+#             s1 = 0
+#             uptime = items['Uptime']
+#             # print ('uptime',uptime)
+#             s += int(uptime[-2:])
+#             s += int(uptime[-5:-3]) * 60
+#             s += int(uptime[-8:-6]) * 3600
+#             if 'd' in uptime:
+#                 patt = re.compile(r'(\d*)')
+#                 day = patt.match(uptime).group()
+#                 s += int(day) * 24 * 60 * 60
+#             try:
+#                 uptime1 = items_db['Uptime']
+#                 s1 += int(uptime1[-2:])
+#                 s1 += int(uptime1[-5:-3]) * 60
+#                 s1 += int(uptime1[-8:-6]) * 3600
+#                 if 'd' in uptime1:
+#                     patt = re.compile(r'(\d*)')
+#                     day = patt.match(uptime1).group()
+#                     s1 += int(day) * 24 * 60 * 60
+#                 if uptime1 > uptime:
+#                     warnlist.append('Engine' + lstHAAP[i] + ' had reboot')
+#                     warnlevel.append('2')
+#             except:
+#                 pass
+#     return [lstHAAPstatus, warnlist, warnlevel]
 
 ###########################分割线##################################################
 '''
