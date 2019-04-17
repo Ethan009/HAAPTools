@@ -230,7 +230,7 @@ class HAAPConn(object):
         self._strAHPrompt = 'AH_CLI>'
         self._strCLIConflict = 'Another session owns the CLI'
         self._Connection = None
-        # self._connect()
+        self._connect()
 
     def _connect(self):
         try:
@@ -276,36 +276,37 @@ class HAAPConn(object):
             self._Connection.write(
                 strCommand.encode(encoding="utf-8") + b'\r')
             strResult = str(self._Connection.read_until(
-                CLI, timeout=3).decode())
+                CLI, timeout=2).decode())
             if self._strCLIPrompt in strResult:
                 return strResult
 
         def execute_at_CLI():
             # Confirm is CLI or Not
-            self._Connection.write(b'\r')
-            strEnterOutput = self._Connection.read_until(CLI, timeout=1)
+            if self._Connection:
+                self._Connection.write(b'\r')
+                strEnterOutput = self._Connection.read_until(CLI, timeout=1)
 
-            if CLI in strEnterOutput:
-                return get_result()
-            elif 'HA-AP'.encode(encoding="utf-8") in strEnterOutput:
-                self._Connection.write('7')
-                str7Output = self._Connection.read_until(CLI, timeout=1)
-                if CLI in str7Output:
+                if CLI in strEnterOutput:
                     return get_result()
-                elif CLI_Conflict in str7Output:
-                    self._Connection.write('y')
-                    strConfirmCLI = self._Connection.read_until(CLI, timeout=1)
-                    if CLI in strConfirmCLI:
+                elif 'HA-AP'.encode(encoding="utf-8") in strEnterOutput:
+                    self._Connection.write('7')
+                    str7Output = self._Connection.read_until(CLI, timeout=1)
+                    if CLI in str7Output:
                         return get_result()
+                    elif CLI_Conflict in str7Output:
+                        self._Connection.write('y')
+                        strConfirmCLI = self._Connection.read_until(CLI, timeout=1)
+                        if CLI in strConfirmCLI:
+                            return get_result()
 
         if self._Connection:
             return execute_at_CLI()
-        else:
-            if self._connect():
-                return execute_at_CLI()
-            else:
-                print('Please Check Telnet Connection to "{}" \n\n'.format(
-                    self._host))
+        # else:
+        #     if self._connect():
+        #         return execute_at_CLI()
+        #     else:
+        #         print('Please Check Telnet Connection to "{}" \n\n'.format(
+        #             self._host))
 
     def Close(self):
         if self._Connection:

@@ -17,7 +17,7 @@ def read_config_file():
 
 class EngineConfig(object):
     """docstring for EngineConfig"""
-    print("11111111111111111")
+
     def __init__(self):
         #        super(EngineConfig, self).__init__()
         self.cfg = read_config_file()
@@ -28,7 +28,6 @@ class EngineConfig(object):
             oddEngines[engine[0]] = engine[1]
             lstEngines_alias = list(oddEngines.keys())
             lstEngines_IP = list(oddEngines.values())
-        print("lstEngines_alias, lstEngines_IP:",lstEngines_alias, lstEngines_IP)
         return lstEngines_alias, lstEngines_IP
 
     def list_engines_alias(self):
@@ -49,8 +48,6 @@ class EngineConfig(object):
     def trace_level(self):
         return self.cfg.getint('EngineSetting', 'trace_level')
 
-<<<<<<< HEAD
-
 
 class DBConfig(object):
     """docstring for DBConfig"""
@@ -68,12 +65,8 @@ class DBConfig(object):
         return self.cfg.get('DBSetting', 'name')
 
 
-        
-=======
-    
 class SwitchConfig(object):
     """docstring for SwitchConfig"""
-    print("1111111")
 
     def __init__(self):
         self.cfg = read_config_file()
@@ -151,7 +144,7 @@ class Setting(object):
     """docstring for Setting"""
     def __init__(self):
         self.cfg = read_config_file()
-        self.Trace = self._odd_oddHAAPErrorDict()
+
     def monitor_web_refresh(self):
         return self.cfg.getint('RefreshInterval', 'monitor_web_refresh')
     
@@ -185,16 +178,10 @@ class Setting(object):
     def PCSANSwitchCommand(self):  
         return str(self.cfg.options("PCSANSwitchCommand"))
     
-    def _odd_oddHAAPErrorDict(self):
-        oddHAAPErrorDict = Odd()
+    def oddRegularTrace(self):
+        oddRegularTrace = Odd()
         for i in self.cfg.items('TraceRegular'):
-            oddHAAPErrorDict[i[0]] = i[1]
-            Trace_left = list(oddHAAPErrorDict.keys())
-            Trace_right = list(oddHAAPErrorDict.values())
-        return Trace_left, Trace_right
-    def list_trace_left(self):
-        return self.Trace[0]
-    
-    def list_trace_right(self):
-        return self.Trace[1]
->>>>>>> optimise_Paul
+            oddRegularTrace[i[0]] = i[1]
+        return oddRegularTrace
+
+

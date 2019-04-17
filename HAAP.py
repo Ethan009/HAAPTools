@@ -57,6 +57,7 @@ st
         self._TN_Conn = None
         self._FTP_Conn = None
         self._telnet_connect()
+        self._telnet_connect_retry()
         self.AHStatus = self._TN_Conn.is_AH()
 
     def _telnet_connect(self):
@@ -64,6 +65,12 @@ st
                                               self._TNport,
                                               self._password,
                                               self._timeout)
+    def _telnet_connect_retry(self):
+        if self._TN_Conn:
+            return self._TN_Conn
+        else:
+            self._telnet_connect()
+            return self._TN_Conn
 
     @deco_Exception
     def _executeCMD(self, cmd):
@@ -337,10 +344,11 @@ class Status(Action):
             return
         lstCommand = ['vpd', 'engine', 'mirror', 'abts', 'qfull']
         dictInfo = {}
-        for command in lstCommand:
-            dictInfo[command] = self._executeCMD(command)
-            time.sleep(0.2)
-        return dictInfo
+        if self._TN_Conn:
+            for command in lstCommand:
+                dictInfo[command] = self._executeCMD(command)
+                time.sleep(0.2)
+            return dictInfo
 
 #Matt replaced by is_AH
     # def get_engine_AH(self):
@@ -449,7 +457,7 @@ class Status(Action):
                 return self._uptime_list()
 
     def uptime_second(self):
-        uptime_list: = self.uptime_list()
+        uptime_list = self.uptime_list()
         if uptime_list:
             intSecond = 0
             # d, h, m, s means days hours minutes seconds
@@ -706,9 +714,9 @@ if __name__ == '__main__':
     ftp_port = objHAAPConfig.FTP_port()
     password = objHAAPConfig.password()
 
-    e1 = Action(host,telnet_port,password,ftp_port)
-    # e1_status = Status(host,telnet_port,password,ftp_port)
-    # print(e1_status.is_master())
+    # e1 = Action(host,telnet_port,password,ftp_port)
+    e1_status = Status(host,telnet_port,password,ftp_port)
+    print(e1_status.is_master())
     # print(e1_status.over_all())
     # e1.get_trace('abc', 2)
     # e1.show_time()
