@@ -7,7 +7,6 @@ import os
 import time
 
 
-
 def deco_OutFromFolder(func):
     strOriFolder = os.getcwd()
 
@@ -19,19 +18,23 @@ def deco_OutFromFolder(func):
             pass
         finally:
             os.chdir(strOriFolder)
+
     return _deco
 
 
 def deco_Exception(func):
+
     def _deco(self, *args, **kwargs):
         try:
             return func(self, *args, **kwargs)
         except Exception as E:
             print(self._host, func.__name__, E)
+
     return _deco
 
 
 class SANSW(object):
+
     def __init__(self, strIP, intPort, strUserName, strPasswd,
                  lstSWPort, intTimeout=2):
         self._host = strIP
@@ -66,6 +69,7 @@ class SANSW(object):
 
     @deco_Exception
     def _PutErrorToDict(self):
+
         def _portInLine(intSWPort, strLine):
             lstLine = strLine.split()
             if (str(intSWPort) + ':') in lstLine:
@@ -78,7 +82,7 @@ class SANSW(object):
                         r'(.*:)((\s+\S+){2})((\s+\S+){6})((\s+\S+){5})(.*)')
                     resultDataAndErr = reDataAndErr.match(portErrLine)
 
-                    return(resultDataAndErr.group(2).split() +
+                    return(resultDataAndErr.group(2).split() + 
                            resultDataAndErr.group(6).split())
 
         def _putToDict():
@@ -88,7 +92,7 @@ class SANSW(object):
                 lstErrInfo = _getErrorAsList(intPortNum, lstPortErrLines)
                 oddPortError[intPortNum] = lstErrInfo
             self._dicPartPortError = oddPortError
-            #print 'aaaaa',oddPortError
+            # print 'aaaaa',oddPortError
 
         if self._strAllPortError:
             _putToDict()
@@ -134,6 +138,7 @@ class SANSW(object):
 
     @deco_Exception
     def get_encout_total(self):
+
         def _get_count():
             int_encoutTotal = 0
             for i in self._dicPartPortError:
@@ -143,11 +148,13 @@ class SANSW(object):
                     return 'Over Million Errors of encout detected...'
                 int_encoutTotal += int(self._dicPartPortError[i][2])
             return int_encoutTotal
+
         if self._dicPartPortError:
             return _get_count()
 
     @deco_Exception
     def get_discC3_total(self):
+
         def _get_count():
             int_encoutTotal = 0
             for i in self._dicPartPortError:
@@ -157,6 +164,7 @@ class SANSW(object):
                     return 'Over Million Errors of encout detected...'
                 int_encoutTotal += int(self._dicPartPortError[i][3])
             return int_encoutTotal
+
         if self._dicPartPortError:
             return _get_count()
 
@@ -181,42 +189,42 @@ class SANSW(object):
         except Exception as E:
             print('Clear Error Count Failed...')
 
+    
+class switch_status(SANSW):
+    
     @deco_Exception
-    def show_porterrors(self):
-        def _show_porterrors():
-            lstDesc = ['PortID', 'FramTX', 'FramRX', 'encout',
-                       'Discc3', 'LinkFL', 'LossSC', 'LossSG']
-            for strDesc in lstDesc:
-                print(strDesc.center(8), end='')
-            print()
-            for intPort in self._dicPartPortError:
-                print(str(intPort).center(8), end='')
-                for strPortErr in self._dicPartPortError[intPort]:
-                    print(strPortErr.center(8), end='')
-                print()
-        if self._dicPartPortError:
-            print('\nThe Ports Errors of SAN Switch {} ...'.format(self._host))
-            _show_porterrors()
+    def get_encout_total(self):
 
-    @deco_OutFromFolder
-    def periodic_sw_check(self, lstSWCommand, strResultFolder, strResultFile):
-        tn = self._SWConn
-        print('111')
-        s.GotoFolder(strResultFolder)
-        print('222')
-        #if tn.exctCMD('\n'):
-        with open(strResultFile, 'w') as f:
-            for strCMD in lstSWCommand:
-                time.sleep(0.25)
-                strResult = tn.exctCMD(strCMD)
-                if strResult:
-                    print(strResult)
-                    f.write(strResult)
-                else:
-                    strErr = '\n*** Execute Command "{}" Failed\n'.format(
-                        strCMD)
-                    # print(strErr)
-                    f.write(strErr)
+        def _get_count():
+            int_encoutTotal = 0
+            for i in self._dicPartPortError:
+                if 'k' in self._dicPartPortError[i][2]:
+                    return 'Over Thousand Errors of encout detected...'
+                elif 'm' in self._dicPartPortError[i][2]:
+                    return 'Over Million Errors of encout detected...'
+                int_encoutTotal += int(self._dicPartPortError[i][2])
+            return int_encoutTotal
+
+        if self._dicPartPortError:
+            return _get_count()
+
+    @deco_Exception
+    def get_discC3_total(self):
+
+        def _get_count():
+            int_encoutTotal = 0
+            for i in self._dicPartPortError:
+                if 'k' in self._dicPartPortError[i][3]:
+                    return 'Over Thousand Errors of encout detected...'
+                elif 'm' in self._dicPartPortError[i][3]:
+                    return 'Over Million Errors of encout detected...'
+                int_encoutTotal += int(self._dicPartPortError[i][3])
+            return int_encoutTotal
+
+        if self._dicPartPortError:
+            return _get_count()
+    
+    
 
     # def SWstatus(self,ip,SAN_status):
     #     #ports=['a1','a2','b1','b2']

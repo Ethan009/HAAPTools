@@ -783,9 +783,11 @@ class HAAP_Status(HAAP):
     @deco_Exception
     def get_mirror_status(self):
         strMirror = self.get_mirror_info()
+        #判断strMirror是否存在
         if strMirror is None:
             print("Get Mirror Status Failed for Engine {}".format(self._host))
         else:
+            
             reMirrorID = re.compile(r'\s\d+\(0x\d+\)')  # e.g." 33281(0x8201)"
             reNoMirror = re.compile(r'No mirrors defined')
 
@@ -813,6 +815,7 @@ class HAAP_Status(HAAP):
                     return -1  # -1 means no mirror defined
                 else:
                     print("Get Mirror Status Failed for Engine {}".format(self._host))
+    
 
     @deco_Exception
     def get_version(self, strVPD_Info=None):
