@@ -55,3 +55,11 @@ Setting = gc.Setting()
 print('folder_PeriodicCheck is %s' % Setting.list_trace_left())
 print('folder_PeriodicCheck is %s' % Setting.list_trace_right())
 
+
+
+import DB as db
+
+db_haap = db.HAAP()
+
+db_haap.insert(2019 April 17, 15:44,[asdfasdfadf,adsfasfd])
+db_haap.query_all()

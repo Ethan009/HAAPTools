@@ -21,9 +21,8 @@ class collHAAP(Document):
 
 class collSANSW(Document):
     time = DateTimeField(default=datetime.datetime.now())
-    Switch_ip = DictField()
     Switch_status = DictField()
-    Switch_total = DictField()
+    Overview = DictField()
 
 
 class collWarning(Document):
@@ -54,6 +53,95 @@ class HAAP(object):
 
 
 class SANSW(object):
+
+    '''
+    "_id" : ObjectId("5ca45497ff237792f883aaef"),
+    "time" : ISODate("2019-04-03T14:36:48.376Z"),
+
+    SwitchShow:
+    "SW_UP":{
+    "IP":"1.1.1.1",
+    
+
+    OverView:{
+    "SW_UP":{
+    "IP":"1.1.1.1",
+    "PE":{
+    "0":[
+        "0", 
+        "0", 
+        "0", 
+        "0", 
+        "0", 
+        "0", 
+        "4"],
+    "1":[
+        "0", 
+        "0", 
+        "1200", 
+        "0", 
+        "0", 
+        "0", 
+        "4"]
+    }
+    "PE_Sum":[
+        "0", 
+        "0", 
+        "0", 
+        "0", 
+        "0", 
+        "0", 
+        "4"]
+    ]
+    "PE_Total":578
+    }
+
+    Switch_Status:{
+    "SW1":{
+    "IP":"1.1.1.1",
+    "strPES":""
+    "PE":{
+    "0":[
+        "0", 
+        "0", 
+        "0", 
+        "0", 
+        "0", 
+        "0", 
+        "4"],
+    "1":[
+        "0", 
+        "0", 
+        "1.2k", 
+        "0", 
+        "0", 
+        "0", 
+        "4"]
+    }
+
+    "SW_Down":{
+    "IP":"2.2.2.2"
+    "PE":{
+    "0":[
+        "0", 
+        "0", 
+        "0", 
+        "0", 
+        "0", 
+        "0", 
+        "4"],
+    "1":[
+        "0", 
+        "0", 
+        "0", 
+        "0", 
+        "0", 
+        "0", 
+        "4"]
+
+    }
+    '''
+
     def insert(self, time_now, lstSW_IP, lstSWS, lstSW_Total):
         t = collSANSW(time=time_now, Switch_ip=lstSW_IP,
                       Switch_status=lstSWS, Switch_total=lstSW_Total)
@@ -91,3 +179,15 @@ class Warning(object):
 
     def query_first_records(self, intN):
         return collWARN.objects().order_by('-time').first()
+
+    def update(self, intN):
+        return collWARN.objects().order_by('-time').first()
+
+if __name__ == '__main__':
+    pass
+
+    haap_db_opration = DB.HAAP()
+    haap_db_opration.insert()
+
+    SW_db_opration = DB.SW()
+    SW_db_opration.insert()

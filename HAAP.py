@@ -418,9 +418,6 @@ class Status(Action):
         if self.AHStatus:
             for i in range(3):
                 lstOverAll.append('--')
-            # lstOverAll.append('--')
-            # lstOverAll.append('--')
-            # lstOverAll.append('--')
 
         else:
             lstOverAll.append(self.uptime_to_show())
