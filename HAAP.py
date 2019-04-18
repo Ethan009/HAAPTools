@@ -48,7 +48,7 @@ st
 
     '''
     def __init__(self, strIP, intTNPort, strPassword,
-                 intFTPPort, intTimeout=3):
+                 intFTPPort, intTimeout=1.5):
         self._host = strIP
         self._TNport = intTNPort
         self._FTPport = intFTPPort
@@ -57,7 +57,7 @@ st
         self._TN_Conn = None
         self._FTP_Conn = None
         self._telnet_connect()
-        self._telnet_connect_retry()
+        self._TN_Connect_Status = None
         self.AHStatus = self._TN_Conn.is_AH()
 
     def _telnet_connect(self):
@@ -65,16 +65,20 @@ st
                                               self._TNport,
                                               self._password,
                                               self._timeout)
-    def _telnet_connect_retry(self):
-        if self._TN_Conn:
-            return self._TN_Conn
-        else:
-            self._telnet_connect()
-            return self._TN_Conn
+        self._TN_Connect_Status = self._TN_Conn.Connection
+    # def _telnet_connect_retry(self):
+    #     print(self._TN_Conn)
+    #     if self._TN_Conn:
+    #         return self._TN_Conn
+    #     else:
+    #         print('connect retry...')
+    #         self._telnet_connect()
+    #         return self._TN_Conn
 
     @deco_Exception
     def _executeCMD(self, cmd):
-        return self._TN_Conn.exctCMD(cmd)
+        if self._TN_Connect_Status:
+            return self._TN_Conn.exctCMD(cmd)
 
     def _FTP_connect(self):
         self._FTP_Conn = ClassConnect.FTPConn(self._host,
@@ -326,9 +330,10 @@ st
 
 class Status(Action):
     def __init__(self, strIP, intTNPort, strPassword,
-                 intFTPPort, intTimeout=3):
+                 intFTPPort, intTimeout=1.5):
         Action.__init__(self, strIP, intTNPort, strPassword,
                       intFTPPort, intTimeout)
+        # self._telnet_connect()
         self.dictInfo = self._get_info_to_dict()
 
         # cmd_dict = {'vpd': 'vpd', 'engine': 'engine',
@@ -344,7 +349,7 @@ class Status(Action):
             return
         lstCommand = ['vpd', 'engine', 'mirror', 'abts', 'qfull']
         dictInfo = {}
-        if self._TN_Conn:
+        if self._TN_Connect_Status:
             for command in lstCommand:
                 dictInfo[command] = self._executeCMD(command)
                 time.sleep(0.2)
@@ -716,7 +721,7 @@ if __name__ == '__main__':
 
     # e1 = Action(host,telnet_port,password,ftp_port)
     e1_status = Status(host,telnet_port,password,ftp_port)
-    print(e1_status.is_master())
+    # print(e1_status.is_master())
     # print(e1_status.over_all())
     # e1.get_trace('abc', 2)
     # e1.show_time()

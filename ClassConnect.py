@@ -229,23 +229,21 @@ class HAAPConn(object):
         self._strCLIPrompt = 'CLI>'
         self._strAHPrompt = 'AH_CLI>'
         self._strCLIConflict = 'Another session owns the CLI'
-        self._Connection = None
-        self._connect()
+        self.Connection = None
+        self.telnet_connect()
 
     def _connect(self):
         try:
             objTelnetConnect = telnetlib.Telnet(
                 self._host, self._port, self._timeout)
-
             objTelnetConnect.read_until(
-                self._strLoginPrompt.encode(encoding="utf-8"), timeout=2)
+                self._strLoginPrompt.encode(encoding="utf-8"), timeout=1)
             objTelnetConnect.write(self._password.encode(encoding="utf-8"))
             objTelnetConnect.write(b'\r')
             objTelnetConnect.read_until(
-                self._strMainMenuPrompt.encode(encoding="utf-8"), timeout=2)
-
-            self._Connection = objTelnetConnect
+                self._strMainMenuPrompt.encode(encoding="utf-8"), timeout=1)
             return True
+            self.Connection = objTelnetConnect
         except Exception as E:
             s.ShowErr(self.__class__.__name__,
                       sys._getframe().f_code.co_name,
@@ -253,8 +251,19 @@ class HAAPConn(object):
                           self._host),
                       '"{}"'.format(E))
 
-    def _get_connection(self):
-        if self._Connection:
+    def _connect_retry(self):
+        if self.Connection:
+            return True
+        else:
+            print('Connect Retry for Engine "%s" ...' % self._host)
+            self._connect()
+
+    def telnet_connect(self):
+        self._connect()
+        self._connect_retry()
+
+    def _get_connection_status(self):
+        if self.Connection:
             return True
         else:
             return False
@@ -273,33 +282,33 @@ class HAAPConn(object):
         CLI_Conflict = self._strCLIConflict.encode(encoding="utf-8")
 
         def get_result():
-            self._Connection.write(
+            self.Connection.write(
                 strCommand.encode(encoding="utf-8") + b'\r')
-            strResult = str(self._Connection.read_until(
+            strResult = str(self.Connection.read_until(
                 CLI, timeout=2).decode())
             if self._strCLIPrompt in strResult:
                 return strResult
 
         def execute_at_CLI():
             # Confirm is CLI or Not
-            if self._Connection:
-                self._Connection.write(b'\r')
-                strEnterOutput = self._Connection.read_until(CLI, timeout=1)
+            if self.Connection:
+                self.Connection.write(b'\r')
+                strEnterOutput = self.Connection.read_until(CLI, timeout=1)
 
                 if CLI in strEnterOutput:
                     return get_result()
                 elif 'HA-AP'.encode(encoding="utf-8") in strEnterOutput:
-                    self._Connection.write('7')
-                    str7Output = self._Connection.read_until(CLI, timeout=1)
+                    self.Connection.write('7')
+                    str7Output = self.Connection.read_until(CLI, timeout=1)
                     if CLI in str7Output:
                         return get_result()
                     elif CLI_Conflict in str7Output:
-                        self._Connection.write('y')
-                        strConfirmCLI = self._Connection.read_until(CLI, timeout=1)
+                        self.Connection.write('y')
+                        strConfirmCLI = self.Connection.read_until(CLI, timeout=1)
                         if CLI in strConfirmCLI:
                             return get_result()
 
-        if self._Connection:
+        if self.Connection:
             return execute_at_CLI()
         # else:
         #     if self._connect():
@@ -309,11 +318,11 @@ class HAAPConn(object):
         #             self._host))
 
     def Close(self):
-        if self._Connection:
-            self._Connection.close()
+        if self.Connection:
+            self.Connection.close()
 
     connection = property(
-        _get_connection, doc="Get HAAPConn instance's connection")
+        _get_connection_status, doc="Get HAAPConn instance's connection")
 
 
 if __name__ == '__main__':
