@@ -71,6 +71,30 @@ def is_port(intPortNum):
     return False
 
 
+def show_engine_status(dictEngines):
+    # dictEngines = get_HAAP_over_all()
+    tupDesc = ('Engine', 'AH', 'Uptime', 'Master', 'Cluster', 'Mirror')
+    tupWidth = (18, 16, 20, 13, 9, 12)
+
+    def _print_description():
+        for i in range(len(tupDesc)):
+            print(tupDesc[i].center(tupWidth[i]), end='')
+        print()
+         
+    def _print_status_in_line(lstStatus):
+        for i in range(len(lstStatus)):
+            print(lstStatus[i].center(tupWidth[i]), end='')
+        print()
+
+    def _print_status_in_table():
+        for engine in lstHAAPAlias:
+            lstStatus = dictEngines[engine]
+            _print_status_in_line(lstStatus)
+
+    _print_description()
+    _print_status_in_table()
+
+
 def ShowErr(*argvs):
     '''
     Four argv:
