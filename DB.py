@@ -34,6 +34,11 @@ class collWarning(Document):
 
 # DB opration of HAAP
 class HAAP(object):
+    # def __init__(self):
+    #     self.last_record_list = get_last_record_list()
+    #     self.time_engine_last_record = self.last_record_list[0]
+    #     self.status_engine_last_record = self.last_record_list[1]
+
     def insert(self, time_now, lstSTS):
         t = collHAAP(time=time_now, engine_status=lstSTS)
         t.save()
@@ -48,42 +53,64 @@ class HAAP(object):
     def query_N_records(self, intN):
         return collHAAP.objects().order_by('-time').limit(intN)
 
-    def query_first_records(self, intN):
+    def query_last_record(self):
         return collHAAP.objects().order_by('-time').first()
+
+    def query_time_of_first_records(self):
+        return collHAAP.objects().order_by('-time').first()
+
+    def get_last_record_list(self):
+        last_record = self.query_last_record()
+        if last_record:
+            record_time = last_record[time]
+            lstHAAPstatus = _convert_dict_to_list_HAAP(last_record[status])
+            return record_time, lstHAAPstatus
+        else:
+            return
+
+    def time_engine_last_record():
+        pass
+
+    def status_engine_last_record():
+        pass
 
 
 class SANSW(object):
 
     '''
+    注意注意：只要两个关键dict filed：origin 和 summary
     "_id" : ObjectId("5ca45497ff237792f883aaef"),
     "time" : ISODate("2019-04-03T14:36:48.376Z"),
 
-    SwitchShow:
+    origin:
     "SW_UP":{
     "IP":"1.1.1.1",
+    "switchshow":""
+    "porterrshow":""
+    }
+    "SW_Down":{
+    "IP":"1.1.1.1",
+    "switchshow":""
+    "porterrshow":""
+    }
     
 
-    OverView:{
-    "SW_UP":{
+    Summary:{
+    "SW01":{
     "IP":"1.1.1.1",
-    "PE":{
-    "0":[
+    "PE_Sum":[
         "0", 
         "0", 
         "0", 
-        "0", 
-        "0", 
-        "0", 
-        "4"],
-    "1":[
-        "0", 
-        "0", 
-        "1200", 
         "0", 
         "0", 
         "0", 
         "4"]
+    ]
+    "PE_Total":578
     }
+    "SW02":{
+    "IP":"1.1.1.2",
     "PE_Sum":[
         "0", 
         "0", 
@@ -182,6 +209,17 @@ class Warning(object):
 
     def update(self, intN):
         return collWARN.objects().order_by('-time').first()
+
+
+def update_haap():
+    pass
+
+def update_sansw():
+    pass
+
+
+
+
 
 if __name__ == '__main__':
     pass

@@ -219,7 +219,7 @@ st
         if tn.exctCMD('\n'):
             with open(strResultFile, 'w') as f:
                 for strCMD in lstCommand:
-                    time.sleep(0.25)
+                    time.sleep(0.1)
                     strResult = tn.exctCMD(strCMD)
                     if strResult:
                         print(strResult)
@@ -227,7 +227,7 @@ st
                     else:
                         strErr = '\n*** Execute Command "{}" Failed\n'.format(
                             strCMD)
-                        # print(strErr)
+                        print(strErr)
                         f.write(strErr)
 
     ### replaced by Class Status
@@ -710,6 +710,7 @@ class Status(Action):
     #         else:
     #             ut = 0
     #     return {'ABTs': abts, 'Qfull': qf, 'Mirror':mirror,'Reboot':ut}
+
 
 
 if __name__ == '__main__':
