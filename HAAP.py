@@ -24,15 +24,18 @@ def deco_OutFromFolder(func):
             pass
         finally:
             os.chdir(strOriFolder)
+
     return _deco
 
 
 def deco_Exception(func):
+
     def _deco(self, *args, **kwargs):
         try:
             return func(self, *args, **kwargs)
         except Exception as E:
             print(func.__name__, E)
+
     return _deco
 
 
@@ -47,6 +50,7 @@ stt
 st
 
     '''
+
     def __init__(self, strIP, intTNPort, strPassword,
                  intFTPPort, intTimeout=1.5):
         self._host = strIP
@@ -147,6 +151,7 @@ st
             return
         tn = self._TN_Conn
         connFTP = self._ftp()
+
         def _get_oddCommand(intTraceLevel):
             oddCMD = OrderedDict()
             if intTraceLevel == 1 or intTraceLevel == 2 or intTraceLevel == 3:
@@ -160,6 +165,7 @@ st
                 print('Trace Level: 1 or 2 or 3')
 
         def _get_trace_file(command, strTraceDes):
+
             # TraceDes = Trace Description
             def _get_trace_name():
                 result = tn.exctCMD(command)
@@ -230,7 +236,7 @@ st
                         # print(strErr)
                         f.write(strErr)
 
-    ### replaced by Class Status
+    # ## replaced by Class Status
     # def infoEngine_lst(self):
     #     # return: [IP, uptime, AH, FW version, status, master, mirror status]
     #     strVPD = self.get_vpd()
@@ -280,12 +286,15 @@ st
             print("Engine '%s' is at AH Status(AH Code %d)"
                 % (self.host, self.AHStatus))
             return
+
         def _exct_cmd():
             t = s.TimeNow()
+
             def complete_print(strDesc):
                 print('    Set  %-13s for Engine "%s" Completely...\
                         ' % ('"%s"' % strDesc, self._host))
                 time.sleep(0.25)
+
             try:
                 # Set Time
                 if self._TN_Conn.exctCMD('rtc set time %d %d %d' % (
@@ -329,6 +338,7 @@ st
 
 
 class Status(Action):
+
     def __init__(self, strIP, intTNPort, strPassword,
                  intFTPPort, intTimeout=1.5):
         Action.__init__(self, strIP, intTNPort, strPassword,
@@ -355,7 +365,7 @@ class Status(Action):
                 time.sleep(0.2)
             return dictInfo
 
-#Matt replaced by is_AH
+# Matt replaced by is_AH
     # def get_engine_AH(self):
     #     if self._TN_Conn:
     #         strvpd = self._TN_Conn.exctCMD('vpd')
@@ -379,7 +389,7 @@ class Status(Action):
     #                     return i[7:] + 'egAH'
     #                     print "There has some AH in this engine", i
 
-#Matt replaced by _get_info_to_dict
+# Matt replaced by _get_info_to_dict
     # @deco_Exception
     # def get_vpd(self):
     #     if self._TN_Conn:
@@ -389,7 +399,7 @@ class Status(Action):
     #         if self._TN_Conn:
     #             return self._TN_Conn.exctCMD('vpd')
 
-#Matt replaced by is_AH
+# Matt replaced by is_AH
     # def get_engine_health(self):
     #     # if self.get_engine_status() == "ONLINE":
     #     if self._TN_Conn:
@@ -512,7 +522,7 @@ class Status(Action):
         if self.dictInfo:
             return self._is_master(self.dictInfo['engine'])
 
-#Matt replaced by master
+# Matt replaced by master
     # def is_master_engine(self):
     #     if self._TN_Conn:
     #         strEngine_info = self._TN_Conn.exctCMD('engine')
@@ -534,7 +544,7 @@ class Status(Action):
     #             else:
     #                 return True
 
-#Matt no need
+# Matt no need
     # @deco_Exception
     # def get_mirror_info(self):
     #     if self._TN_Conn:
@@ -542,7 +552,6 @@ class Status(Action):
     #     else:
     #         self._telnet_connect()
     #         return self._TN_Conn.exctCMD('mirror')
-
     
 # ## Matt Need to be optimise...
     @deco_Exception
@@ -598,7 +607,7 @@ class Status(Action):
         else:
             print("Get Firmware Version Failed for Engine {}".format(self._host))
 
-### Matt 暂时先不考虑这一部分内容
+# ## Matt 暂时先不考虑这一部分内容
     # def has_abts_qfull(self, SAN_status, ip):
     #     strVPD = self.get_vpd()
     #     ports = ['a1', 'a2', 'b1', 'b2']
@@ -719,8 +728,6 @@ if __name__ == '__main__':
     ftp_port = objHAAPConfig.FTP_port()
     password = objHAAPConfig.password()
 
-    # e1 = Action(host,telnet_port,password,ftp_port)
-    e1_status = Status(host,telnet_port,password,ftp_port)
     # print(e1_status.is_master())
     # print(e1_status.over_all())
     # e1.get_trace('abc', 2)

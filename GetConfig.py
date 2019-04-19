@@ -96,7 +96,7 @@ class SwitchConfig(object):
     def list_switch_IP(self):
         return self.SwitchIP[1]
 
-    def list_switch_Ports(self):
+    def list_switch_ports(self):
         return self.SwitchPorts[1]
 
     def telnet_port(self):
@@ -183,5 +183,6 @@ class Setting(object):
         for i in self.cfg.items('TraceRegular'):
             oddRegularTrace[i[0]] = i[1]
         return oddRegularTrace
+
 
 
