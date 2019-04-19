@@ -783,7 +783,6 @@ class HAAP_Status(HAAP):
     @deco_Exception
     def get_mirror_status(self):
         strMirror = self.get_mirror_info()
-        #判断strMirror是否存在
         if strMirror is None:
             print("Get Mirror Status Failed for Engine {}".format(self._host))
         else:

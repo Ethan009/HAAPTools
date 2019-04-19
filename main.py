@@ -137,9 +137,9 @@ for i in objCFG.items('Switches'):
 lstSwitchAlias = list(addSwitches.keys())
 lstSwitch = list(addSwitches.values())
 # <<<Switch_level>>>
-level_one = objCFG.get('level', 'level_one')
-level_two = objCFG.get('level', 'level_two')
-level_three = objCFG.get('level', 'level_three')
+level_one = objCFG.get('SWlevel', 'level_one')
+level_two = objCFG.get('SWlevel', 'level_two')
+level_three = objCFG.get('SWlevel', 'level_three')
 
 # <<<HAAP Config>>>
 oddEngines = Odd()
@@ -186,21 +186,21 @@ strPCFolder = objCFG.get('FolderSetting', 'PeriodicCheck')
 # <<<Inside Function Feild>>>
 
 # <<<warn level>>>
-level1 = objCFG.get('level', '1')
+level1 = objCFG.get('SwWarn', '1')
 level1 = eval(level1)
 abtslv1 = level1['abts']
 qflv1 = level1['Q_full']
 eclv1 = level1['Encout']
 d3lv1 = level1['Discc3']
 
-level2 = objCFG.get('level', '2')
+level2 = objCFG.get('SwWarn', '2')
 level2 = eval(level2)
 abtslv2 = level2['abts']
 qflv2 = level2['Q_full']
 eclv2 = level2['Encout']
 d3lv2 = level2['Discc3']
 
-level3 = objCFG.get('level', '3')
+level3 = objCFG.get('SwWarn', '3')
 level3 = eval(level3)
 abtslv3 = level3['abts']
 qflv3 = level3['Q_full']
@@ -524,7 +524,7 @@ def get_Switch_status_list():
             b = _SW(lstSW[i], lstSWPorts[i])._dicPartPortError[q]            
             a['port' + str(lstSWPorts[i][h])] = b
         lstSwitchstatus['Switch' + str(i)] = (a) 
-        # print ("lstSwitchstatus:", lstSwitchstatus)
+        print ("lstSwitchstatus:", lstSwitchstatus)
     return lstSwitchstatus
 
 
@@ -1305,13 +1305,14 @@ def main():
 
 
 if __name__ == '__main__':
-    # get_engine_from_db()
+    #get_engine_from_db()
     # get_HAAP_status_list()
     # get_all_recond()sb
     # get_Switch_from_db()
     #get_Switch_Total()
     # get_HAAP_status_list()
-    main()
+    get_Switch_status_list()
+    #main()
     # email_send()
     # job_update_interva(10,)
     # job_update_interval4(10,)P't't

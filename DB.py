@@ -12,7 +12,7 @@ intDBPort = cfgDB.port()
 connect(strDBName, host=strDBHost, port=intDBPort)
 
 # intialize 3 collections
-
+ 
 
 class collHAAP(Document):
     time = DateTimeField(default=datetime.datetime.now())
@@ -78,6 +78,11 @@ class Warning(object):
         t = collWARN(time=time_now, level=lstdj,
                      warn_message=lstSTS, confirm_status=confirm)
         t.save()
+   
+    def update(self, time_now, lstdj, lstSTS, confirm):
+        t = collWARN(time=time_now, level=lstdj,
+                     warn_message=lstSTS, confirm_status=confirm)
+        t.save()
 
     def query_range(self, time_start, time_end):
         collWARN.objects(date__gte=time_start,
@@ -91,3 +96,10 @@ class Warning(object):
 
     def query_first_records(self, intN):
         return collWARN.objects().order_by('-time').first()
+    
+
+    
+    
+    
+    
+    

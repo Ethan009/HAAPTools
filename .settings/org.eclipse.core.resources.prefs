@@ -1,5 +1,9 @@
 eclipse.preferences.version=1
+encoding/DB.py=utf-8
 encoding/GetConfig.py=utf-8
+encoding/HAAP.py=utf8
+encoding/SANSW.py=utf-8
 encoding/Source.py=utf-8
+encoding/email_form.py=utf8
 encoding/main.py=utf-8
 encoding/test_read_config.py=utf-8

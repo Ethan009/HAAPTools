@@ -49,8 +49,6 @@ class EngineConfig(object):
     def trace_level(self):
         return self.cfg.getint('EngineSetting', 'trace_level')
 
-<<<<<<< HEAD
-
 
 class DBConfig(object):
     """docstring for DBConfig"""
@@ -69,7 +67,6 @@ class DBConfig(object):
 
 
         
-=======
     
 class SwitchConfig(object):
     """docstring for SwitchConfig"""
@@ -103,7 +100,7 @@ class SwitchConfig(object):
     def list_switch_IP(self):
         return self.SwitchIP[1]
 
-    def list_switch_Ports(self):
+    def list_switch_ports(self):
         return self.SwitchPorts[1]
 
     def telnet_port(self):
@@ -197,4 +194,3 @@ class Setting(object):
     
     def list_trace_right(self):
         return self.Trace[1]
->>>>>>> optimise_Paul
