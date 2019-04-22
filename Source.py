@@ -78,12 +78,12 @@ def show_engine_status(dictEngines):
 
     def _print_description():
         for i in range(len(tupDesc)):
-            print(tupDesc[i].center(tupWidth[i]), end='')
+            print(tupDesc[i].center(tupWidth[i]),end == '')
         print()
          
     def _print_status_in_line(lstStatus):
         for i in range(len(lstStatus)):
-            print(lstStatus[i].center(tupWidth[i]), end='')
+            print(lstStatus[i].center(tupWidth[i]), end =='')
         print()
 
     def _print_status_in_table():

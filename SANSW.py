@@ -134,6 +134,83 @@ class SANSW():
             else:
                 return 'Please Correct the Port Number...'
 
+#     @deco_Exception
+#     def get_encout_by_port(self, intSWPort):
+#         if self._dicPartPortError:
+#             if intSWPort in self._dicPartPortError.keys():
+#                 return self._dicPartPortError[intSWPort][2]
+#             else:
+#                 print('Please Correct the Port Number...')
+# 
+#     @deco_Exception
+#     def get_discC3_by_port(self, intSWPort):
+#         if self._dicPartPortError:
+#             if intSWPort in self._dicPartPortError.keys():
+#                 return self._dicPartPortError[intSWPort][3]
+#             else:
+#                 print('Please Correct the Port Number...')
+# 
+#     @deco_Exception
+#     def get_encout_total(self):
+# 
+#         def _get_count():
+#             int_encoutTotal = 0
+#             for i in self._dicPartPortError:
+#                 if 'k' in self._dicPartPortError[i][2]:
+#                     return 'Over Thousand Errors of encout detected...'
+#                 elif 'm' in self._dicPartPortError[i][2]:
+#                     return 'Over Million Errors of encout detected...'
+#                 int_encoutTotal += int(self._dicPartPortError[i][2])
+#             return int_encoutTotal
+# 
+#         if self._dicPartPortError:
+#             return _get_count()
+# 
+#     @deco_Exception
+#     def get_discC3_total(self):
+# 
+#         def _get_count():
+#             int_encoutTotal = 0
+#             for i in self._dicPartPortError:
+#                 if 'k' in self._dicPartPortError[i][3]:
+#                     return 'Over Thousand Errors of encout detected...'
+#                 elif 'm' in self._dicPartPortError[i][3]:
+#                     return 'Over Million Errors of encout detected...'
+#                 int_encoutTotal += int(self._dicPartPortError[i][3])
+#             return int_encoutTotal
+# 
+#         if self._dicPartPortError:
+#             return _get_count()
+
+    # @deco_Exception
+    def clear_porterr_All(self):
+        try:
+            self._SWConn.exctCMD('statsclear')
+            print('Clear Error Count for SW "{}" Completely...'.format(
+                self._host))
+            return True
+        except Exception as E:
+            print('Clear Error Count for SW "{}" Failed...'.format(self._host))
+
+    @deco_Exception
+    def clear_porterr_by_port(self, intSWPort):
+        try:
+            self._SWConn.exctCMD(
+                'portstatsclear {}'.format(str(intSWPort)))
+            print('Clear Error Count of Port {} for SW "{}" Completely...\
+                '.format(str(intSWPort), self._host))
+            return True
+        except Exception as E:
+            print('Clear Error Count Failed...')
+
+
+class Status(SANSW):
+
+    def __init__(self, strIP, intPort, strUserName, strPasswd,
+                 lstSWPort, intTimeout=2):
+        SANSW.__init__(self, strIP, intPort, strUserName, strPasswd,
+                 lstSWPort, intTimeout)
+    
     @deco_Exception
     def get_encout_by_port(self, intSWPort):
         if self._dicPartPortError:
@@ -182,33 +259,6 @@ class SANSW():
         if self._dicPartPortError:
             return _get_count()
 
-    # @deco_Exception
-    def clear_porterr_All(self):
-        try:
-            self._SWConn.exctCMD('statsclear')
-            print('Clear Error Count for SW "{}" Completely...'.format(
-                self._host))
-            return True
-        except Exception as E:
-            print('Clear Error Count for SW "{}" Failed...'.format(self._host))
-
-    @deco_Exception
-    def clear_porterr_by_port(self, intSWPort):
-        try:
-            self._SWConn.exctCMD(
-                'portstatsclear {}'.format(str(intSWPort)))
-            print('Clear Error Count of Port {} for SW "{}" Completely...\
-                '.format(str(intSWPort), self._host))
-            return True
-        except Exception as E:
-            print('Clear Error Count Failed...')
-
-
-class Status(SANSW):
-    def __init__(self, strIP, intPort, strUserName, strPasswd,
-                 lstSWPort, intTimeout=2):
-        SANSW.__init__(self, strIP, intPort, strUserName, strPasswd,
-                 lstSWPort, intTimeout)
     '''
     @author: Paul
     @function:  
@@ -218,7 +268,6 @@ class Status(SANSW):
     get_switch_original 输入端口报错原始值 输出Int值                                                                                 ·_switch_original 输入端口报错原始值 输出int 值
     
     '''
-    
     
     def get_switch_int(self):
         
@@ -239,7 +288,6 @@ class Status(SANSW):
                 lstSwitchstatus['Switch' + str(i)] = (a) 
                 print ("lstSwitchstatus:", lstSwitchstatus)
         return lstSwitchstatus
-        
     
     def get_switch_original(self):
         
@@ -247,5 +295,6 @@ class Status(SANSW):
 
 
 if __name__ == '__main__':
-    print(collection_data_switch().get_switch_total())
-    pass
+    Status.get_switch_total(self)
+    print(Status().get_switch_total())
+    #pass
