@@ -84,9 +84,15 @@ class SwitchConfig(object):
     def _odd_switches_Ports(self):
         oddSwitcesPorts = Odd()
         for switch in self.cfg.items('SANSwitchePorts'):
-            oddSwitcesPorts[switch[0]] = switch[1]
+            oddSwitcesPorts[switch[0]] = eval(switch[1])
             lstSwitches_alias = list(oddSwitcesPorts.keys())
-            lstSwitches_Ports = list(oddSwitcesPorts.values())
+            print("1234:",lstSwitches_alias)
+            lstSwitches_Ports = oddSwitcesPorts.values()
+            print("wqeqwe:",type(lstSwitches_Ports[0]))
+#             lstSwitches_Ports = lstSwitches_Ports.split()
+        
+            
+                
 
         return lstSwitches_alias, lstSwitches_Ports
 

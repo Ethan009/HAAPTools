@@ -2,11 +2,11 @@
 
 import GetConfig as gc
 
-HAAP_Config = gc.EngineConfig()
-
-# print('FTP Port is %s' % HAAP_Config.FTP_port())
-pd = HAAP_Config.password()
-print('password is %s' % pd)
+# HAAP_Config = gc.EngineConfig()
+# 
+# # print('FTP Port is %s' % HAAP_Config.FTP_port())
+# pd = HAAP_Config.password()
+# print('password is %s' % pd)
 
 # print('type of password is %s' % type(HAAP_Config.password()))
 
@@ -23,10 +23,11 @@ print('password is %s' % pd)
 
 
 SWITCH_Config = gc.SwitchConfig()
-print('telnet_port is %s' % SWITCH_Config.telnet_port())
-print('telnet_port is %s' % SWITCH_Config.sw_username())
-print('telnet_port is %s' % SWITCH_Config.sw_password())
-print('telnet_port is %s' % SWITCH_Config.list_switch_Ports())
+# print('telnet_port is %s' % SWITCH_Config.list_switch_IP())
+# print('telnet_port is %s' % SWITCH_Config.telnet_port())
+# print('telnet_port is %s' % SWITCH_Config.sw_username())
+# print('telnet_port is %s' % SWITCH_Config.sw_password())
+print('telnet_port is %s' % SWITCH_Config.list_switch_ports())
 
 # print('telnet_port is %s' % SWITCH_Config.SWTotal_level1())
 # print('telnet_port is %s' % SWITCH_Config.SWTotal_level2())
@@ -51,15 +52,15 @@ Setting = gc.Setting()
 # print('folder_PeriodicCheck is %s' % Setting.folder_PeriodicCheck())
 #print('folder_PeriodicCheck is %s' % Setting.PCEngineCommand())
 #print('folder_PeriodicCheck is %s' % Setting.PCSANSwitchCommand())
+# 
+# print('folder_PeriodicCheck is %s' % Setting.list_trace_left())
+# print('folder_PeriodicCheck is %s' % Setting.list_trace_right())
 
-print('folder_PeriodicCheck is %s' % Setting.list_trace_left())
-print('folder_PeriodicCheck is %s' % Setting.list_trace_right())
 
 
-
-import DB as db
-
-db_haap = db.HAAP()
-
-db_haap.insert(2019 April 17, 15:44,[asdfasdfadf,adsfasfd])
-db_haap.query_all()
+# import DB as db
+# 
+# db_haap = db.HAAP()
+# 
+# db_haap.insert(2019 April 17, 15:44,[asdfasdfadf,adsfasfd])
+# db_haap.query_all()
