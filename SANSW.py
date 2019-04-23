@@ -225,6 +225,43 @@ class Status(SANSW):
     get_switch_original 输入端口报错原始值 输出Int值                                                                                 ·_switch_original 输入端口报错原始值 输出int 值
     
     '''
+
+    def err_num_int(self, strNum):
+        if strNum[-1] == 'g':
+            return int(float(strNum[:-1])*1000000000)
+        elif strNum[-1] == 'm':
+            return int(float(strNum[:-1])*1000000)
+        elif strNum[-1] == 'k':
+            return int(float(strNum[:-1])*1000)
+        else:
+            return int(strNum)
+
+    def list_string_to_int(self, lstString):
+        return [self.err_num_int(i) for i in lstString]
+
+    def _dict_string_to_int(self, dicPE):
+        dicIntPE = odd()
+        for i in range(len(dicPE.values())):
+            port = dicPe.keys()[i]
+            lstPortError = dicPE.values()[i]
+            dicIntPE[port] = self.list_string_to_int(lstPortError)
+        return dicIntPE
+
+    def sum_and_total(self, dicSANSWPorts):
+        dicIntPE = self._dict_string_to_int(dicSANSWPorts)
+        lstSum = []
+        for type in range(6):
+            sum = 0
+            for lstPort in dicIntPE.values():
+                sum += lstPort[type]
+            lstSum.append(sum)
+        total = sum(lstSum)
+        return lstSum,total
+
+    # def total(self):
+    #     sum(self.sum_all_type(self._dicPartPortError))
+
+    ### 
     
     def num(self,lisport):
         for port in range(len(lisport)):
@@ -265,6 +302,8 @@ class Status(SANSW):
     def get_switch_original(self):
         
         return
+
+
 
 
 if __name__ == '__main__':
