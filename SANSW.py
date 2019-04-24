@@ -1,7 +1,7 @@
 # coding: utf-8
 from __future__ import print_function
 from ClassConnect import *
-from collections import OrderedDict 
+from collections import OrderedDict as odd
 import re
 import Source as s
 import os
@@ -106,7 +106,7 @@ class SANSW():
                            resultDataAndErr.group(6).split())
  
         def _putToDict():
-            oddPortError = OrderedDict()
+            oddPortError = odd()
             lstPortErrLines = str(self._strAllPortError).split('\n')
             for intPortNum in self._allSWPort:
                 lstErrInfo = _getErrorAsList(intPortNum, lstPortErrLines)
@@ -240,22 +240,25 @@ class Status(SANSW):
         return [self.err_num_int(i) for i in lstString]
 
     def _dict_string_to_int(self, dicPE):
+        print(dicPE)
         dicIntPE = odd()
         for i in range(len(dicPE.values())):
-            port = dicPe.keys()[i]
+            port = dicPE.keys()[i]
             lstPortError = dicPE.values()[i]
             dicIntPE[port] = self.list_string_to_int(lstPortError)
         return dicIntPE
 
-    def sum_and_total(self, dicSANSWPorts):
-        dicIntPE = self._dict_string_to_int(dicSANSWPorts)
+    def sum_and_total(self):
+        dicIntPE = self._dict_string_to_int(self._dicPartPortError)
         lstSum = []
+        total = 0
         for type in range(6):
             sum = 0
             for lstPort in dicIntPE.values():
                 sum += lstPort[type]
             lstSum.append(sum)
-        total = sum(lstSum)
+        for sum in lstSum:
+            total += sum
         return lstSum,total
 
     # def total(self):
@@ -307,13 +310,15 @@ class Status(SANSW):
 
 
 if __name__ == '__main__':
-    host = objSwitchConfig.list_switch_IP()[0]
-    telnet_port = objSwitchConfig.telnet_port()
-    username = objSwitchConfig.sw_username()
-    password = objSwitchConfig.sw_password()
-    lstSWPort = objSwitchConfig.list_switch_ports()[0]
+
+    gcsw = gc.SwitchConfig()
+    host = gcsw.list_switch_IP()[0]
+    port = gcsw.SSH_port()
+    username = gcsw.sw_username()
+    password = gcsw.sw_password()
+    lstSWPort = gcsw.list_switch_ports()[0]
     
-    e = host,telnet_port,username,password,lstSWPort
-    print("e:",e)
+    
     #SANSW(host,telnet_port,username,password,lstSWPort)._PutErrorToDict()
-    Status = Status(host,telnet_port,username,password,lstSWPort).get_switch_total()
+    s1 = Status(host,port,username,password,lstSWPort).sum_and_total()
+    print(s1)

@@ -105,7 +105,7 @@ class SwitchConfig(object):
     def list_switch_ports(self):
         return self.SwitchPorts[1]
 
-    def telnet_port(self):
+    def SSH_port(self):
         return self.cfg.getint('SANSwitcheSetting', 'port')
 
     def sw_username(self):
