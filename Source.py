@@ -19,8 +19,81 @@ objCFG.read('Conf.ini')
 error_level = int(objCFG.get('MessageLogging', 'msgLevel'))
 
 
-# def ShowErr_level3(_class, _func, _Msg, _Error=''):
-#     pass
+def is_Warning(intValue, data):
+    '''
+    data is int or a tuple
+    '''
+    # def judge_level(intValue, tupData):
+    #     if intValue >= tupData[2]:
+    #         return '3'
+    #     elif intValue >= tupData[1]:
+    #         return 2
+    #     elif intValue >= tupData[0]:
+    #         return 1
+
+    if isinstance(data, int):
+        print('<>')
+        if intValue > data:
+            return True
+    else:
+        if intValue >= data[2]:
+            return 3
+        elif intValue >= data[1]:
+            return 2
+        elif intValue >= data[0]:
+            return 1
+        # return judge_level(intValue, data)
+
+def is_IP(strIP):
+    reIP = re.compile(
+        '^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$')
+    if reIP.match(strIP):
+        return True
+    else:
+        return False
+
+def is_IP_list(lstIP):
+    return all(map(is_IP, lstIP))
+
+def is_file(strFileName):
+    if os.path.isfile(strFileName):
+        return True
+    else:
+        return False
+
+def is_port(intPortNum):
+    if type(intPortNum) == int:
+        return True
+    if type(intPortNum) == str:
+        if intPortNum.isdigit():
+            if type(eval(intPortNum)) == int:
+                return True
+    return False
+
+
+def show_engine_status(dictEngines):
+    # dictEngines = get_HAAP_over_all()
+    tupDesc = ('Engine', 'AH', 'Uptime', 'Master', 'Cluster', 'Mirror')
+    tupWidth = (18, 16, 20, 13, 9, 12)
+
+    def _print_description():
+        for i in range(len(tupDesc)):
+            print(tupDesc[i].center(tupWidth[i]),end == '')
+        print()
+         
+    def _print_status_in_line(lstStatus):
+        for i in range(len(lstStatus)):
+            print(lstStatus[i].center(tupWidth[i]), end =='')
+        print()
+
+    def _print_status_in_table():
+        for engine in lstHAAPAlias:
+            lstStatus = dictEngines[engine]
+            _print_status_in_line(lstStatus)
+
+    _print_description()
+    _print_status_in_table()
+
 
 def ShowErr(*argvs):
     '''
@@ -37,6 +110,7 @@ def ShowErr(*argvs):
 |    Error Message: {:<55}|
 |        {:<66}|
 ----------------------------------------------------------------------------\
+
 '''.format(argvs[2], argvs[3])))
     elif error_level == 2:
         return ShowErr_level2(argvs)
@@ -49,6 +123,7 @@ def ShowErr(*argvs):
 |    Error Message: {:<55}|
 |        {:<66}|
 ----------------------------------------------------------------------------\
+
 '''.format(argvs[0], argvs[1], argvs[2], argvs[3])))
 
 def GotoFolder(strFolder):
@@ -196,6 +271,7 @@ def TraceAnalyse(oddHAAPErrorDict, strTraceFolder):
 
 
 if __name__ == '__main__':
+
     pass
 
 

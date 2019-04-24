@@ -2,8 +2,48 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8fc406ef-6f3d-40dd-bf3c-7067124c8c33" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.project" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.pydevproject" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DB.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GetConfig.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HAAP.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/M.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SANSW.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/email_form.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test_read_config.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/testfile/test_Ethan_mac.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/update_log.log" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/templates/warning.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ClassConnect.py" beforeDir="false" afterPath="$PROJECT_DIR$/ClassConnect.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ClassHAAP.py" beforeDir="false" afterPath="$PROJECT_DIR$/ClassHAAP.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ClassSW.py" beforeDir="false" afterPath="$PROJECT_DIR$/ClassSW.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Conf.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Conf.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Notes.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SW_Version_diff.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source.py" beforeDir="false" afterPath="$PROJECT_DIR$/Source.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/ClassConnect_l.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/ClassHAAP_l.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/ClassSW_l.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/functionTelnet.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/archive/test_l.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/call.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exe/Conf.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Conf2.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/exe/main.exe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exe/web/static/bootstrap.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exe/web/static/index.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exe/web/templates/monitor.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exe_from_win7/Conf.ini" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exe_from_win7/main.exe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exe_from_win7/web/static/bootstrap.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exe_from_win7/web/static/index.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/exe_from_win7/web/templates/monitor.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/static/bootstrap.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/static/bootstrap.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/static/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/static/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/templates/monitor.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/templates/monitor.html" afterDir="false" />
     </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -12,8 +52,56 @@
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/HAAPTools$main.coverage" NAME="main Coverage Results" MODIFIED="1553675260858" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
+  <component name="FUSProjectUsageTrigger">
+    <session id="1480737473">
+      <usages-collector id="statistics.lifecycle.project">
+        <counts>
+          <entry key="project.open.time.1" value="1" />
+          <entry key="project.opened" value="1" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.open">
+        <counts>
+          <entry key="py" value="3" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.open">
+        <counts>
+          <entry key="Python" value="3" />
+        </counts>
+      </usages-collector>
+    </session>
+  </component>
   <component name="FileEditorManager">
-    <leaf />
+    <leaf>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/M.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="85">
+              <caret line="209" column="66" lean-forward="true" selection-start-line="209" selection-start-column="66" selection-end-line="209" selection-end-column="66" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/main.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="225">
+              <caret line="32" column="29" selection-start-line="32" selection-start-column="29" selection-end-line="32" selection-end-column="29" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/HAAP.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="175">
+              <caret line="339" column="6" selection-start-line="339" selection-start-column="6" selection-end-line="339" selection-end-column="6" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -24,13 +112,17 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
+  <component name="ProjectFrameBounds" extendedState="1">
+    <option name="y" value="32" />
+    <option name="width" value="1119" />
+    <option name="height" value="803" />
+  </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -42,7 +134,11 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -56,12 +152,17 @@
       </list>
     </option>
   </component>
+  <component name="StructureViewFactory">
+    <option name="AUTOSCROLL_MODE" value="false" />
+    <option name="AUTOSCROLL_FROM_SOURCE" value="true" />
+    <option name="ACTIVE_ACTIONS" value=",SHOW_FIELDS" />
+  </component>
   <component name="SvnConfiguration">
     <configuration />
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="b0a95cf1-b73e-43a0-a9bb-5e87dca7a9f7" name="Default Changelist" comment="" />
+      <changelist id="8fc406ef-6f3d-40dd-bf3c-7067124c8c33" name="Default Changelist" comment="" />
       <created>1553135663149</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -70,9 +171,9 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1440" height="900" extended-state="0" />
+    <frame x="0" y="32" width="1119" height="803" extended-state="1" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49916527" visible="true" weight="0.20028612" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49916527" visible="true" weight="0.15638964" />
       <window_info id="Favorites" order="1" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
@@ -85,15 +186,18 @@
       <window_info anchor="bottom" id="Version Control" order="8" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.5007153" side_tool="true" weight="0.22771084" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="11" sideWeight="0.49928468" visible="true" weight="0.30722892" />
+      <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.49928468" visible="true" weight="0.18306011" />
       <window_info anchor="bottom" id="Python Console" order="12" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="SciView" order="3" />
       <window_info anchor="right" id="Database" order="4" />
-      <window_info anchor="right" id="Structure" order="5" sideWeight="0.5008347" side_tool="true" visible="true" weight="0.25679544" />
+      <window_info active="true" anchor="right" x="230" y="109" width="319" height="577" id="Structure" order="5" sideWeight="0.5008347" side_tool="true" type="WINDOWED" visible="true" weight="0.22818312" />
     </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
@@ -119,13 +223,6 @@
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="466">
-          <caret line="32" column="29" selection-start-line="32" selection-start-column="29" selection-end-line="32" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Conf.ini">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -133,6 +230,27 @@
       <provider selected="true" editor-type-id="text-editor">
         <state>
           <caret column="11" selection-start-column="11" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HAAP.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="175">
+          <caret line="339" column="6" selection-start-line="339" selection-start-column="6" selection-end-line="339" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="32" column="29" selection-start-line="32" selection-start-column="29" selection-end-line="32" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/M.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="209" column="66" lean-forward="true" selection-start-line="209" selection-start-column="66" selection-end-line="209" selection-end-column="66" />
         </state>
       </provider>
     </entry>
