@@ -60,8 +60,8 @@ st
         self._timeout = intTimeout
         self._TN_Conn = None
         self._FTP_Conn = None
-        self._telnet_connect()
         self._TN_Connect_Status = None
+        self._telnet_connect()    
         self.AHStatus = self._TN_Conn.is_AH()
 
     def _telnet_connect(self):
@@ -69,7 +69,10 @@ st
                                               self._TNport,
                                               self._password,
                                               self._timeout)
-        self._TN_Connect_Status = self._TN_Conn.Connection
+        # print('tn connection: %s' % self._TN_Conn)
+        # print('vpd: %s' % self._TN_Conn.exctCMD('vpd'))
+        self._TN_Connect_Status = self._TN_Conn
+        # print('vpd: %s' % self._TN_Connect_Status.exctCMD('vpd'))
     # def _telnet_connect_retry(self):
     #     print(self._TN_Conn)
     #     if self._TN_Conn:
@@ -359,9 +362,11 @@ class Status(Action):
             return
         lstCommand = ['vpd', 'engine', 'mirror', 'abts', 'qfull']
         dictInfo = {}
+        print(self._TN_Connect_Status)
         if self._TN_Connect_Status:
             for command in lstCommand:
                 dictInfo[command] = self._executeCMD(command)
+                print(dictInfo[command])
                 time.sleep(0.2)
             return dictInfo
 
@@ -469,7 +474,7 @@ class Status(Action):
         if self.dictInfo:
             strVPD = self.dictInfo['vpd']
             if strVPD:
-                return self._uptime_list()
+                return self._uptime_list(strVPD)
 
     def uptime_second(self):
         uptime_list = self.uptime_list()
@@ -729,7 +734,11 @@ if __name__ == '__main__':
     ftp_port = objHAAPConfig.FTP_port()
     password = objHAAPConfig.password()
 
-    # print(e1_status.is_master())
+    print(host,telnet_port,ftp_port,password)
+
+    e1 = Status(host,telnet_port,password,ftp_port)
+
+    print(e1.uptime_list())
     # print(e1_status.over_all())
     # e1.get_trace('abc', 2)
     # e1.show_time()
