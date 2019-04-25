@@ -10,6 +10,8 @@ import Source as s
 
 import GetConfig as gc
 
+#import DB
+
 objHAAPConfig = gc.EngineConfig()
 
 
@@ -60,8 +62,8 @@ st
         self._timeout = intTimeout
         self._TN_Conn = None
         self._FTP_Conn = None
-        self._telnet_connect()
         self._TN_Connect_Status = None
+        self._telnet_connect()
         self.AHStatus = self._TN_Conn.is_AH()
 
     def _telnet_connect(self):
@@ -508,10 +510,24 @@ class Status(Action):
                 else:
                     return '%d Seconds' % s
 
+##Ehtan
 
-    def
+    def check_uptime(self):
+        pass
 
-    @deco_Exception
+    def check_mirror(self):
+        pass
+
+    # def check_haapstatus(self,haapstatus):
+    #     DB_HAAP_status = DB.HAAP
+    #     if haapstatus == "ONLINE" : return None
+    #     if not DB_HAAP_status == "ONLINE" : return None
+    #
+    #
+    #
+    #
+    #
+    # @deco_Exception
     def _is_master(self, strEngine):
         if strEngine is None:
             return
@@ -731,7 +747,8 @@ if __name__ == '__main__':
     telnet_port = objHAAPConfig.telnet_port()
     ftp_port = objHAAPConfig.FTP_port()
     password = objHAAPConfig.password()
-
+    # haap = Status('10.203.1.221','23','password','21')
+    # haap._get_info_to_dict
     # print(e1_status.is_master())
     # print(e1_status.over_all())
     # e1.get_trace('abc', 2)

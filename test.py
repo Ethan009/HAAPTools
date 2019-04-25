@@ -25,15 +25,25 @@ intTNPort = hconf.telnet_port()
 intFTPPort = hconf.FTP_port()
 strPassword = hconf.password()
 
+
+
 oddEngineInstance = Odd()
 for engine in lstEngine:
-    oddEngineInstance[engine] = h.HAAP(engine,
+    oddEngineInstance[engine] = h.Status(engine,
         intTNPort,
         strPassword,
         intFTPPort)
 
-ditEngineStatus = {}
-for engine in lstEngine:
-     ditEngineStatus[engine] = oddEngineInstance[engine]
+    print oddEngineInstance[engine].dictInfo
 
-print ditEngineStatus
+
+
+# ditEngineStatus = {}
+# for engine in lstEngine:
+#     ditEngineStatus[engine] = oddEngineInstance[engine]
+#
+# print ditEngineStatus
+
+
+#Ethan
+
