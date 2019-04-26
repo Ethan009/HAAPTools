@@ -28,67 +28,114 @@ import GetConfig as gc
 
 # <<<Help String Feild>>>
 strHelp = '''
-        Command           Description
+        Command   Description
 
-        ptes                    : Print Port Error of Defined SAN Switch Ports
-        ptcl <IP Port> | all    : Clear Port Error Counter for Given Port on Given SAN switch
-        # ptclALL                 : Clear Port Error Counter for All Ports on All Defined SAN switches
-        sws <IP> | all           : Print switchshow Info for Given SAN Switch
-        # swsALL         : Print switchshow Info for All Defined SAN Switches
-        gt             : Get Trace of All Defined Engine(s), Save in {trace} Folder
-        anls <Folder> | all          : Analyse Trace of All Defined Engine(s)
-        # anlsTrace      : Analyze Trace Files under <Folder>
-        bk <IP> | all          : Backup Config for All Defined Engine(s), Save in {cfg} Folder
-        ec             : Execute Commands listed in <File> on Given Engine
-        pc <sw|haap IP> |all            : Execute Periodic Check on Given Engine, Save in {pc} Folder
-        # pcsw           : Execute Periodic Check on Given Switch, Save in {pc} Folder
-        # pcALL          : Execute Periodic Check on All Defined Engine(s), Save in {pc} Folder
-        cfw          : Change Firmware for Given Engine
-        sts <IP> | all            : Show Overall Status for All Engines
-        st  <IP> | all           : Sync Time with Local System For All Engines
-        stm  <IP> | all          : Get Time of All Defined Engine(s)
-        wrt            : Start Web Update Real Time
-        wdb            : Start Web Update from DataBase
-        # sancheck       : san check
-        # swc            : start warning check
+        ptes  : Port Error Show for SAN Switch(s)('porterrshow')
+        ptcl  : Clear Port Error Counter('statsclear' or '')
+        sws   : Print SAN Switch Info('switchshow')
+
+        gt    : Get Trace of HA-AP Engine(s)
+        at    : Analyse Trace of HA-AP Engine(s)
+        bk    : Backup Config for HA-AP Engine(s)
+        ec    : Execute Commands
+        fw    : Change Firmware for HA-AP Engine
+        sts   : Show Overall Status for HA-AP Engine(s)
+        st    : Sync Time with Local System
+        stm   : Show Time Now for HA-AP Engine(s)
+
+        pc    : Periodically Check
+        mnt   : Monitor and Show Status throgh Web Server
         '''
 
+
+strPTESHelp = '''
+    SAN Switch Clear Port Error Counter('statsclear' or '')
+    ptes <SW_IP> | all   
+        SW_IP  - for defined SAN Switch
+        all    - for All SAN Switchs defined in Conf.ini
+'''
+
 strPTCLHelp = '''
-    ptcl <Switch_IP> <Port_Num>
+    SAN Switch Port Error Show('porterrshow')
+    ptcl <SW_IP Port> | all
+        SW_IP Port  - for defined Port of defined SAN Switch
+        all         - for All SAN Switchs defined in Conf.ini
 '''
 
 strSWSHelp = '''
-    sws <Switch_IP> 
+    Print SAN Switch Info('switchshow')
+    sws <SW_IP> | all
+        SW_IP  - for defined SAN Switch
+        all    - for All SAN Switchs defined in Conf.ini
 '''
 
-strAutoCLIHelp = '''
-    ec <Engine_IP> <Command_File>
+strGTHelp = '''
+    Get Trace of HA-AP Engine(s), Save in "{trace}" Folder
+    gt <HAAPIP> | all
+        HAAP_IP  - for defined HA-AP Engine
+        all      - for All HA-AP Engines defined in Conf.ini
+'''.format(trace)
+
+strATHelp = '''
+    Analyse Trace of HA-AP Engine(s)
+    at <HAAP_IP> | all
+        HAAP_IP  - for Given HA-AP Engine
+        all      - for All HA-AP Engines defined in Conf.ini        
+'''
+
+strBKHelp = '''
+    Backup Config for HA-AP Engine(s), Save in "{cfg}" Folder
+    bk <HAAP_IP> | all
+        HAAP_IP  - for Given HA-AP Engine
+        all      - for All HA-AP Engines defined in Conf.ini        
+'''.format(cfg)
+
+strECHelp = '''
+    Execute Commands listed in <Command_File> on Given Engine
+    ec <HAAP_IP> <Command_File>
+'''
+
+strFWHelp = '''
+    Change Firmware for Given Engine Using <FW_File>
+    fw <HAAP_IP> <FW_File>
+'''
+
+strSTSHelp = '''
+    sts <HAAP_IP> | all
+        HAAP_IP  - for Given HA-AP Engine
+        all      - for All HA-AP Engines defined in Conf.ini        
+'''
+
+strSTHelp = '''
+    st <HAAP_IP> | all
+        HAAP_IP  - for Given HA-AP Engine
+        all      - for All HA-AP Engines defined in Conf.ini        
+'''
+
+strSTMHelp = '''
+    stm <HAAP_IP> | all
+        HAAP_IP  - for Given HA-AP Engine
+        all      - for All HA-AP Engines defined in Conf.ini        
 '''
 
 strPCHelp = '''
-    pc <Engine_IP>
+    Periodically Check for HA-AP Engine(s) or SAN Switch(s)
+    pc <sw SW_IP|haap HAAP_IP> | all
+        sw SW_IP      - for Given HA-AP Engine
+        haap HAAP_IP  - for Given HA-AP Engine
+        all           - for All HA-AP Engines and SAN Switches        
 '''
 
-strPCSWHelp = '''
-    pcsw <Switch_IP>
+strMNTHelp = '''
+    mnt real | db
+        real  - for Get Status Real Time
+        db   - for Get Status from DB(Need MongoDB)        
 '''
-
-strHelpAnalyseTrace = '''
-    anlsTrace <Trace_Folder>
-'''
-
-strHelpUpdateFW = '''
-    chgFW <Engine_IP> <Firmware_File>
-'''
-
-strHelpSingleCommand = '''
-    {}
-'''
-# <<<Help String Field>>>
 
 # <<<Help String Field>>>
 
 
+# <<<Get Config Field>>>
 # Config of HAAP
 HAAP_Config = gc.EngineConfig()
 lstHAAP = HAAP_Config.list_engines_IP()
@@ -120,6 +167,8 @@ lstCommand_PC_SANSW
 
 refresh_interval = gc.Setting.monitor_web_refresh()
 
+# <<<Get Config Field>>>
+
 def _get_TimeNow_Human():
     return datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -141,18 +190,6 @@ def get_HAAP_over_all():
     for i in len(range(lstHAAP)):
         odd[lstHAAPAlias[i]] = _HAAP_Status(lstHAAP[i]).over_all()
     return odd
-
-def _convert_dict_to_list_HAAP(odd):
-    lstHAAPstatus = []
-    for i in range(len(odd)):
-        lstOneEngine = []
-        lstOneEngine.append(odd.keys(i))
-        for status in odd[i]:
-            lstOneEngine.append(status)
-        lstHAAPstatus.append(lstOneEngine)
-    return lstHAAPstatus
-
-
 
 def get_HAAP_ditInfo():
     odd = Odd()
@@ -221,219 +258,9 @@ def _change_firmware(strEngineIP, strFWFile):
     _HAAP_Action(strEngineIP).updateFW(strFWFile)
 
 
-# update DB
-
-# query from DB
-tupHAAP_last_record = db.HAAP.get_last_record_list()
-if tupHAAP_last_record:
-    time_engine_last_record = tupHAAP_last_record[0]
-    status_engine_last_record = tupHAAP_last_record[1]
-else:
-    time_engine_last_record = _get_TimeNow_Human()
-    status_engine_last_record = None
-
-
-### 需要db.SANSW配合写类似 get_last_record_list 方法
-tupSANSW_last_record = db.SANSW.get_last_record_list()
-if tupSANSW_last_record:
-    time_SANSW_last_record = tupSANSW_last_record[0]
-    status_SANSW_last_record = tupSANSW_last_record[1]
-else:
-    time_SANSW_last_record = _get_TimeNow_Human()
-    status_SANSW_last_record = None
-
-
-def start_web(mode):
-    app = Flask(__name__, template_folder='./web/templates',
-                static_folder='./web/static', static_url_path='')
-
-### 写在网页里面
-    lstDesc = ('EngineIP', 'Status', 'Uptime', 'Master', 'Cluster' 'Mirror')
-    lstDesc_switches = ('SwitchIP', 'Encout', 'Discc3', 'Link Fail', 'Loss Sigle', 'Loss Sync')
-    
-
-    @app.route("/", methods=['GET', 'POST'])
-    def home():
-        refresh_interval = refresh_interval
-        if mode == 'rt':
-            refresh_time = _get_TimeNow_Human()
-            engine_refresh_time = refresh_time
-            switch_refresh_time = refresh_time
-            Status=Status,
-            Status_switch=Status_switch,
-            warns=warns
-
-        elif mode == 'db':
-            refresh_time = _get_TimeNow_Human()
-            engine_refresh_time = time_engine_last_record
-            switch_refresh_time = refresh_time
-            Status=status_engine_last_record,
-            Status_switch=Status_switch,
-            warns=warns
-
-        return render_template("monitor.html",
-                               engine_refresh_time=engine_refresh_time,
-                               switch_refresh_time=switch_refresh_time,
-                               Status=Status,
-                               Status_switch=Status_switch,
-                               timeup=refresh_interval,
-                               warns=warns)
-
-    # 错误信息显示页面
-    @app.route("/warning/")
-    def warning():
-        error_message = get_all_recond()
-
-        return render_template("warning.html",
-                               error_message=error_message)
-
-    app.run(debug=False, use_reloader=False, host='127.0.0.1', port=5000)
-
-
-
-def job_update_interval(intInterval):
-    t = s.Timing()
-    db = DB_collHAAP()
-
-    def do_it():
-        # print(get_HAAP_status_list()[0],'8888888888888')
-        n = datetime.datetime.now()
-        do_update = db.haap_insert(n, get_HAAP_status_list())
-        # print('update complately...@ %s' % n)
-
-        return do_update
-
-    t.add_interval(do_it, intInterval)
-    t.stt()
-
-
-# by klay
-confirm_status = 0
-
-
-def job_update_interval_haap(intInterval):
-    t = s.Timing()
-    db = DB_collHAAP()
-
-    def do_it():
-        n = datetime.datetime.now()
-        # print(get_HAAP_status_list()[2])
-
-        a = get_HAAP_status_list()
-        # do_update = db.haap_insert(n, a[0])
-        db.haap_insert(n, a[0])
-        if a[2] != []:
-            for i in range(len(a[2])):
-
-                # do_update = db.haap2_insert(n, a[2][i], a[1][i], confirm_status)
-                db.haap2_insert(n, a[2][i], a[1][i], confirm_status)
-                # print('update complately...@ %s' % n)
-            warnlist = a[1]
-            warnlevel = a[2]
-            email.Timely_send(warnlist, warnlevel)
-
-    t.add_interval(do_it, 10)
-    t.stt()
-
-
-# #线程3交换机的
-def job_update_interval_switch(intInterval):
-    t = s.Timing()
-    db = DB_collHAAP()
-
-    def do_it():
-        n = datetime.datetime.now()
-        a = get_Switch_Total()
-        # do_update_Switch = db.Switch_insert(n, get_Switch_IP(), get_Switch_status_list(), a[0])
-        db.Switch_insert(n, get_Switch_IP(), get_Switch_status_list(), a[0])
-        if a[1] != []:
-            for i in range(len(a[2])):
-                # do_update = db.haap2_insert(n, a[2][i], a[1][i], confirm_status)
-                db.haap2_insert(n, a[2][i], a[1][i], confirm_status)
-                print("qqq",qqq)
-                # print('update complately...@ %s' % n)
-            warnlist = a[1]
-            warnlevel = a[2]
-            email.Timely_send(warnlist, warnlevel)
-
-    t.add_interval(do_it,10)
-    t.stt()
-
-
-# 线程4发送邮件
-def job_update_interval_email(intInterval):
-    t = s.Timing()
-    db = DB_collHAAP()
-
-    def do_it():
-        warninfo = email.send_warnmail(mailto_list, sub, get_all_recond())
-        # print('ddf',warninfo)
-        return warninfo
-
-    t.add_interval(do_it, intInterval)
-    t.stt()
-
-    
-def stopping_web(intSec):
-    try:
-        print('\nStopping Web Server ', end='')
-        for i in range(intSec):
-            time.sleep(1)
-            print('.', end='')
-        time.sleep(1)
-        print('\n\nWeb Server Stopped.')
-    except KeyboardInterrupt:
-        print('\n\nWeb Server Stopped.')
-
-
-# by klay
-def start_warn_check():
-    t1 = Thread(target=start_web, args=('db',))
-    t2 = Thread(target=job_update_interval_haap, args=(10,))
-    t3 = Thread(target=job_update_interval_switch, args=(10,))
-    t4 = Thread(target=job_update_interval_email, args=(20 * 360,))
-
-    t1.setDaemon(True)
-    t2.setDaemon(True)
-    t3.setDaemon(True)
-    t4.setDaemon(True)
-
-    t1.start()
-    t2.start()
-    t3.start()
-    t4.start()
-    try:
-        while t4.isAlive():
-            pass
-        while t3.isAlive():
-            pass
-        while t2.isAlive():
-            pass
-        while t1.isAlive():
-            pass
-    except KeyboardInterrupt:
-        stopping_web(3)
-
-
-def thrd_web_rt():
-    t1 = Thread(target=start_web, args=('rt',))
-    t1.setDaemon(True)
-    t1.start()
-    try:
-        while t1.isAlive():
-            pass
-    except KeyboardInterrupt:
-        stopping_web(3)
-
-
-
 def main():
-    # get_wc()
-    # _get_SWInstance()
-    # _get_HAAPInstance()
     if len(sys.argv) == 1:
         print(strHelp)
-        # print ('aaaaaa',len(sys.argv))
 
     elif sys.argv[1] == 'ptes':
         if len(sys.argv) != 2:
