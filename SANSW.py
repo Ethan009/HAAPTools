@@ -11,6 +11,16 @@ import array
 from functools import total_ordering
 objSwitchConfig = gc.SwitchConfig()
 
+# <<<Get Config Field>>>
+swcfg = gc.SwitchConfig()
+list_sw_ip = swcfg.list_switch_IP()
+list_sw_alias = swcfg.list_switch_alias()
+ssh_port = swcfg.ssh_port()
+user = swcfg.username()
+passwd = swcfg.password()
+list_sw_ports = swcfg.list_switch_ports()
+# <<<Get Config Field>>>
+
 
 def deco_OutFromFolder(func):
     strOriFolder = os.getcwd()
@@ -23,38 +33,64 @@ def deco_OutFromFolder(func):
             pass
         finally:
             os.chdir(strOriFolder)
-
     return _deco
 
 
 def deco_Exception(func):
-
     def _deco(self, *args, **kwargs):
         try:
             return func(self, *args, **kwargs)
         except Exception as E:
             print(self._host, func.__name__, E)
-
     return _deco
 
-# 
-# def SW():
-#     host = objSwitchConfig.list_switch_IP()[1]
-#     telnet_port = objSwitchConfig.telnet_port()
-#     username = objSwitchConfig.sw_username()
-#     password = objSwitchConfig.sw_password()
-#     lstSWPort = objSwitchConfig.list_switch_ports()[1]
-#     e1 = host, telnet_port, password, username, password, lstSWPort
-#     print("e1:", e1)
-#     return e1
 
-def _SW(host, lstSWPort):
-    return SANSW(host, telnet_port,
-                    username, password, lstSWPort)
+def clear_all():
+    for ip in list_sw_ip:
+        Action(ip, ssh_port, user, passwd).clear_all_port()
 
-  
+def clear_one_port(ip, sw_port):
+    Action(ip, ssh_port, user, passwd).clear_one_port(sw_port)
 
-class SANSW():
+# def print_porterror_all():
+#     for ip in list_sw_ip:
+#         Action(ip, ssh_port, user, passwd).print_porterrshow()
+
+# def print_porterror(ip):
+#     Action(ip, ssh_port, user, passwd).print_porterrshow()
+
+def print_porterror_all_formated():
+    for ip in list_sw_ip:
+        Action(ip, ssh_port, user, passwd).print_porterrshow()
+
+def print_porterror_formated(ip):
+    Action(ip, ssh_port, user, passwd).print_porterrshow()
+
+
+
+def print_switchshow_all():
+    for ip in list_sw_ip:
+        Action(ip, ssh_port, user, passwd).print_switchshow()
+
+def print_switchshow(ip):
+    Action(ip, ssh_port, user, passwd).print_switchshow()
+
+
+def periodically_check_all():
+    for ip in list_engines_IP:
+        PCFile_name = 'PC_%s_Engine_%s.log' % (
+            s.time_now_folder(), ip)
+        Action(ip, telnet_port, passwd, FTP_port).periodic_check(
+            lstPCCommand, strPCFolder, PCFile_name)
+
+def periodically_check(ip):
+    PCFile_name = 'PC_%s_Engine_%s.log' % (
+        s.time_now_folder(), ip)
+    Action(ip, telnet_port, passwd, FTP_port).periodic_check(
+        lstPCCommand, strPCFolder, PCFile_name)
+
+
+class Action():
     def __init__(self, strIP, intPort, strUserName, strPasswd,
                  lstSWPort, intTimeout=2):
         self._host = strIP
@@ -63,21 +99,23 @@ class SANSW():
         self._password = strPasswd
         self._timeout = intTimeout
         self._allSWPort = lstSWPort
-        self._strAllPortError = None
-        self._dicPartPortError = None
+        self.strPorterrshow = None
+        self.strSwitchshow = None
         self._SWConn = None
-        self._getporterrshow()
-        self._PutErrorToDict()
+        self._get_switch_info()
 
     @deco_Exception
-    def _getporterrshow(self):
+    def _get_switch_info(self):
         try:
             self._SWConn = SSHConn(self._host,
                                    self._port,
                                    self._username,
                                    self._password,
                                    self._timeout)
-            self._strAllPortError = self._SWConn.exctCMD(
+            self.strPorterrshow = self._SWConn.exctCMD(
+                'porterrshow')
+            time.sleep(0.25)
+            self.strSwitchshow = self._SWConn.exctCMD(
                 'porterrshow')
             return True
         except Exception as E:
@@ -88,108 +126,19 @@ class SANSW():
                       '"%s"' % E)
 
     @deco_Exception
-    def _PutErrorToDict(self):
- 
-        def _portInLine(intSWPort, strLine):
-            lstLine = strLine.split()
-            if (str(intSWPort) + ':') in lstLine:
-                return True
- 
-        def _getErrorAsList(intPortNum, lstPortErrLines):
-            for portErrLine in lstPortErrLines:
-                if _portInLine(intPortNum, portErrLine):
-                    reDataAndErr = re.compile(
-                        r'(.*:)((\s+\S+){2})((\s+\S+){6})((\s+\S+){5})(.*)')
-                    resultDataAndErr = reDataAndErr.match(portErrLine)
- 
-                    return(resultDataAndErr.group(2).split() + 
-                           resultDataAndErr.group(6).split())
- 
-        def _putToDict():
-            oddPortError = odd()
-            lstPortErrLines = str(self._strAllPortError).split('\n')
-            for intPortNum in self._allSWPort:
-                lstErrInfo = _getErrorAsList(intPortNum, lstPortErrLines)
-                oddPortError[intPortNum] = lstErrInfo
-            self._dicPartPortError = oddPortError
-            print ('aaaaa', oddPortError)
- 
-        if self._strAllPortError:
-            _putToDict()
+    def print_porterrshow(self):
+        if self.strPorterrshow:
+            print('Porterrshow for SAN Switch "{}":\n'.format(self._host))
+            print(self.strPorterrshow)
 
     @deco_Exception
-    def _porterrshow(self):
-        if self._strAllPortError:
-            print('Porterrshow for SAN Switch {}:\n'.format(self._host))
-            print(self._strAllPortError)
+    def print_switchshow(self):
+        if self.strSwitchshow:
+            print('Switchshow for SAN Switch "{}":\n'.format(self._host))
+            print(self.switchshow)
 
     @deco_Exception
-    def _switchshow(self):
-        if self._SWConn:
-            try:
-                print('Switchshow for SAN Switch {}:\n'.format(self._host))
-                print(self._SWConn.exctCMD('switchshow'))
-            except Exception as E:
-                pass
-
-    @deco_Exception
-    def get_linkfail_by_port(self, intSWPort):
-        if self._dicPartPortError:
-            if intSWPort in self._dicPartPortError.keys():
-                return self._dicPartPortError[intSWPort][4]
-            else:
-                return 'Please Correct the Port Number...'
-
-    @deco_Exception
-    def get_encout_by_port(self, intSWPort):
-        if self._dicPartPortError:
-            if intSWPort in self._dicPartPortError.keys():
-                return self._dicPartPortError[intSWPort][2]
-            else:
-                print('Please Correct the Port Number...')
- 
-    @deco_Exception
-    def get_discC3_by_port(self, intSWPort):
-        if self._dicPartPortError:
-            if intSWPort in self._dicPartPortError.keys():
-                return self._dicPartPortError[intSWPort][3]
-            else:
-                print('Please Correct the Port Number...')
- 
-    @deco_Exception
-    def get_encout_total(self):
- 
-        def _get_count():
-            int_encoutTotal = 0
-            for i in self._dicPartPortError:
-                if 'k' in self._dicPartPortError[i][2]:
-                    return 'Over Thousand Errors of encout detected...'
-                elif 'm' in self._dicPartPortError[i][2]:
-                    return 'Over Million Errors of encout detected...'
-                int_encoutTotal += int(self._dicPartPortError[i][2])
-            return int_encoutTotal
- 
-        if self._dicPartPortError:
-            return _get_count()
- 
-    @deco_Exception
-    def get_discC3_total(self):
- 
-        def _get_count():
-            int_encoutTotal = 0
-            for i in self._dicPartPortError:
-                if 'k' in self._dicPartPortError[i][3]:
-                    return 'Over Thousand Errors of encout detected...'
-                elif 'm' in self._dicPartPortError[i][3]:
-                    return 'Over Million Errors of encout detected...'
-                int_encoutTotal += int(self._dicPartPortError[i][3])
-            return int_encoutTotal
- 
-        if self._dicPartPortError:
-            return _get_count()
-
-    @deco_Exception
-    def clear_porterr_All(self):
+    def clear_all_port(self):
         try:
             self._SWConn.exctCMD('statsclear')
             print('Clear Error Count for SW "{}" Completely...'.format(
@@ -199,7 +148,7 @@ class SANSW():
             print('Clear Error Count for SW "{}" Failed...'.format(self._host))
 
     @deco_Exception
-    def clear_porterr_by_port(self, intSWPort):
+    def clear_one_port(self, intSWPort):
         try:
             self._SWConn.exctCMD(
                 'portstatsclear {}'.format(str(intSWPort)))
@@ -209,22 +158,69 @@ class SANSW():
         except Exception as E:
             print('Clear Error Count Failed...')
 
+    def periodic_check(self, lstCommand, strResultFolder, strResultFile):
+        s.GotoFolder(strResultFolder)
+        if self._SWConn:
+            with open(strResultFile, 'w') as f:
+                for strCMD in lstCommand:
+                    time.sleep(0.2)
+                    strResult = self._SWConn.exctCMD(strCMD)
+                    if strResult:
+                        print(strResult)
+                        f.write(strResult)
+                    else:
+                        strErr = '\n*** Execute Command "{}" Failed\n'.format(
+                            strCMD)
+                        print(strErr)
+                        f.write(strErr)
 
-class Status(SANSW):
+
+
+class Status(Action):
 
     def __init__(self, strIP, intPort, strUserName, strPasswd,
                  lstSWPort, intTimeout=2):
-        SANSW.__init__(self, strIP, intPort, strUserName, strPasswd,
-                 lstSWPort, intTimeout)
+        Action.__init__(self, strIP, intPort, strUserName, strPasswd,
+                       lstSWPort, intTimeout)
+        self._PutErrorToDict()
+        self._dicPartPortError = None
     '''
     @author: Paul
     @function:  
     get_int输出一种Int值错误数
     get_switch_status 输出一种类型错误在所有端口上的错误总数
     get_switch_total  所有错误总数
-    get_switch_original 输入端口报错原始值 输出Int值                                                                                 ·_switch_original 输入端口报错原始值 输出int 值
-    
+    get_switch_original 输入端口报错原始值 输出Int值
+    ·_switch_original 输入端口报错原始值 输出int 值
     '''
+
+    @deco_Exception
+    def _PutErrorToDict(self):
+
+        def _portInLine(intSWPort, strLine):
+            lstLine = strLine.split()
+            if (str(intSWPort) + ':') in lstLine:
+                return True
+
+        def _getErrorAsList(intPortNum, lstPortErrLines):
+            for portErrLine in lstPortErrLines:
+                if _portInLine(intPortNum, portErrLine):
+                    reDataAndErr = re.compile(
+                        r'(.*:)((\s+\S+){2})((\s+\S+){6})((\s+\S+){5})(.*)')
+                    resultDataAndErr = reDataAndErr.match(portErrLine)
+                    return(resultDataAndErr.group(2).split() +
+                           resultDataAndErr.group(6).split())
+
+        def _putToDict():
+            oddPortError = odd()
+            lstPortErrLines = str(self.strPorterrshow).split('\n')
+            for intPortNum in self._allSWPort:
+                lstErrInfo = _getErrorAsList(intPortNum, lstPortErrLines)
+                oddPortError[intPortNum] = lstErrInfo
+            self._dicPartPortError = oddPortError
+
+        if self.strPorterrshow:
+            _putToDict()
 
     def err_num_int(self, strNum):
         if strNum[-1] == 'g':
@@ -259,54 +255,68 @@ class Status(SANSW):
             lstSum.append(sum)
         for sum in lstSum:
             total += sum
-        return lstSum,total
+        return lstSum, total
 
-    # def total(self):
-    #     sum(self.sum_all_type(self._dicPartPortError))
+    def print_porterror_formated():
+        tuplDesc = ('Port', 'RX', 'RT' 'EncOut', 'DiscC3', 'LinkFail', 'LossSigle', 'LossSync')
+        tuplWidth = (3, 8, 8, 6, 6, 6, 6, 6)
 
-    ### 
-    
-    def num(self,lisport):
-        for port in range(len(lisport)):
-            if not lisport[port].isdigit():
-                a=list(lisport[port])
-                if a[-1] == 'm':
-                    lisport[port]=str(int(float(lisport[port][:-1])*10000))
-                elif a[-1] == 'k':
-                    lisport[port]=str(int(float(lisport[port][:-1])*1000))
-        
-    #优化每个端口的错误数
-    def get_switch_int(self):
-        lstSwitchstatus = []
-       # a = {}
-        for h in range(len(self._allSWPort)):
-            b = self._dicPartPortError[lstSWPort[h]]
-            self.num(b)
-            lstSwitchstatus.append(b)
-            #加了port的值
-            #a['port' + str(lstSWPort[h])] = b
-        return lstSwitchstatus
-    
-    #每个Ip所有端口每种错误总值
-    def get_switch_status(self):
-        b = self.get_switch_int()
-        total=[0,0,0,0,0,0,0]
-        for a in range(len(b)):
-            total = [total[i]+int(b[a][i]) for i in range(len(b[a]))]
-        return total
-    
-    #所有端口错误总值
-    def get_switch_total(self):
-        b = self.get_switch_status()
-        b = sum(b)
-        return b 
+        def _print_description():
+            for i in range(len(tupDesc)):
+                print(tupDesc[i].center(tupWidth[i]), end='')
+            print()
 
-    
-    def get_switch_original(self):
-        
-        return
+        def _print_status_in_line(dicPE):
+            for port in range(len(dicPE)):
+                print(dicPE.keys()[port].center(tuplWidth[0]), end='')
+                for i in dicPE.values()[port]
+                    print(dicPE.keys()[i].center(tupWidth[i+1]), end='')
+                print()
+
+        print('Port Error Show for SAN Switch "%s":\n' % self._host)
+        _print_description()
+        _print_status_in_line(self._dicPartPortError)
 
 
+ #      dictEngines = _get_HAAPInstance()
+ # 1084      tupDesc = ('Engine', 'AH', 'Uptime', 'FirmWare', 'Master', 'Mirror')
+ # 1085:     tupWidth = (18, 16, 20, 13, 9, 12)
+ # 1086  
+ # 1087      def _print_description():
+ # 1088          for i in range(len(tupDesc)):
+ # 1089:             print(tupDesc[i].center(tupWidth[i]), end='')
+ # 1090          print()
+ # 1091           
+ # 1092      def _print_status_in_line(lstStatus):
+ # 1093          for i in range(len(lstStatus)):
+ # 1094:             print(lstStatus[i].center(tupWidth[i]), end='')
+ # 1095          print()
+
+
+
+    @deco_Exception
+    def get_linkfail_by_port(self, intSWPort):
+        if self._dicPartPortError:
+            if intSWPort in self._dicPartPortError.keys():
+                return self._dicPartPortError[intSWPort][4]
+            else:
+                return 'Please Correct the Port Number...'
+
+    @deco_Exception
+    def get_encout_by_port(self, intSWPort):
+        if self._dicPartPortError:
+            if intSWPort in self._dicPartPortError.keys():
+                return self._dicPartPortError[intSWPort][2]
+            else:
+                print('Please Correct the Port Number...')
+
+    @deco_Exception
+    def get_discC3_by_port(self, intSWPort):
+        if self._dicPartPortError:
+            if intSWPort in self._dicPartPortError.keys():
+                return self._dicPartPortError[intSWPort][3]
+            else:
+                print('Please Correct the Port Number...')
 
 
 if __name__ == '__main__':
@@ -316,9 +326,8 @@ if __name__ == '__main__':
     port = gcsw.SSH_port()
     username = gcsw.sw_username()
     password = gcsw.sw_password()
-    lstSWPort = gcsw.list_switch_ports()[0]
-    
-    
-    #SANSW(host,telnet_port,username,password,lstSWPort)._PutErrorToDict()
-    s1 = Status(host,port,username,password,lstSWPort).sum_and_total()
+    lstPort = gcsw.list_switch_ports()[0]
+
+    # SANSW(host,telnet_port,username,password,lstSWPort)._PutErrorToDict()
+    s1 = Status(host, port, username, password, lstPort).sum_and_total()
     print(s1)

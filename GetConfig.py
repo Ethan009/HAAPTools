@@ -90,9 +90,6 @@ class SwitchConfig(object):
             lstSwitches_Ports = oddSwitcesPorts.values()
             print("wqeqwe:",type(lstSwitches_Ports[0]))
 #             lstSwitches_Ports = lstSwitches_Ports.split()
-        
-            
-                
 
         return lstSwitches_alias, lstSwitches_Ports
 
@@ -150,6 +147,9 @@ class Setting(object):
     """docstring for Setting"""
     def __init__(self):
         self.cfg = read_config_file()
+
+    def message_level(self):
+        return self.cfg.getint('MessageLogging', 'msglevel')
 
     def monitor_web_refresh(self):
         return self.cfg.getint('RefreshInterval', 'monitor_web_refresh')

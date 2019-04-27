@@ -2,6 +2,7 @@
 import os
 import sys
 import time
+import datetime
 from mongoengine import *
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.interval import IntervalTrigger
@@ -13,24 +14,44 @@ try:
 except Exception:
     import ConfigParser as cp
 
-objCFG = cp.ConfigParser(allow_no_value=True)
-objCFG.read('Conf.ini')
 
-error_level = int(objCFG.get('MessageLogging', 'msgLevel'))
+# <<<Get Config Field>>>
+setting = gc.Setting()
+error_level = setting.message_level()
 
+# <<<Get Config Field>>>
+
+
+
+def deco_OutFromFolder(func):
+    strOriFolder = os.getcwd()
+
+    def _deco(self, *args, **kwargs):
+        try:
+            return func(self, *args, **kwargs)
+        except Exception as E:
+            # print(func.__name__, E)
+            pass
+        finally:
+            os.chdir(strOriFolder)
+    return _deco
+
+
+def deco_Exception(func):
+    def _deco(self, *args, **kwargs):
+        try:
+            return func(self, *args, **kwargs)
+        except Exception as E:
+            print(func.__name__, E)
+    return _deco
+
+def time_now_folder():
+    return datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 
 def is_Warning(intValue, data):
     '''
     data is int or a tuple
     '''
-    # def judge_level(intValue, tupData):
-    #     if intValue >= tupData[2]:
-    #         return '3'
-    #     elif intValue >= tupData[1]:
-    #         return 2
-    #     elif intValue >= tupData[0]:
-    #         return 1
-
     if isinstance(data, int):
         print('<>')
         if intValue > data:
@@ -43,6 +64,10 @@ def is_Warning(intValue, data):
         elif intValue >= data[0]:
             return 1
         # return judge_level(intValue, data)
+
+def is_trace_leve(num):
+    if num in (1,2,3):
+        return True
 
 def is_IP(strIP):
     reIP = re.compile(
