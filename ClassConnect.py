@@ -242,8 +242,9 @@ class HAAPConn(object):
             objTelnetConnect.write(b'\r')
             objTelnetConnect.read_until(
                 self._strMainMenuPrompt.encode(encoding="utf-8"), timeout=1)
-            return True
+            
             self.Connection = objTelnetConnect
+            return True
         except Exception as E:
             s.ShowErr(self.__class__.__name__,
                       sys._getframe().f_code.co_name,
