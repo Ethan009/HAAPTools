@@ -1,4 +1,6 @@
-# coding:utf8
+# coding:utf-8
+
+from __future__ import print_function
 import ClassConnect
 import re
 from collections import OrderedDict
@@ -12,8 +14,8 @@ import GetConfig as gc
 
 # <<<Get Config Field>>>
 haapcfg = gc.EngineConfig()
-list_haap_ip = haapcfg.list_engines_IP()
-list_haap_alias = haapcfg.list_engines_alias()
+list_engines_IP = haapcfg.list_engines_IP()
+list_engines_alias = haapcfg.list_engines_alias()
 telnet_port = haapcfg.telnet_port()
 FTP_port = haapcfg.FTP_port()
 passwd = haapcfg.password()
@@ -39,38 +41,38 @@ def backup_config(ip):
 def change_firmware(ip, fw_file):
     Action(ip, telnet_port, passwd, FTP_port).change_FW(fw_file)
 
-def get_trace_all(tracle_level):
+def get_trace_all(trace_level):
     folder = '%s/%s' % (strTraceFolder, s.time_now_folder())
-    try:
-        if trace_level:
-            for ip in list_engines_IP:
-                Action(ip, telnet_port, passwd, FTP_port).get_trace(
-                    folder, trace_level_cfg)
-        else:
-            for ip in list_engines_IP:
-                Action(ip, telnet_port, passwd, FTP_port).get_trace(
-                    folder, trace_level)
-    finally:
-        return folder
+    # try:
+    if trace_level:
+        for ip in list_engines_IP:
+            Action(ip, telnet_port, passwd, FTP_port).get_trace(
+                folder, trace_level)
+    else:
+        for ip in list_engines_IP:
+            Action(ip, telnet_port, passwd, FTP_port).get_trace(
+                folder, trace_level_cfg)
+    # finally:
+    #     return folder
 
 
-def get_trace(ip, tracle_level):
+def get_trace(ip, trace_level):
     folder = '%s/%s' % (strTraceFolder, s.time_now_folder())
     try:
         if trace_level:
             Action(ip, telnet_port, passwd, FTP_port).get_trace(
-                    folder, trace_level_cfg)
+                    folder, trace_level)
         else:
             Action(ip, telnet_port, passwd, FTP_port).get_trace(
-                    folder, trace_level)
+                    folder, trace_level_cfg)
     finally:
         return folder
 
-def analyse_trace_all(tracle_level):
-    s.TraceAnalyse(oddHAAPErrorDict, get_trace_all(tracle_level))
+def analyse_trace_all(trace_level):
+    s.TraceAnalyse(oddHAAPErrorDict, get_trace_all(trace_level))
 
-def analyse_trace(ip, tracle_level):
-    s.TraceAnalyse(oddHAAPErrorDict, get_trace(ip, tracle_level))
+def analyse_trace(ip, trace_level):
+    s.TraceAnalyse(oddHAAPErrorDict, get_trace(ip, trace_level))
 
 def execute_multi_commands(ip, command_file):
     Action(ip, telnet_port, passwd, FTP_port).auto_commands(command_file)
@@ -80,12 +82,13 @@ tupWidth = (18, 16, 20, 13, 9, 12)
 
 def _print_description():
     for i in range(len(tupDesc)):
-        print(tupDesc[i].center(tupWidth[i]),end == '')
+        print(tupDesc[i].center(tupWidth[i]), end='')
     print()
 
 def _print_status_in_line(lstStatus):
     for i in range(len(lstStatus)):
-        print(lstStatus[i].center(tupWidth[i]), end =='')
+        if lstStatus[i]:
+            print(lstStatus[i].center(tupWidth[i]), end ='')
     print()
 
 def show_stauts_all():
@@ -103,7 +106,7 @@ def set_time_all():
     for ip in list_engines_IP:
         Action(ip, telnet_port, passwd, FTP_port).set_time()
 
-def set_time():
+def set_time(ip):
     Action(ip, telnet_port, passwd, FTP_port).set_time()
 
 def show_time_all():
@@ -180,7 +183,7 @@ st
             connFTP = self._FTP_Conn
         return connFTP
 
-    @deco_OutFromFolder
+    @s.deco_OutFromFolder
     def backup(self, strBaseFolder):
         connFTP = self._ftp()
         s.GotoFolder(strBaseFolder)
@@ -197,7 +200,7 @@ st
                 break
             time.sleep(0.25)
 
-    @deco_Exception
+    @s.deco_Exception
     def change_firmware(self, strFWFile):
         connFTP = self._ftp()
         time.sleep(0.25)
@@ -205,7 +208,7 @@ st
         print('FW Upgrade Done for {}, Waiting for reboot...'.format(
             self._host))
 
-    @deco_Exception
+    @s.deco_Exception
     def auto_commands(self, strCMDFile):
         tn = self._TN_Conn
         if self.AHStatus:
@@ -224,7 +227,7 @@ st
                     break
                 time.sleep(0.5)
 
-    @deco_OutFromFolder
+    @s.deco_OutFromFolder
     def get_trace(self, strBaseFolder, intTraceLevel):
         if self.AHStatus:
             print("Engine '%s' is at AH Status(AH Code %d)"
@@ -267,11 +270,11 @@ st
                         strTraceDes, self._host))
                     return True
                 else:
-                    print('Get Trace "{:<10}" for Engine "{}" Failed...\
+                    print('Get Trace "{:<10}" for Engine "{}" Failed!!!\
                         '.format(strTraceDes, self._host))
                 #     s.ShowErr(self.__class__.__name__,
                 #               sys._getframe().f_code.co_name,
-                #               'Get Trace "{:<10}" for Engine "{}" Failed...\
+                #               'Get Trace "{:<10}" for Engine "{}" Failed!!!\
                 #               '.format(strTraceDes, self._host))
 
         oddCommand = _get_oddCommand(intTraceLevel)
@@ -286,16 +289,17 @@ st
                     else:
                         break
                 except Exception as E:
-                    s.ShowErr(self.__class__.__name__,
-                              sys._getframe().f_code.co_name,
-                              'Get Trace "{}" Failed for Engine "{}",\
-                    Error:'.format(lstDescribe[i], self._host),
-                              E)
+                    # s.ShowErr(self.__class__.__name__,
+                    #           sys._getframe().f_code.co_name,
+                    #           'Get Trace "{}" Failed for Engine "{}",\
+                    # Error:'.format(lstDescribe[i], self._host),
+                    #           E)
                     break
                 time.sleep(0.1)
 
-    @deco_OutFromFolder
+    @s.deco_OutFromFolder
     def periodic_check(self, lstCommand, strResultFolder, strResultFile):
+        print(type(lstCommand))
         if self.AHStatus:
             print("Engine '%s' is at AH Status(AH Code %d)"
                   % (self.host, self.AHStatus))
@@ -353,10 +357,12 @@ st
                           '"{}"'.format(E))
 
         if self._TN_Conn:
-            print('\nSetting Time for Engine %s ...' % self._host)
-            _exct_cmd()
+            if _exct_cmd():
+                print('\nSetting Time for Engine "%s" Completely...' % self._host)
+            else:
+                print('\nSetting Time for Engine "%s" Failed!!!' % self._host)
         else:
-            print('\nSetting Time for Engine %s Failed...' % self._host)
+            print('\nSetting Time for Engine "%s" Failed!!!' % self._host)
 
     def show_time(self):
         if self.AHStatus:
@@ -376,14 +382,14 @@ class Uptime(object):
     """docstring for uptime"""
 
     def __init__(self, strVPD):
-        # super(uptime, self).__init__()
-        self.list_uptime = _uptime_list(strVPD)
+        self.vpd = strVPD
+        self.list_uptime = self._uptime_list()
 
-    def _uptime_list(self, strVPD):
-        if strVPD:
+    def _uptime_list(self):
+        if self.vpd:
             reUpTime = re.compile(
                 r'Uptime\s*:\s*((\d*)d*\s*(\d{2}):(\d{2}):(\d{2}))')
-            objReUpTime = reUpTime.search(strVPD)
+            objReUpTime = reUpTime.search(self.vpd)
             lstUpTime = []
            # add day to list
             try:
@@ -396,8 +402,8 @@ class Uptime(object):
             return lstUpTime
 
     def uptime_list(self):
-        if strVPD:
-            return self._uptime_list(strVPD)
+        if self.vpd:
+            return self._uptime_list(self.vpd)
 
     def uptime_second(self):
         uptime_list = self.uptime_list()
@@ -446,7 +452,7 @@ class Status(Action):
         self.dictInfo = self._get_info_to_dict()
         self.uptime = Uptime(self.dictInfo['vpd'])
 
-    @deco_Exception
+    @s.deco_Exception
     def _get_info_to_dict(self):
         if self.AHStatus:
             print("Engine '%s' is at AH Status(AH Code %d)"
@@ -454,11 +460,9 @@ class Status(Action):
             return
         lstCommand = ['vpd', 'engine', 'mirror', 'abts', 'qfull']
         dictInfo = {}
-        print(self._TN_Connect_Status)
         if self._TN_Connect_Status:
             for command in lstCommand:
                 dictInfo[command] = self._executeCMD(command)
-                print(dictInfo[command])
                 time.sleep(0.2)
             return dictInfo
 
@@ -471,30 +475,30 @@ class Status(Action):
     def uptime_to_show(self):
         return self.uptime.uptime_to_show()
 
-    def show_engine_status(self):
-    # dictEngines = get_HAAP_over_all()
-    tupDesc = ('Engine', 'AH', 'Uptime', 'Master', 'Cluster', 'Mirror')
-    tupWidth = (18, 16, 20, 13, 9, 12)
+    # def show_engine_status(self):
+    # # dictEngines = get_HAAP_over_all()
+    #     tupDesc = ('Engine', 'AH', 'Uptime', 'Master', 'Cluster', 'Mirror')
+    #     tupWidth = (18, 16, 20, 13, 9, 12)
 
-        def _print_description():
-            for i in range(len(tupDesc)):
-                print(tupDesc[i].center(tupWidth[i]),end == '')
-            print()
+    #     def _print_description():
+    #         for i in range(len(tupDesc)):
+    #             print(tupDesc[i].center(tupWidth[i]),end == '')
+    #         print()
              
-        def _print_status_in_line(lstStatus):
-            for i in range(len(lstStatus)):
-                print(lstStatus[i].center(tupWidth[i]), end =='')
-            print()
+    #     def _print_status_in_line(lstStatus):
+    #         for i in range(len(lstStatus)):
+    #             print(lstStatus[i].center(tupWidth[i]), end =='')
+    #         print()
 
-        def _print_status_in_table():
-            for engine in lstHAAPAlias:
-                lstStatus = dictEngines[engine]
-                _print_status_in_line(lstStatus)
+    #     def _print_status_in_table():
+    #         for engine in lstHAAPAlias:
+    #             lstStatus = dictEngines[engine]
+    #             _print_status_in_line(lstStatus)
 
-        _print_description()
-        _print_status_in_table()
+    #     _print_description()
+    #     _print_status_in_table()
 
-    @deco_Exception
+    @s.deco_Exception
     def _is_master(self, strEngine):
         if strEngine is None:
             return
@@ -504,17 +508,18 @@ class Status(Action):
             if objReMaster:
                 return 'M'
 
-    @deco_Exception
+    @s.deco_Exception
     def is_master(self):
         if self.dictInfo['engine']:
             return self._is_master(self.dictInfo['engine'])
 
     def cluster_status(self):
-        if 'offline' in self.dictInfo['engine']:
-            return True
+        if self.dictInfo['engine']:
+            if 'offline' in self.dictInfo['engine']:
+                return True
 
     def get_version(self):
-        if self.dictInfo is None:
+        if self.dictInfo['vpd'] is None:
             return
         strVPD = self.dictInfo['vpd']
         reFirmWare = re.compile(r'Firmware\sV\d+(.\d+)*')
@@ -525,7 +530,7 @@ class Status(Action):
             print('Get Firmware Version Failed for Engine "%s"' % self._host)
 
 # ## Matt Need to be optimise...
-    @deco_Exception
+    @s.deco_Exception
     def get_mirror_status(self):
         strMirror = self.dictInfo['mirror']
         if strMirror is None:

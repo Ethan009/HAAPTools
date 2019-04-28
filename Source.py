@@ -3,17 +3,14 @@ import os
 import sys
 import time
 import datetime
-from mongoengine import *
-from apscheduler.schedulers.blocking import BlockingScheduler
-from apscheduler.triggers.interval import IntervalTrigger
 import re
-import xlwt
 
 try:
     import configparser as cp
 except Exception:
     import ConfigParser as cp
 
+import GetConfig as gc
 
 # <<<Get Config Field>>>
 setting = gc.Setting()
@@ -65,7 +62,7 @@ def is_Warning(intValue, data):
             return 1
         # return judge_level(intValue, data)
 
-def is_trace_leve(num):
+def is_trace_level(num):
     if num in (1,2,3):
         return True
 
@@ -95,29 +92,6 @@ def is_port(intPortNum):
                 return True
     return False
 
-
-def show_engine_status(dictEngines):
-    # dictEngines = get_HAAP_over_all()
-    tupDesc = ('Engine', 'AH', 'Uptime', 'Master', 'Cluster', 'Mirror')
-    tupWidth = (18, 16, 20, 13, 9, 12)
-
-    def _print_description():
-        for i in range(len(tupDesc)):
-            print(tupDesc[i].center(tupWidth[i]),end == '')
-        print()
-         
-    def _print_status_in_line(lstStatus):
-        for i in range(len(lstStatus)):
-            print(lstStatus[i].center(tupWidth[i]), end =='')
-        print()
-
-    def _print_status_in_table():
-        for engine in lstHAAPAlias:
-            lstStatus = dictEngines[engine]
-            _print_status_in_line(lstStatus)
-
-    _print_description()
-    _print_status_in_table()
 
 
 def ShowErr(*argvs):
@@ -153,15 +127,16 @@ def ShowErr(*argvs):
 
 def GotoFolder(strFolder):
     def _mkdir():
-        if os.path.exists(strFolder):
-            return True
-        else:
-            try:
-                os.makedirs(strFolder)
+        if strFolder:
+            if os.path.exists(strFolder):
                 return True
-            except Exception as E:
-                print('Create Folder "{}" Fail With Error:\n\t"{}"'.format(
-                    strFolder, E))
+            else:
+                try:
+                    os.makedirs(strFolder)
+                    return True
+                except Exception as E:
+                    print('Create Folder "{}" Fail With Error:\n\t"{}"'.format(
+                        strFolder, E))
 
     if _mkdir():
         try:
@@ -242,6 +217,7 @@ class TimeNow(object):
 
 
 def TraceAnalyse(oddHAAPErrorDict, strTraceFolder):
+    import xlwt
 
     def _read_file(strFileName):
         try:
