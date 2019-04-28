@@ -90,10 +90,6 @@ class SwitchConfig(object):
             lstSwitches_Ports = oddSwitcesPorts.values()
             print("wqeqwe:",type(lstSwitches_Ports[0]))
 #             lstSwitches_Ports = lstSwitches_Ports.split()
-        
-            
-                
-
         return lstSwitches_alias, lstSwitches_Ports
 
     def list_switch_alias(self):

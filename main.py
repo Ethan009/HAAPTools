@@ -681,7 +681,7 @@ class DB_collHAAP(object):
     def haap2_insert(self, time_now, lstdj, lstSTS, confirm):
         t = collWARN(time=time_now, level=lstdj, warn_message=lstSTS, confirm_status=confirm)
         t.save()
-
+        
 #BY wen###
     def Switch_insert(self, time_now, lstSW_IP, lstSWS, lstSW_Total):
         t = collSWITCH(time=time_now, Switch_ip=lstSW_IP, Switch_status=lstSWS, Switch_total=lstSW_Total)

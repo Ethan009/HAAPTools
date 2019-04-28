@@ -245,6 +245,7 @@ class Status(SANSW):
             port = dicPe.keys()[i]
             lstPortError = dicPE.values()[i]
             dicIntPE[port] = self.list_string_to_int(lstPortError)
+        print("dicIntPE:",dicIntPE)
         return dicIntPE
 
     def sum_and_total(self, dicSANSWPorts):
@@ -256,47 +257,52 @@ class Status(SANSW):
                 sum += lstPort[type]
             lstSum.append(sum)
         total = sum(lstSum)
+        print("lstSum:",lstSum)
         return lstSum,total
+    
+    
+    
+    
 
     # def total(self):
     #     sum(self.sum_all_type(self._dicPartPortError))
 
     ### 
     
-    def num(self,lisport):
-        for port in range(len(lisport)):
-            if not lisport[port].isdigit():
-                a=list(lisport[port])
-                if a[-1] == 'm':
-                    lisport[port]=str(int(float(lisport[port][:-1])*10000))
-                elif a[-1] == 'k':
-                    lisport[port]=str(int(float(lisport[port][:-1])*1000))
-        
-    #优化每个端口的错误数
-    def get_switch_int(self):
-        lstSwitchstatus = []
-       # a = {}
-        for h in range(len(self._allSWPort)):
-            b = self._dicPartPortError[lstSWPort[h]]
-            self.num(b)
-            lstSwitchstatus.append(b)
-            #加了port的值
-            #a['port' + str(lstSWPort[h])] = b
-        return lstSwitchstatus
-    
-    #每个Ip所有端口每种错误总值
-    def get_switch_status(self):
-        b = self.get_switch_int()
-        total=[0,0,0,0,0,0,0]
-        for a in range(len(b)):
-            total = [total[i]+int(b[a][i]) for i in range(len(b[a]))]
-        return total
-    
-    #所有端口错误总值
-    def get_switch_total(self):
-        b = self.get_switch_status()
-        b = sum(b)
-        return b 
+#     def num(self,lisport):
+#         for port in range(len(lisport)):
+#             if not lisport[port].isdigit():
+#                 a=list(lisport[port])
+#                 if a[-1] == 'm':
+#                     lisport[port]=str(int(float(lisport[port][:-1])*10000))
+#                 elif a[-1] == 'k':
+#                     lisport[port]=str(int(float(lisport[port][:-1])*1000))
+#         
+#     #优化每个端口的错误数
+#     def get_switch_int(self):
+#         lstSwitchstatus = []
+#        # a = {}
+#         for h in range(len(self._allSWPort)):
+#             b = self._dicPartPortError[lstSWPort[h]]
+#             self.num(b)
+#             lstSwitchstatus.append(b)
+#             #加了port的值
+#             #a['port' + str(lstSWPort[h])] = b
+#         return lstSwitchstatus
+#     
+#     #每个Ip所有端口每种错误总值
+#     def get_switch_status(self):
+#         b = self.get_switch_int()
+#         total=[0,0,0,0,0,0,0]
+#         for a in range(len(b)):
+#             total = [total[i]+int(b[a][i]) for i in range(len(b[a]))]
+#         return total
+#     
+#     #所有端口错误总值
+#     def get_switch_total(self):
+#         b = self.get_switch_status()
+#         b = sum(b)
+#         return b 
 
     
     def get_switch_original(self):
@@ -307,13 +313,22 @@ class Status(SANSW):
 
 
 if __name__ == '__main__':
+    
+    
     host = objSwitchConfig.list_switch_IP()[0]
     telnet_port = objSwitchConfig.telnet_port()
     username = objSwitchConfig.sw_username()
     password = objSwitchConfig.sw_password()
     lstSWPort = objSwitchConfig.list_switch_ports()[0]
     
+    gcsw = gc.SwitchConfig()
+    host = gcsw.list_switch_IP()[0]
+    port = gcsw.telnet_port()
+    username = gcsw.sw_username()
+    password = gcsw.sw_password()
+    lstSWPort = gcsw.list_switch_ports()[0]
+    
     e = host,telnet_port,username,password,lstSWPort
     print("e:",e)
     #SANSW(host,telnet_port,username,password,lstSWPort)._PutErrorToDict()
-    Status = Status(host,telnet_port,username,password,lstSWPort).get_switch_total()
+    Status = Status(host,telnet_port,username,password,lstSWPort).sum_and_total()
