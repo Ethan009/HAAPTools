@@ -82,7 +82,7 @@ class SwitchConfig(object):
     def _odd_switches_Ports(self):
         oddSWPort = Odd()
         for sw in self.cfg.items('SANSwitchePorts'):
-            oddSWPort[sw[0]] = sw[1]
+            oddSWPort[sw[0]] = eval(sw[1])
         return oddSWPort
 
     def list_switch_alias(self):

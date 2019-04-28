@@ -78,17 +78,25 @@ def execute_multi_commands(ip, command_file):
     Action(ip, telnet_port, passwd, FTP_port).auto_commands(command_file)
 
 tupDesc = ('Engine', 'AH', 'Uptime', 'Master', 'Cluster', 'Mirror')
-tupWidth = (18, 16, 20, 13, 9, 12)
+tupWidth = (18, 5, 32, 8, 9, 8)
 
 def _print_description():
     for i in range(len(tupDesc)):
-        print(tupDesc[i].center(tupWidth[i]), end='')
+        print(tupDesc[i].ljust(tupWidth[i]), end='')
     print()
 
 def _print_status_in_line(lstStatus):
+    if not lstStatus[1]:
+        lstStatus[1] = 'OK'
+    if not lstStatus[4]:
+        lstStatus[4] = 'OK'
+    if not lstStatus[5]:
+        lstStatus[5] = 'OK'
     for i in range(len(lstStatus)):
         if lstStatus[i]:
-            print(lstStatus[i].center(tupWidth[i]), end ='')
+            print(lstStatus[i].ljust(tupWidth[i]), end ='')
+        else:
+            print(''.ljust(tupWidth[i]), end ='')
     print()
 
 def show_stauts_all():
@@ -111,7 +119,7 @@ def set_time(ip):
 
 def show_time_all():
     for ip in list_engines_IP:
-        Action(ip, telnet_port, passwd, FTP_port).set_time()
+        Action(ip, telnet_port, passwd, FTP_port).show_time()
 
 def show_time():
     Action(ip, telnet_port, passwd, FTP_port).show_time()
@@ -349,6 +357,7 @@ st
                             DoW - 7
                         if self._TN_Conn.exctCMD('rtc set day %d' % DoW):
                             complete_print('Day_of_Week')
+                return True
             except Exception as E:
                 s.ShowErr(self.__class__.__name__,
                           sys._getframe().f_code.co_name,
@@ -403,7 +412,7 @@ class Uptime(object):
 
     def uptime_list(self):
         if self.vpd:
-            return self._uptime_list(self.vpd)
+            return self._uptime_list()
 
     def uptime_second(self):
         uptime_list = self.uptime_list()
@@ -573,13 +582,11 @@ class Status(Action):
         if self.AHStatus:
             for i in range(3):
                 lstOverAll.append('--')
-
         else:
             lstOverAll.append(self.uptime_to_show())
             lstOverAll.append(self.is_master())
-            lstOverAll.append(self.get_version())
             lstOverAll.append(self.cluster_status())
-
+            lstOverAll.append(self.get_mirror_status())
         return lstOverAll
 
 

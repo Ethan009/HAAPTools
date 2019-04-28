@@ -144,8 +144,8 @@ def main():
         elif sys.argv[2] == 'all':
             sw.print_porterror_all_formated()
         else:
-            if s.is_IP(sys.argv[1]):
-                sw.print_porterror_formated(sys.argv[1])
+            if s.is_IP(sys.argv[2]):
+                sw.print_porterror_formated(sys.argv[2])
             else:
                 print('Please Provide Correct Switch IP...')
 
@@ -220,7 +220,7 @@ def main():
         num_argv = len(sys.argv)
         if num_argv > 3:
             trace_level = sys.argv[3]
-        if num_argv == 2 and num_argv > 4:
+        if num_argv == 2 or num_argv > 4:
             print(strPTCLHelp)
         elif sys.argv[2] == 'all':
             if num_argv > 3:
@@ -245,14 +245,13 @@ def main():
         if len(sys.argv) != 4:
             print(strECHelp)
             return
-        if len(sys.argv) == 4:
+        else:
             ip = sys.argv[2]
             command_file = sys.argv[3]
             if not s.is_IP(ip):
                 print('Please Provide Correct Engine IP...')
             if not s.is_file(command_file):
                 print('File Not Exists. Please Provide Correct File...')
-        else:
             haap.execute_multi_commands(ip, command_file)
 
     elif sys.argv[1] == 'sts':

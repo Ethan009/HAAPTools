@@ -156,7 +156,7 @@ class SSHConn(object):
     # def download(self, remotepath, localpath):
     #     def _download():
     #         if self._sftp is None:
-    #             self._sftp = self._client.open_sftp()
+    #             self._sftp = self.SSHConnection.open_sftp()
     #         self._sftp.get(remotepath, localpath)
     #     try:
     #         _download()
@@ -171,7 +171,7 @@ class SSHConn(object):
     # def upload(self, localpath, remotepath):
     #     def _upload():
     #         if self._sftp is None:
-    #             self._sftp = self._client.open_sftp()
+    #             self._sftp = self.SSHConnection.open_sftp()
     #         self._sftp.put(localpath, remotepath)
     #     try:
     #         _upload()
@@ -197,7 +197,7 @@ class SSHConn(object):
 
     def exctCMD(self, command):
         def GetRusult():
-            stdin, stdout, stderr = self._client.exec_command(command)
+            stdin, stdout, stderr = self.SSHConnection.exec_command(command)
             data = stdout.read()
             if len(data) > 0:
                 # print(data.strip())
@@ -286,6 +286,8 @@ class HAAPConn(object):
                 reAHNum = re.compile(r'Alert:\s*(\d*)')
                 objReAHNum = reAHNum.search(strVPD)
                 return int(objReAHNum.group(1))
+            else:
+                return 0
 
     def exctCMD(self, strCommand):
         CLI = self._strCLIPrompt.encode(encoding="utf-8")
