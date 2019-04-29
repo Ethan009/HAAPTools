@@ -3,7 +3,7 @@
 from __future__ import print_function
 import SANSW as sw
 import HAAP as haap
-
+import DB as db
 import Source as s
 from collections import OrderedDict as Odd
 from apscheduler.schedulers.blocking import BlockingScheduler
@@ -98,13 +98,12 @@ intFTPPort = HAAP_Config.FTP_port()
 strHAAPPasswd = HAAP_Config.password()
 intTraceLevel = HAAP_Config.trace_level()
 # Config of SANSW
-SANSW_Config = gc.SANSWConfig()
-lstSANSW
-lstSANSWAlias
-intSWSSHPort
-strSWUser
-strSWPWD
-dicSANSWPorts
+SANSW_Config = gc.SwitchConfig()
+lstSANSWAlias = SANSW_Config.list_switch_alias()
+intSWSSHPort = SANSW_Config.ssh_port()
+strSWUser = SANSW_Config.sw_username()
+strSWPWD = SANSW_Config.sw_password()
+dicSANSWPor = SANSW_Config.list_switch_ports()
 
 # Config of DB
 
@@ -112,13 +111,13 @@ dicSANSWPorts
 
 # Config of Setting
 
-oddTraceRegular
-strDesFolder
-strPCFolder
-lstCommand_PC_HAAP
-lstCommand_PC_SANSW
+# oddTraceRegular
+# strDesFolder
+# strPCFolder
+# lstCommand_PC_HAAP
+# lstCommand_PC_SANSW
 
-refresh_interval = gc.Setting.monitor_web_refresh()
+# refresh_interval = gc.Setting.monitor_web_refresh()
 
 def _get_TimeNow_Human():
     return datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -176,6 +175,7 @@ def get_SANSW_origin():
     odd = Odd()
     for i in len(range(lstSANSW)):
         odd[lstSANSWAlias[i]] = _SANSW_Status(lstSANSW[i]).origin()
+    print("odd:",odd)
     return odd
 
 def get_SANSW_summary():
@@ -642,6 +642,7 @@ def main():
 
 
 if __name__ == '__main__':
+    #get_SANSW_origin()
     main()
 
 

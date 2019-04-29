@@ -130,7 +130,6 @@ class SANSW(object):
     Switch_Status:{
     "SW1":{
     "IP":"1.1.1.1",
-    "strPES":""
     "PE":{
     "0":[
         "0", 

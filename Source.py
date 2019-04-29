@@ -14,7 +14,7 @@ except Exception:
     import ConfigParser as cp
 
 objCFG = cp.ConfigParser(allow_no_value=True)
-objCFG.read('Conf.ini')
+objCFG.read('Conf2.ini')
 
 error_level = int(objCFG.get('MessageLogging', 'msgLevel'))
 

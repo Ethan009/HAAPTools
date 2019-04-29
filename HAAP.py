@@ -514,8 +514,6 @@ class Status(Action):
                     return '%d Seconds' % s
 
 
-    def
-
     @deco_Exception
     def _is_master(self, strEngine):
         if strEngine is None:

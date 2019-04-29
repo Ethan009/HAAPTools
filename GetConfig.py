@@ -79,7 +79,7 @@ class SwitchConfig(object):
             oddSwitces[switch[0]] = switch[1]
             lstSwitches_alias = list(oddSwitces.keys())
             lstSwitches_IP = list(oddSwitces.values())
-        return oddSwitces, lstSwitches_IP
+        return lstSwitches_alias, lstSwitches_IP
     
     def _odd_switches_Ports(self):
         oddSwitcesPorts = Odd()
@@ -101,7 +101,7 @@ class SwitchConfig(object):
     def list_switch_ports(self):
         return self.SwitchPorts[1]
 
-    def SSH_port(self):
+    def ssh_port(self):
         return self.cfg.getint('SANSwitcheSetting', 'port')
 
     def sw_username(self):
@@ -175,10 +175,11 @@ class Setting(object):
         return str(self.cfg.get('FolderSetting', 'PeriodicCheck'))
     
     def PCEngineCommand(self):  
-        return str(self.cfg.options("PCEngineCommand"))
+       # print("11111111111:",type(str(self.cfg.options("PCEngineCommand"))))
+        return self.cfg.options("PCEngineCommand")
     
     def PCSANSwitchCommand(self):  
-        return str(self.cfg.options("PCSANSwitchCommand"))
+        return self.cfg.options("PCSANSwitchCommand")
     
     def oddRegularTrace(self):
         oddRegularTrace = Odd()
