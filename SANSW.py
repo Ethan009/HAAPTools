@@ -13,6 +13,7 @@ objSwitchConfig = gc.SwitchConfig()
 
 # <<<Get Config Field>>>
 swcfg = gc.SwitchConfig()
+
 list_sw_IP = swcfg.list_switch_IP()
 list_sw_alias = swcfg.list_switch_alias()
 ssh_port = swcfg.SSH_port()
@@ -54,7 +55,6 @@ def print_porterror_formated(ip):
         else:
             print('"%s" is NOT Configured in Conf.ini' % ip)
     id = get_index(ip, list_sw_IP)
-
     if id is not None:
         Status(list_sw_IP[id],
          ssh_port,
@@ -73,7 +73,6 @@ def print_switchshow(ip):
     else:
         print('"%s" is NOT Configured in Conf.ini' % ip)
 
-
 def periodically_check_all():
     for ip in list_sw_IP:
         PCFile_name = 'PC_%s_Engine_%s.log' % (
@@ -89,6 +88,7 @@ def periodically_check(ip):
 
 
 class Action():
+
     def __init__(self, strIP, intPort, strUserName, strPasswd,
                  lstSWPort, intTimeout=2):
         self._host = strIP
@@ -101,6 +101,7 @@ class Action():
         self.strSwitchshow = None
         self._SWConn = None
         self._get_switch_info()
+
 
     @s.deco_Exception
     def _get_switch_info(self):
@@ -147,6 +148,7 @@ class Action():
         except:
             print('Clear Error Count for SW "{}" Failed!!!'.format(self._host))
 
+
     @s.deco_Exception
     def clear_one_port(self, intSWPort):
         try:
@@ -176,8 +178,6 @@ class Action():
                                 strCMD)
                             print(strErr)
                             f.write(strErr)
-
-
 
 class Status(Action):
 
@@ -228,11 +228,11 @@ class Status(Action):
 
     def err_num_int(self, strNum):
         if strNum[-1] == 'g':
-            return int(float(strNum[:-1])*1000000000)
+            return int(float(strNum[:-1]) * 1000000000)
         elif strNum[-1] == 'm':
-            return int(float(strNum[:-1])*1000000)
+            return int(float(strNum[:-1]) * 1000000)
         elif strNum[-1] == 'k':
-            return int(float(strNum[:-1])*1000)
+            return int(float(strNum[:-1]) * 1000)
         else:
             return int(strNum)
 
@@ -250,7 +250,9 @@ class Status(Action):
             return dicIntPE
 
     def sum_and_total(self):
+        print("13213:",self._dicPartPortError)
         dicIntPE = self._dict_string_to_int(self._dicPartPortError)
+        print("222:",dicIntPE)
         lstSum = []
         total = 0
         for type in range(6):
@@ -279,26 +281,35 @@ class Status(Action):
                         print(dicPE.values()[port][i].ljust(tuplWidth[i+1]), end='')
                     print()
 
-        print('Port Error Show for SAN Switch "%s":\n' % self._host)
+        print('\nPort Error Show for SAN Switch "%s":\n' % self._host)
         _print_description()
         _print_status_in_line(self._dicPartPortError)
+    
+   ### Paul
+    def origin(self):
+        one = self._dicPartPortError.keys()
+        two = self._dicPartPortError.values()
+        porterr_show = dict(zip(one,two))
+        origin_key = ['IP','porterrshow']
+        origin_values = [host,porterr_show]
+        origin = dict(zip(origin_key,origin_values))
+        return origin
 
-
- #      dictEngines = _get_HAAPInstance()
- # 1084      tuplDesc = ('Engine', 'AH', 'Uptime', 'FirmWare', 'Master', 'Mirror')
- # 1085:     tupWidth = (18, 16, 20, 13, 9, 12)
- # 1086  
- # 1087      def _print_description():
- # 1088          for i in range(len(tupDesc)):
- # 1089:             print(tupDesc[i].center(tupWidth[i]), end='')
- # 1090          print()
- # 1091           
- # 1092      def _print_status_in_line(lstStatus):
- # 1093          for i in range(len(lstStatus)):
- # 1094:             print(lstStatus[i].center(tupWidth[i]), end='')
- # 1095          print()
-
-
+    ####
+    def summary(self):
+        summary_key = ['Ip','Sum','Total']
+        swmmary_values = [host,self.sum_and_total()[0],self.sum_and_total()[1]]
+        summary = dict(zip(summary_key,swmmary_values))
+        return summary
+    ###
+    def switch_status(self):
+        dicIntPE_key = self.sum_and_total()[2].keys()
+        dicIntPE_values = self.sum_and_total()[2].values()
+        dicIntPE  = dict(zip(dicIntPE_key,dicIntPE_values))
+        switch_status_key = ['IP',"port"]
+        switch_status_values = [host,dicIntPE]
+        switch_status = dict(zip(switch_status_key,switch_status_values))
+        return switch_status
 
     @s.deco_Exception
     def get_linkfail_by_port(self, intSWPort):
@@ -315,6 +326,7 @@ class Status(Action):
                 return self._dicPartPortError[intSWPort][2]
             else:
                 print('Please Correct the Port Number...')
+
 
     @s.deco_Exception
     def get_discC3_by_port(self, intSWPort):
@@ -336,6 +348,4 @@ if __name__ == '__main__':
     list_sw_ports = swcfg.list_switch_ports()
     print(Status(list_sw_IP[0], ssh_port, user, passwd, list_sw_ports[0]).print_porterror_formated)
 
-    # SANSW(host,ssh_port,username,password,lstSWPort)._PutErrorToDict()
-    # Status(host, port, username, password, lstPort).print_porterror_formated()
-    
+

@@ -484,29 +484,6 @@ class Status(Action):
     def uptime_to_show(self):
         return self.uptime.uptime_to_show()
 
-    # def show_engine_status(self):
-    # # dictEngines = get_HAAP_over_all()
-    #     tupDesc = ('Engine', 'AH', 'Uptime', 'Master', 'Cluster', 'Mirror')
-    #     tupWidth = (18, 16, 20, 13, 9, 12)
-
-    #     def _print_description():
-    #         for i in range(len(tupDesc)):
-    #             print(tupDesc[i].center(tupWidth[i]),end == '')
-    #         print()
-             
-    #     def _print_status_in_line(lstStatus):
-    #         for i in range(len(lstStatus)):
-    #             print(lstStatus[i].center(tupWidth[i]), end =='')
-    #         print()
-
-    #     def _print_status_in_table():
-    #         for engine in lstHAAPAlias:
-    #             lstStatus = dictEngines[engine]
-    #             _print_status_in_line(lstStatus)
-
-    #     _print_description()
-    #     _print_status_in_table()
-
     @s.deco_Exception
     def _is_master(self, strEngine):
         if strEngine is None:

@@ -23,7 +23,7 @@ except Exception:
                    'time_of_send_Email':'2019/1/25 15:00:10',
                    'message':'Engine \'192.168.0.7\' Mirrir Degrade'}]'''
 objCFG = cp.ConfigParser(allow_no_value=True)
-objCFG.read('Conf.ini')
+objCFG.read('Conf2.ini')
 sub= "用户未确认信息"
 mailto_list = objCFG.get('EmailSetting','receiver')
 def send_warnmail(mailto_list, sub,warninfo_email):
