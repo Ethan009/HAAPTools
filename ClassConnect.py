@@ -132,9 +132,9 @@ class SSHConn(object):
         self._timeout = timeout
         self._username = username
         self._password = password
-        self._client = None
+        self.SSHConnection = None
         self._sftp = None
-        # self._connect()
+        self.ssh_connect()
 
     def _connect(self):
         try:
@@ -144,7 +144,7 @@ class SSHConn(object):
                                  username=self._username,
                                  password=self._password,
                                  timeout=self._timeout)
-            self._client = objSSHClient
+            self.SSHConnection = objSSHClient
             return True
         except Exception as E:
             s.ShowErr(self.__class__.__name__,
@@ -156,7 +156,7 @@ class SSHConn(object):
     # def download(self, remotepath, localpath):
     #     def _download():
     #         if self._sftp is None:
-    #             self._sftp = self._client.open_sftp()
+    #             self._sftp = self.SSHConnection.open_sftp()
     #         self._sftp.get(remotepath, localpath)
     #     try:
     #         _download()
@@ -171,7 +171,7 @@ class SSHConn(object):
     # def upload(self, localpath, remotepath):
     #     def _upload():
     #         if self._sftp is None:
-    #             self._sftp = self._client.open_sftp()
+    #             self._sftp = self.SSHConnection.open_sftp()
     #         self._sftp.put(localpath, remotepath)
     #     try:
     #         _upload()
@@ -183,9 +183,21 @@ class SSHConn(object):
     #         print(__name__, E)
     #         print('Upload Failed ...')
 
+    def _connect_retry(self):
+        if self.SSHConnection:
+            return True
+        else:
+            print('Connect Retry for Engine "%s" ...' % self._host)
+            self._connect()
+
+    def ssh_connect(self):
+        self._connect()
+        self._connect_retry()
+
+
     def exctCMD(self, command):
         def GetRusult():
-            stdin, stdout, stderr = self._client.exec_command(command)
+            stdin, stdout, stderr = self.SSHConnection.exec_command(command)
             data = stdout.read()
             if len(data) > 0:
                 # print(data.strip())
@@ -205,17 +217,14 @@ class SSHConn(object):
             #                   self._host),
             #               E)
 
-        if self._connect():
+        if self.SSHConnection:
             output = _return(GetRusult())
             if output:
                 return output
-        else:
-            print('Please Check SSH Connection to "{}" \n\n'.format(
-                self._host))
 
     def close(self):
-        if self._client:
-            self._client.close()
+        if self.ssh_connect:
+            self.ssh_connect.close()
 
 
 class HAAPConn(object):
@@ -276,6 +285,8 @@ class HAAPConn(object):
                 reAHNum = re.compile(r'Alert:\s*(\d*)')
                 objReAHNum = reAHNum.search(strVPD)
                 return int(objReAHNum.group(1))
+            else:
+                return 0
 
     def exctCMD(self, strCommand):
         CLI = self._strCLIPrompt.encode(encoding="utf-8")

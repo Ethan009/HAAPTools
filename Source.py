@@ -2,35 +2,53 @@
 import os
 import sys
 import time
-from mongoengine import *
-from apscheduler.schedulers.blocking import BlockingScheduler
-from apscheduler.triggers.interval import IntervalTrigger
+import datetime
 import re
-import xlwt
 
 try:
     import configparser as cp
 except Exception:
     import ConfigParser as cp
 
-objCFG = cp.ConfigParser(allow_no_value=True)
-objCFG.read('Conf.ini')
+import GetConfig as gc
 
-error_level = int(objCFG.get('MessageLogging', 'msgLevel'))
+# <<<Get Config Field>>>
+setting = gc.Setting()
+error_level = setting.message_level()
 
+# <<<Get Config Field>>>
+
+
+
+def deco_OutFromFolder(func):
+    strOriFolder = os.getcwd()
+
+    def _deco(self, *args, **kwargs):
+        try:
+            return func(self, *args, **kwargs)
+        except Exception as E:
+            # print(func.__name__, E)
+            pass
+        finally:
+            os.chdir(strOriFolder)
+    return _deco
+
+
+def deco_Exception(func):
+    def _deco(self, *args, **kwargs):
+        try:
+            return func(self, *args, **kwargs)
+        except Exception as E:
+            print(func.__name__, E)
+    return _deco
+
+def time_now_folder():
+    return datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 
 def is_Warning(intValue, data):
     '''
     data is int or a tuple
     '''
-    # def judge_level(intValue, tupData):
-    #     if intValue >= tupData[2]:
-    #         return '3'
-    #     elif intValue >= tupData[1]:
-    #         return 2
-    #     elif intValue >= tupData[0]:
-    #         return 1
-
     if isinstance(data, int):
         print('<>')
         if intValue > data:
@@ -43,6 +61,10 @@ def is_Warning(intValue, data):
         elif intValue >= data[0]:
             return 1
         # return judge_level(intValue, data)
+
+def is_trace_level(num):
+    if num in (1,2,3):
+        return True
 
 def is_IP(strIP):
     reIP = re.compile(
@@ -70,29 +92,6 @@ def is_port(intPortNum):
                 return True
     return False
 
-
-def show_engine_status(dictEngines):
-    # dictEngines = get_HAAP_over_all()
-    tupDesc = ('Engine', 'AH', 'Uptime', 'Master', 'Cluster', 'Mirror')
-    tupWidth = (18, 16, 20, 13, 9, 12)
-
-    def _print_description():
-        for i in range(len(tupDesc)):
-            print(tupDesc[i].center(tupWidth[i]),end == '')
-        print()
-         
-    def _print_status_in_line(lstStatus):
-        for i in range(len(lstStatus)):
-            print(lstStatus[i].center(tupWidth[i]), end =='')
-        print()
-
-    def _print_status_in_table():
-        for engine in lstHAAPAlias:
-            lstStatus = dictEngines[engine]
-            _print_status_in_line(lstStatus)
-
-    _print_description()
-    _print_status_in_table()
 
 
 def ShowErr(*argvs):
@@ -128,15 +127,16 @@ def ShowErr(*argvs):
 
 def GotoFolder(strFolder):
     def _mkdir():
-        if os.path.exists(strFolder):
-            return True
-        else:
-            try:
-                os.makedirs(strFolder)
+        if strFolder:
+            if os.path.exists(strFolder):
                 return True
-            except Exception as E:
-                print('Create Folder "{}" Fail With Error:\n\t"{}"'.format(
-                    strFolder, E))
+            else:
+                try:
+                    os.makedirs(strFolder)
+                    return True
+                except Exception as E:
+                    print('Create Folder "{}" Fail With Error:\n\t"{}"'.format(
+                        strFolder, E))
 
     if _mkdir():
         try:
@@ -217,6 +217,7 @@ class TimeNow(object):
 
 
 def TraceAnalyse(oddHAAPErrorDict, strTraceFolder):
+    import xlwt
 
     def _read_file(strFileName):
         try:

@@ -49,7 +49,7 @@ class SANSW(object):
         self._getporterrshow()
         self._PutErrorToDict()
 
-    @deco_Exception
+    @s.deco_Exception
     def _getporterrshow(self):
         try:
             self._SWConn = SSHConn(self._host,
@@ -67,7 +67,7 @@ class SANSW(object):
                           self._host),
                       '"%s"' % E)
 
-    @deco_Exception
+    @s.deco_Exception
     def _PutErrorToDict(self):
 
         def _portInLine(intSWPort, strLine):
@@ -97,13 +97,13 @@ class SANSW(object):
         if self._strAllPortError:
             _putToDict()
 
-    @deco_Exception
+    @s.deco_Exception
     def _porterrshow(self):
         if self._strAllPortError:
             print('Porterrshow for SAN Switch {}:\n'.format(self._host))
             print(self._strAllPortError)
 
-    @deco_Exception
+    @s.deco_Exception
     def _switchshow(self):
         if self._SWConn:
             try:
@@ -112,7 +112,7 @@ class SANSW(object):
             except Exception as E:
                 pass
 
-    @deco_Exception
+    @s.deco_Exception
     def get_linkfail_by_port(self, intSWPort):
         if self._dicPartPortError:
             if intSWPort in self._dicPartPortError.keys():
@@ -120,7 +120,7 @@ class SANSW(object):
             else:
                 return 'Please Correct the Port Number...'
 
-    @deco_Exception
+    @s.deco_Exception
     def get_encout_by_port(self, intSWPort):
         if self._dicPartPortError:
             if intSWPort in self._dicPartPortError.keys():
@@ -128,7 +128,7 @@ class SANSW(object):
             else:
                 print('Please Correct the Port Number...')
 
-    @deco_Exception
+    @s.deco_Exception
     def get_discC3_by_port(self, intSWPort):
         if self._dicPartPortError:
             if intSWPort in self._dicPartPortError.keys():
@@ -136,7 +136,7 @@ class SANSW(object):
             else:
                 print('Please Correct the Port Number...')
 
-    @deco_Exception
+    @s.deco_Exception
     def get_encout_total(self):
 
         def _get_count():
@@ -152,7 +152,7 @@ class SANSW(object):
         if self._dicPartPortError:
             return _get_count()
 
-    @deco_Exception
+    @s.deco_Exception
     def get_discC3_total(self):
 
         def _get_count():
@@ -168,7 +168,7 @@ class SANSW(object):
         if self._dicPartPortError:
             return _get_count()
 
-    # @deco_Exception
+    # @s.deco_Exception
     def clear_porterr_All(self):
         try:
             self._SWConn.exctCMD('statsclear')
@@ -176,9 +176,9 @@ class SANSW(object):
                 self._host))
             return True
         except Exception as E:
-            print('Clear Error Count for SW "{}" Failed...'.format(self._host))
+            print('Clear Error Count for SW "{}" Failed!!!'.format(self._host))
 
-    @deco_Exception
+    @s.deco_Exception
     def clear_porterr_by_port(self, intSWPort):
         try:
             self._SWConn.exctCMD(
@@ -187,12 +187,12 @@ class SANSW(object):
                 '.format(str(intSWPort), self._host))
             return True
         except Exception as E:
-            print('Clear Error Count Failed...')
+            print('Clear Error Count Failed!!!')
 
     
 class switch_status(SANSW):
     
-    @deco_Exception
+    @s.deco_Exception
     def get_encout_total(self):
 
         def _get_count():
@@ -208,7 +208,7 @@ class switch_status(SANSW):
         if self._dicPartPortError:
             return _get_count()
 
-    @deco_Exception
+    @s.deco_Exception
     def get_discC3_total(self):
 
         def _get_count():

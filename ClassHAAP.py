@@ -69,7 +69,7 @@ class HAAP():
                                               self._password,
                                               self._timeout)
 
-    @deco_Exception
+    @s.deco_Exception
     def _executeCMD(self, cmd):
         return self._TN_Conn.exctCMD(cmd)
 
@@ -111,7 +111,7 @@ class HAAP():
                                               self._password,
                                               self._timeout)
 
-    # @deco_Exception
+    # @s.deco_Exception
     # def get_vpd(self):
     #     if self._TN_Conn:
     #         return self._TN_Conn.exctCMD('vpd')
@@ -212,7 +212,7 @@ class HAAP():
     #                     lsUpTime.append(int(result_reUptTime.group(i)))
     #                 return lsUpTime
 
-    # @deco_Exception
+    # @s.deco_Exception
     # def is_master_engine(self):
     #     if self._TN_Conn:
     #         strEngine_info = self._TN_Conn.exctCMD('engine')
@@ -234,7 +234,7 @@ class HAAP():
     #             else:
     #                 return True
 
-    # @deco_Exception
+    # @s.deco_Exception
     # def get_mirror_info(self):
     #     if self._TN_Conn:
     #         return self._TN_Conn.exctCMD('mirror')
@@ -242,7 +242,7 @@ class HAAP():
     #         self._telnet_connect()
     #         return self._TN_Conn.exctCMD('mirror')
     #
-    # @deco_Exception
+    # @s.deco_Exception
     # def get_mirror_status(self):
     #     strMirror = self.get_mirror_info()
     #     if strMirror is None:
@@ -275,7 +275,7 @@ class HAAP():
     #             else:
     #                 print("Get Mirror Status Failed for Engine {}".format(self._host))
 
-    # @deco_Exception
+    # @s.deco_Exception
     # def get_version(self, strVPD_Info=None):
     #     if strVPD_Info is None:
     #         strVPD_Info = self.get_vpd()
@@ -290,7 +290,7 @@ class HAAP():
     #         else:
     #             print("Get Firmware Version Failed for Engine {}".format(self._host))
 
-    @deco_OutFromFolder
+    @s.deco_OutFromFolder
     def backup(self, strBaseFolder):
         s.GotoFolder(strBaseFolder)
         connFTP = self._FTP_Conn
@@ -307,7 +307,7 @@ class HAAP():
                 break
             time.sleep(0.25)
 
-    @deco_Exception
+    @s.deco_Exception
     def updateFW(self, strFWFile):
         FTPConn = self._FTP_Conn
         time.sleep(0.25)
@@ -315,7 +315,7 @@ class HAAP():
         print('FW Upgrade Done for {}, Waiting for reboot...'.format(
             self._host))
 
-    @deco_Exception
+    @s.deco_Exception
     def execute_multi_command(self, strCMDFile):
         tn = self._TN_Conn
         with open(strCMDFile, 'r') as f:
@@ -330,7 +330,7 @@ class HAAP():
                     break
                 time.sleep(0.5)
 
-    @deco_OutFromFolder
+    @s.deco_OutFromFolder
     def get_trace(self, strBaseFolder, intTraceLevel):
         tn = self._TN_Conn
         connFTP = self._FTP_Conn
@@ -368,11 +368,11 @@ class HAAP():
                         strTraceDes, self._host))
                     return True
                 else:
-                    print('Get Trace "{:<10}" for Engine "{}" Failed...\
+                    print('Get Trace "{:<10}" for Engine "{}" Failed!!!\
                         '.format(strTraceDes, self._host))
                 #     s.ShowErr(self.__class__.__name__,
                 #               sys._getframe().f_code.co_name,
-                #               'Get Trace "{:<10}" for Engine "{}" Failed...\
+                #               'Get Trace "{:<10}" for Engine "{}" Failed!!!\
                 #               '.format(strTraceDes, self._host))
 
         oddCommand = _get_oddCommand(intTraceLevel)
@@ -396,7 +396,7 @@ class HAAP():
                     break
                 time.sleep(0.1)
 
-    @deco_OutFromFolder
+    @s.deco_OutFromFolder
     def periodic_check(self, lstCommand, strResultFolder, strResultFile):
         tn = self._TN_Conn
         s.GotoFolder(strResultFolder)
@@ -502,7 +502,7 @@ class HAAP():
             print('\nSetting Time for Engine %s ...' % self._host)
             _exct_cmd()
         else:
-            print('\nSetting Time for Engine %s Failed...' % self._host)
+            print('\nSetting Time for Engine %s Failed!!!' % self._host)
 
     def show_engine_time(self):
         print('Time of Engine "%s":' % self._host)
@@ -682,7 +682,7 @@ class HAAP_Status(HAAP):
                         return i[7:] + 'egAH'
                         print "There has some AH in this engine", i
 
-    @deco_Exception
+    @s.deco_Exception
     def get_vpd(self):
         if self._TN_Conn:
             return self._TN_Conn.exctCMD('vpd')
@@ -750,7 +750,7 @@ class HAAP_Status(HAAP):
                         lsUpTime.append(int(result_reUptTime.group(i)))
                     return lsUpTime
 
-    @deco_Exception
+    @s.deco_Exception
     def is_master_engine(self):
         if self._TN_Conn:
             strEngine_info = self._TN_Conn.exctCMD('engine')
@@ -772,7 +772,7 @@ class HAAP_Status(HAAP):
                 else:
                     return True
 
-    @deco_Exception
+    @s.deco_Exception
     def get_mirror_info(self):
         if self._TN_Conn:
             return self._TN_Conn.exctCMD('mirror')
@@ -780,7 +780,7 @@ class HAAP_Status(HAAP):
             self._telnet_connect()
             return self._TN_Conn.exctCMD('mirror')
 
-    @deco_Exception
+    @s.deco_Exception
     def get_mirror_status(self):
         strMirror = self.get_mirror_info()
         if strMirror is None:
@@ -816,7 +816,7 @@ class HAAP_Status(HAAP):
                     print("Get Mirror Status Failed for Engine {}".format(self._host))
     
 
-    @deco_Exception
+    @s.deco_Exception
     def get_version(self, strVPD_Info=None):
         if strVPD_Info is None:
             strVPD_Info = self.get_vpd()

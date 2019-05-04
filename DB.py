@@ -1,7 +1,10 @@
 # coding:utf-8
 
-from mongoengine import Document
+from mongoengine import Document, connect
 import GetConfig as gc
+from mongoengine.fields import *
+import datetime
+
 
 # read config and connet to the datebase
 cfgDB = gc.DBConfig()
@@ -21,8 +24,9 @@ class collHAAP(Document):
 
 class collSANSW(Document):
     time = DateTimeField(default=datetime.datetime.now())
+    origin = DictField()
+    Summary = DictField()
     Switch_status = DictField()
-    Overview = DictField()
 
 
 class collWarning(Document):
@@ -126,7 +130,6 @@ class SANSW(object):
     Switch_Status:{
     "SW1":{
     "IP":"1.1.1.1",
-    "strPES":""
     "PE":{
     "0":[
         "0", 
@@ -169,9 +172,9 @@ class SANSW(object):
     }
     '''
 
-    def insert(self, time_now, lstSW_IP, lstSWS, lstSW_Total):
-        t = collSANSW(time=time_now, Switch_ip=lstSW_IP,
-                      Switch_status=lstSWS, Switch_total=lstSW_Total)
+    def insert(self, time_now, origin, Summary, Switch_Status):
+        t = collSANSW(time=time_now, Switch_origin=origin,
+                      Switch_Summary=Summary,switch_status=Switch_Status)
         t.save()
 
     def query_range(self, time_start, time_end):
@@ -194,11 +197,6 @@ class Warning(object):
                      warn_message=lstSTS, confirm_status=confirm)
         t.save()
    
-    def update(self, time_now, lstdj, lstSTS, confirm):
-        t = collWARN(time=time_now, level=lstdj,
-                     warn_message=lstSTS, confirm_status=confirm)
-        t.save()
-
     def query_range(self, time_start, time_end):
         collWARN.objects(date__gte=time_start,
                          date__lt=time_end).order_by('-date')
@@ -214,24 +212,32 @@ class Warning(object):
 
     def update(self, intN):
         return collWARN.objects().order_by('-time').first()
+    
+    def get_recond(self):
+        warns = []
+        a = collWARN.objects(confirm_status=0)
+        for z in a:
+            warns.append({'level':z.level, 'time':z.time, 'message':z.warn_message})
+        return(warns)
 
-
-def update_haap():
-    pass
-
-def update_sansw():
-    pass
-
-
-
+    def update_Warning(self):
+        update_Warning = collWARN.objects(confirm_status=0).update(confirm_status=1)
+        
 
 
 if __name__ == '__main__':
     pass
+
+    last_update = Warning.get_recond()
+    update_Warning = Warning.update_Warning()
+    
+    
 
     haap_db_opration = DB.HAAP()
     haap_db_opration.insert()
 
     SW_db_opration = DB.SW()
     SW_db_opration.insert()
+    
+    
 

@@ -50,7 +50,7 @@ Setting = gc.Setting()
 # print('folder_traceanalyse is %s' % Setting.folder_traceanalyse())
 # print('folder_cfgbackup is %s' % Setting.folder_cfgbackup())
 # print('folder_PeriodicCheck is %s' % Setting.folder_PeriodicCheck())
-#print('folder_PeriodicCheck is %s' % Setting.PCEngineCommand())
+print('folder_PeriodicCheck is %s' % Setting.PCEngineCommand())
 #print('folder_PeriodicCheck is %s' % Setting.PCSANSwitchCommand())
 # 
 # print('folder_PeriodicCheck is %s' % Setting.list_trace_left())
