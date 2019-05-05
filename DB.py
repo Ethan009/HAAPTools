@@ -7,6 +7,7 @@ import datetime
 import Source as s
 import SANSW as sw
 
+
 # read config and connet to the datebase
 cfgDB = gc.DBConfig()
 strDBName = cfgDB.name()
@@ -20,9 +21,6 @@ connect(strDBName, host=strDBHost, port=intDBPort)
 
 # intialize 3 collections
 
-# #获取SANSW部分数据
-
-####获取HAAP部分数据
  
 
 class collHAAP(Document):
