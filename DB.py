@@ -4,29 +4,37 @@ from mongoengine import Document, connect
 import GetConfig as gc
 from mongoengine.fields import *
 import datetime
-
+import Source as s
+import SANSW as sw
 
 # read config and connet to the datebase
 cfgDB = gc.DBConfig()
 strDBName = cfgDB.name()
+print("strDBName:", strDBName)
 strDBHost = cfgDB.host()
+print("strDBName:", strDBHost)
 intDBPort = cfgDB.port()
+print("strDBName:", intDBPort)
 
 connect(strDBName, host=strDBHost, port=intDBPort)
 
 # intialize 3 collections
+
+# #获取SANSW部分数据
+
+####获取HAAP部分数据
  
 
 class collHAAP(Document):
     time = DateTimeField(default=datetime.datetime.now())
-    engine_status = ListField()
+    engine_status = DictField()
 
 
 class collSANSW(Document):
     time = DateTimeField(default=datetime.datetime.now())
     origin = DictField()
-    Summary = DictField()
-    Switch_status = DictField()
+    switch_summary = DictField()
+    switch_status = DictField()
 
 
 class collWarning(Document):
@@ -66,8 +74,9 @@ class HAAP(object):
     def get_last_record_list(self):
         last_record = self.query_last_record()
         if last_record:
-            record_time = last_record[time]
-            lstHAAPstatus = _convert_dict_to_list_HAAP(last_record[status])
+            record_time = last_record.time
+            lstHAAPstatus = last_record.engine_status
+            print("lstHAAPstatus:",lstHAAPstatus)
             return record_time, lstHAAPstatus
         else:
             return
@@ -86,7 +95,7 @@ class SANSW(object):
     "_id" : ObjectId("5ca45497ff237792f883aaef"),
     "time" : ISODate("2019-04-03T14:36:48.376Z"),
 
-    origin:
+    origin:{
     "SW_UP":{
     "IP":"1.1.1.1",
     "switchshow":""
@@ -97,7 +106,7 @@ class SANSW(object):
     "switchshow":""
     "porterrshow":""
     }
-    
+    }
 
     Summary:{
     "SW01":{
@@ -173,8 +182,8 @@ class SANSW(object):
     '''
 
     def insert(self, time_now, origin, Summary, Switch_Status):
-        t = collSANSW(time=time_now, Switch_origin=origin,
-                      Switch_Summary=Summary,switch_status=Switch_Status)
+        t = collSANSW(time=time_now, origin=origin,
+                      switch_summary=Summary, switch_status=Switch_Status)
         t.save()
 
     def query_range(self, time_start, time_end):
@@ -187,20 +196,35 @@ class SANSW(object):
     def query_N_records(self, intN):
         return collSANSW.objects().order_by('-time').limit(intN)
 
-    def query_first_records(self, intN):
+    def query_first_records(self):
         return collSANSW.objects().order_by('-time').first()
+   
+    def get_last_record_list(self):
+        '''
+        @note: 获取交换机数据
+        '''
+        last_record = self.query_first_records()
+        if last_record:
+            record_time = last_record.time
+            lst_switch_origin = last_record.origin
+            lst_switch_summary = last_record.switch_summary
+            lst_switch_status = last_record.switch_status
+            lstall = [record_time, lst_switch_origin, lst_switch_summary, lst_switch_status]
+            return lstall
+        else:
+            return
 
 
 class Warning(object):
+
     def insert(self, time_now, lstdj, lstSTS, confirm):
-        t = collWARN(time=time_now, level=lstdj,
+        t = collWarning(time=time_now, level=lstdj,
                      warn_message=lstSTS, confirm_status=confirm)
         t.save()
    
     def query_range(self, time_start, time_end):
         collWARN.objects(date__gte=time_start,
                          date__lt=time_end).order_by('-date')
-
     def query_all(self):
         return collWARN.objects().order_by('-time')
 
@@ -214,30 +238,50 @@ class Warning(object):
         return collWARN.objects().order_by('-time').first()
     
     def get_recond(self):
+        '''
+        @note: 获取confirm_status为o的数据
+        '''
         warns = []
-        a = collWARN.objects(confirm_status=0)
+        a = collWarning.objects(confirm_status=0)
         for z in a:
             warns.append({'level':z.level, 'time':z.time, 'message':z.warn_message})
         return(warns)
-
+    
     def update_Warning(self):
-        update_Warning = collWARN.objects(confirm_status=0).update(confirm_status=1)
-        
+        '''
+        更新confirm_status  0 到 1
+        '''
+        update_Warning = collWarning.objects(confirm_status=0).update(confirm_status=1)
+    
+    def get_last_record_list(self):
+        '''
+        @note: 获取预警数据库信息
+        '''
+        last_record = self.get_recond()
+        if last_record:
+            lst_last_update = last_record
+            print("lst_last_update",lst_last_update)
+            return lst_last_update
+        else:
+            return
+    
+    
+#####插入数据库
+class insert_all(object):
+    '''
+    @author: paul
+    @note: 插入数据库语句
+    '''
+    def switch_insert(self):
+        SANSW().insert(n, origin, switch_summary, switch_status)
+    
+    def haap_insert(self):
+        HAAP().insert(n, lstSTS)
+     
+    def warning_insert(self):
+        Warning().insert(n, level, warn_message, confirm_status)
 
 
 if __name__ == '__main__':
     pass
-
-    last_update = Warning.get_recond()
-    update_Warning = Warning.update_Warning()
-    
-    
-
-    haap_db_opration = DB.HAAP()
-    haap_db_opration.insert()
-
-    SW_db_opration = DB.SW()
-    SW_db_opration.insert()
-    
-    
 
