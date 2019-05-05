@@ -6,6 +6,7 @@ from mongoengine.fields import *
 import datetime
 import Source as s
 import SANSW as sw
+import HAAP as haap
 
 
 # read config and connet to the datebase
@@ -17,26 +18,67 @@ print("strDBName:", strDBHost)
 intDBPort = cfgDB.port()
 print("strDBName:", intDBPort)
 
+# <<<Get Config Field>>>
+#HAAP
+haapcfg = gc.EngineConfig()
+list_engines_IP = haapcfg.list_engines_IP()[0]
+telnet_port = haapcfg.telnet_port()
+FTP_port = haapcfg.FTP_port()
+passwd = haapcfg.password()
+#switch
+swcfg = gc.SwitchConfig()
+list_sw_IP = swcfg.list_switch_IP()
+list_sw_alias = swcfg.list_switch_alias()
+ssh_port = swcfg.SSH_port()
+user = swcfg.username()
+passwd = swcfg.password()
+list_sw_ports = swcfg.list_switch_ports()
+
+
 connect(strDBName, host=strDBHost, port=intDBPort)
 
 # intialize 3 collections
 
+def _HAAP():
+    return haap.Status(list_engines_IP, telnet_port,
+                       passwd, FTP_port)
+
+def _SW():
+    return sw.Status(list_sw_IP, ssh_port,
+                     user, passwd, list_sw_ports)
+    
+
+def get_from_haap_status():
+    '''
+    @author: paul
+    @note: 获取引擎数据
+    '''
+    status = _HAAP()
+    status = status.xxxxxxx()
+    print("status.update_sss:",status)
+    return status
+
+def get_from_switch_status():
+    '''
+    @note: 获取交换机数据
+    '''
+    status = _SW()
+    status = status.xxxxxxx()
+    print("status.update_sss:",status)
+    return status
 
 
 
- 
 
 class collHAAP(Document):
     time = DateTimeField(default=datetime.datetime.now())
     engine_status = DictField()
-
 
 class collSANSW(Document):
     time = DateTimeField(default=datetime.datetime.now())
     origin = DictField()
     switch_summary = DictField()
     switch_status = DictField()
-
 
 class collWarning(Document):
     time = DateTimeField(default=datetime.datetime.now())
@@ -283,5 +325,6 @@ class insert_all(object):
 
 
 if __name__ == '__main__':
+    get_from_switch_status()
     pass
 
