@@ -21,6 +21,9 @@ connect(strDBName, host=strDBHost, port=intDBPort)
 
 # intialize 3 collections
 
+
+
+
  
 
 class collHAAP(Document):
@@ -258,7 +261,6 @@ class Warning(object):
         last_record = self.get_recond()
         if last_record:
             lst_last_update = last_record
-            print("lst_last_update",lst_last_update)
             return lst_last_update
         else:
             return
