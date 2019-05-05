@@ -24,6 +24,7 @@ list_sw_ports = swcfg.list_switch_ports()
 setting = gc.Setting()
 lstPCCommand = setting.PCEngineCommand()
 strPCFolder = setting.folder_PeriodicCheck()
+tuplThresholdTotal = setting.threshold_total()
 # <<<Get Config Field>>>
 
 def clear_all():
@@ -263,6 +264,15 @@ class Status(Action):
         for sum in lstSum:
             total += sum
         return lstSum, total
+
+    def sum_total_and_warning(self):
+        lstSumTotal = list(self.sum_and_total())
+        #return lstSumTotal.append(s.is_Warning(lstSumTotal[1], tuplThresholdTotal))
+        intTotal = lstSumTotal[1]
+        intWarningLevel = s.is_Warning(intTotal, tuplThresholdTotal)
+        lstSumTotalWarning = lstSumTotal.append(intWarningLevel)
+        return lstSumTotalWarning
+        # 代码还是要给人看的，不光给机器看。。。
 
     def print_porterror_formated(self):
         tuplDesc = ('Port', 'RX', 'RT', 'EncOut', 'DiscC3', 'LinkFail', 'LossSigle', 'LossSync')

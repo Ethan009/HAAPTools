@@ -557,7 +557,7 @@ class Status(Action):
         lstOverAll.append(self._host)
         lstOverAll.append(self.AHStatus)
         if self.AHStatus:
-            for i in range(3):
+            for i in range(4):
                 lstOverAll.append('--')
         else:
             lstOverAll.append(self.uptime_to_show())
@@ -565,6 +565,23 @@ class Status(Action):
             lstOverAll.append(self.cluster_status())
             lstOverAll.append(self.get_mirror_status())
         return lstOverAll
+
+    def over_all_and_warning():
+        lstStatus = self.over_all()
+        if any([lstStatus[i] for i in [1, 4, 5]]):
+            lstStatus.append(2)
+        else:
+            lstStatus.append(0)
+        return lstStatus
+
+    # 思路Step by Step。。。
+    # 需要一个当前引擎状态的值，方便网页显示时候直接参考，显示不同颜色
+    # 先写了warning_status，先用循环生成lstStatus，再用一行for写
+    # 后面状态返回，先用循环方式写，后发现可以用any写
+    # 再后来，发现这个状态最好是附加在over_all之上，然后将any写在over_all里面
+    # 再后来，发现最好是用一个新的方法用来专门给网页调用，就另外写一个方法，调用over_all
+    # 为了原来程序正常运行，在over_all返回时，不返回最后一个值
+
 
 
 # ## Matt 暂时先不考虑这一部分内容
