@@ -139,7 +139,6 @@ def periodically_check():
         lstPCCommand, strPCFolder, )
 
 
-
 class Action():
     '''
 get_trace
@@ -454,7 +453,7 @@ class Uptime(object):
 class Status(Action):
 
     def __init__(self, strIP, intTNPort, strPassword,
-                 intFTPPort, intTimeout=1.5):
+                 intFTPPort, intTimeout=5):
         Action.__init__(self, strIP, intTNPort, strPassword,
                         intFTPPort, intTimeout)
         # self._telnet_connect()
@@ -566,7 +565,7 @@ class Status(Action):
             lstOverAll.append(self.get_mirror_status())
         return lstOverAll
 
-    def over_all_and_warning():
+    def over_all_and_warning(self):
         lstStatus = self.over_all()
         if any([lstStatus[i] for i in [1, 4, 5]]):
             lstStatus.append(2)
@@ -583,8 +582,58 @@ class Status(Action):
     # 为了原来程序正常运行，在over_all返回时，不返回最后一个值
 
 
+class DB_data():
 
-# ## Matt 暂时先不考虑这一部分内容
+    def __init__(self):
+
+
+    def get_uptime(self):
+        pass
+
+    def get_mirror(self):
+        pass
+
+    def get_status(self):
+        pass
+
+class warning():
+    def __init__(self,Status,Uptime,Mirror):
+        self.uptime=Uptime
+        self.status=Status
+        self.mirror=Mirror
+        self.db_data=DB_data()
+
+    def restart(self):
+        DB_uptime=self.db_data.get_uptime()
+        if self.uptime:
+            if self.uptime < DB_uptime:
+                return 2
+            else :
+                return
+
+    def haapstatus(self):
+        DB_status=self.db_data.get_status()
+        if self.status:
+            if self.status == "online":
+                return
+            elif DB_status != "online":
+                return
+            else:
+                return 2
+
+    def haapmirror(self):
+        DB_mirror=self.db_data.get_mirror()
+        if self.mirror:
+            if self.mirror == 0:
+                return
+            elif DB_mirror != 0:
+                return
+            else :
+                return 2
+
+
+
+## Matt 暂时先不考虑这一部分内容
     # def has_abts_qfull(self, SAN_status, ip):
     #     strVPD = self.get_vpd()
     #     ports = ['a1', 'a2', 'b1', 'b2']
@@ -684,18 +733,19 @@ class Status(Action):
     #         else:
     #             ut = 0
     #     return {'ABTs': abts, 'Qfull': qf, 'Mirror':mirror,'Reboot':ut}
+
 if __name__ == '__main__':
-    # HAAP('10.203.1.111','23','21','password').has_abts_qfull()
-    host = objHAAPConfig.list_engines_IP()[1]
-    telnet_port = objHAAPConfig.telnet_port()
-    ftp_port = objHAAPConfig.FTP_port()
-    password = objHAAPConfig.password()
 
-    print(host, telnet_port, ftp_port, password)
+    # print ('a',list_engines_IP)
+    # print ('b',list_engines_alias)
+    # print ('c',telnet_port)
+    # print ('d',FTP_port)
+    # print ('e',passwd)
+    # print ('f',trace_level_cfg)
 
-    e1 = Status(host, telnet_port, password, ftp_port)
-
-    print(e1.uptime_list())
+    for i in list_engines_IP:
+        s=Status(i,telnet_port,passwd,FTP_port)
+        print (s.over_all_and_warning())
     # print(e1_status.over_all())
     # e1.get_trace('abc', 2)
     # e1.show_time()

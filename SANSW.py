@@ -24,7 +24,7 @@ list_sw_ports = swcfg.list_switch_ports()
 setting = gc.Setting()
 lstPCCommand = setting.PCEngineCommand()
 strPCFolder = setting.folder_PeriodicCheck()
-tuplThresholdTotal = setting.threshold_total()
+#tuplThresholdTotal = setting.threshold_total()
 # <<<Get Config Field>>>
 
 def clear_all():
