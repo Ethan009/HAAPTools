@@ -144,6 +144,10 @@ def periodically_check():
     Action(ip, telnet_port, passwd, FTP_port).periodic_check(
         lstPCCommand, strPCFolder, )
 
+def check_HAAP():
+    for i in list_engines_IP:
+        s=warning(i,telnet_port,passwd,FTP_port)
+        print (s.lstwarning)
 
 
 class Action():
@@ -467,6 +471,7 @@ class Status(Action):
         self.dictInfo = self._get_info_to_dict()
         self.uptime = Uptime(self.dictInfo['vpd'])
 
+
     @s.deco_Exception
     def _get_info_to_dict(self):
         if self.AHStatus:
@@ -480,7 +485,7 @@ class Status(Action):
                 dictInfo[command] = self._executeCMD(command)
                 time.sleep(0.2)
             return dictInfo
-
+    
     def uptime_list(self):
         return self.uptime.uptime_list()
 
@@ -563,7 +568,7 @@ class Status(Action):
         lstOverAll.append(self._host)
         lstOverAll.append(self.AHStatus)
         if self.AHStatus:
-            for i in range(3):
+            for i in range(4):
                 lstOverAll.append('--')
         else:
             lstOverAll.append(self.uptime_to_show())
@@ -572,8 +577,107 @@ class Status(Action):
             lstOverAll.append(self.get_mirror_status())
         return lstOverAll
 
+    def over_all_and_warning(self):
+        lstStatus = self.over_all()
+        if any([lstStatus[i] for i in [1, 4, 5]]):
+            lstStatus.append(2)
+        else:
+            lstStatus.append(0)
+        return lstStatus
 
-# ## Matt 暂时先不考虑这一部分内容
+    def warning_list(self):
+        lstStatus=self.over_all_and_warning()
+
+            lstStatus=[lstStatus[i] for i in [0,4,5]]
+            lstStatus.append(self.uptime_second())
+        return lstStatus
+
+
+
+
+    # 思路Step by Step。。。
+    # 需要一个当前引擎状态的值，方便网页显示时候直接参考，显示不同颜色
+    # 先写了warning_status，先用循环生成lstStatus，再用一行for写
+    # 后面状态返回，先用循环方式写，后发现可以用any写
+    # 再后来，发现这个状态最好是附加在over_all之上，然后将any写在over_all里面
+    # 再后来，发现最好是用一个新的方法用来专门给网页调用，就另外写一个方法，调用over_all
+    # 为了原来程序正常运行，在over_all返回时，不返回最后一个值
+
+
+class DB_data():
+    def __init__(self):
+        pass
+
+    def get_uptime(self):
+        pass
+
+    def get_mirror(self):
+        pass
+
+    def get_status(self):
+        pass
+
+class warning(Status):
+    def __init__(self, strIP, intTNPort, strPassword,
+                 intFTPPort, intTimeout=1.5):
+        Status.__init__(self, strIP, intTNPort, strPassword,
+                        intFTPPort, intTimeout)
+        self.db_data=DB_data()
+        self.lstwarning = self.warning_list()
+        self.haap_info()
+
+    def haap_info(self):
+        self.ip=self.lstwarning[0]
+        self.uptime=self.lstwarning[3]
+        self.mirror=self.lstwarning[2]
+        self.status=self.lstwarning[1]
+
+    def checkuptime(self):
+        DB_uptime=self.db_data.get_uptime()
+        if self.uptime:
+            if self.uptime <= DB_uptime:
+                return 'engine restart'
+            else :
+                return None
+        else:
+            return '--'
+
+    def checkstatus(self):
+        DB_status=self.db_data.get_status()
+        if self.status:
+            if self.status == None:
+                return None
+            elif DB_status != None:
+                return None
+            else:
+                return 'engine offline'
+        else:
+            return '--'
+
+    def checkmirror(self):
+        DB_mirror=self.db_data.get_mirror()
+        if self.mirror:
+            if self.mirror == 0:
+                return None
+            elif DB_mirror != 0:
+                return None
+            else :
+                return 'engine mirror not ok'
+        else:
+            return '--'
+
+    def all_check(self):
+        lstcheck=[]
+        lstcheck.append(self.checkstatus())
+        lstcheck.append(self.checkmirror())
+        lstcheck.append(self.checkuptime())
+        return lstcheck
+
+
+
+
+
+## Matt 暂时先不考虑这一部分内容
     # def has_abts_qfull(self, SAN_status, ip):
     #     strVPD = self.get_vpd()
     #     ports = ['a1', 'a2', 'b1', 'b2']
@@ -673,15 +777,17 @@ class Status(Action):
     #         else:
     #             ut = 0
     #     return {'ABTs': abts, 'Qfull': qf, 'Mirror':mirror,'Reboot':ut}
+
 if __name__ == '__main__':
     # HAAP('10.203.1.111','23','21','password').has_abts_qfull()
-    host = objHAAPConfig.list_engines_IP()[1]
-    telnet_port = objHAAPConfig.telnet_port()
-    ftp_port = objHAAPConfig.FTP_port()
-    password = objHAAPConfig.password()
-
-
-
+    # print ('a',list_engines_IP)
+    # print ('b',list_engines_alias)
+    # print ('c',telnet_port)
+    # print ('d',FTP_port)
+    # print ('e',passwd)
+    # print ('f',trace_level_cfg)
+    # print(e1.uptime_list())
+    # print(e1.dictInfo)
     # print(e1_status.over_all())
     # e1.get_trace('abc', 2)
     # e1.show_time()

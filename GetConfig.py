@@ -103,8 +103,15 @@ class SwitchConfig(object):
     def password(self):
         return str(self.cfg.get('SANSwitcheSetting', 'password'))
 
-    def SWTotal_level1(self):
-        return self.cfg.getint('Threshold', 'SWTotal_level1')
+    def threshold_total(self):
+        lstThreshold = []
+        level1 = self.cfg.getint('Threshold', 'SWTotal_level1')
+        level2 = self.cfg.getint('Threshold', 'SWTotal_level2')
+        level3 = self.cfg.getint('Threshold', 'SWTotal_level3')
+        lstThreshold.append(level1)
+        lstThreshold.append(level2)
+        lstThreshold.append(level3)
+        return tuple(lstThreshold)
 
     def SWTotal_level2(self):
         return self.cfg.getint('Threshold', 'SWTotal_level2')
@@ -144,14 +151,17 @@ class Setting(object):
     def message_level(self):
         return self.cfg.getint('MessageLogging', 'msglevel')
 
-    def monitor_web_refresh(self):
-        return self.cfg.getint('RefreshInterval', 'monitor_web_refresh')
+    def interval_web_refresh(self):
+        return self.cfg.getint('Interval', 'web_refresh')
 
-    def status_upadate(self):
-        return self.cfg.getint('RefreshInterval', 'Status_upadate')
+    def interval_haap_update(self):
+        return self.cfg.getint('Interval', 'haap_update')
 
-    def warning_check(self):
-        return self.cfg.getint('RefreshInterval', 'warning_check')
+    def interval_sansw_update(self):
+        return self.cfg.getint('Interval', 'sansw_update')
+
+    def interval_warning_check(self):
+        return self.cfg.getint('Interval', 'warning_check')
 
     def folder_collection(self):
         return str(self.cfg.get('FolderSetting', 'collection'))

@@ -317,6 +317,9 @@ def main():
             else:
                 strPTCLHelp
 
+    elif sys.argv[1] == 'mnt':
+        mnt.start()
+
     else:
         print(strHelp)
 
