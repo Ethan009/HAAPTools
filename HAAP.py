@@ -479,7 +479,7 @@ class Status(Action):
                 dictInfo[command] = self._executeCMD(command)
                 time.sleep(0.2)
             return dictInfo
-
+    
     def uptime_list(self):
         return self.uptime.uptime_list()
 
