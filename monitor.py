@@ -128,9 +128,7 @@ def job_update_interval(intInterval):
         n = datetime.datetime.now()
         do_update = db.haap_insert(n, get_HAAP_status_list())
         # print('update complately...@ %s' % n)
-
         return do_update
-
     t.add_interval(do_it, intInterval)
     t.stt()
 
