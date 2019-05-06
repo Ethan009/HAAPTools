@@ -686,16 +686,17 @@ class Status(Action):
     #     return {'ABTs': abts, 'Qfull': qf, 'Mirror':mirror,'Reboot':ut}
 if __name__ == '__main__':
     # HAAP('10.203.1.111','23','21','password').has_abts_qfull()
-    host = objHAAPConfig.list_engines_IP()[1]
-    telnet_port = objHAAPConfig.telnet_port()
-    ftp_port = objHAAPConfig.FTP_port()
-    password = objHAAPConfig.password()
+    host = haapcfg.list_engines_IP()[1]
+    telnet_port = haapcfg.telnet_port()
+    ftp_port = haapcfg.FTP_port()
+    password = haapcfg.password()
 
     print(host, telnet_port, ftp_port, password)
 
     e1 = Status(host, telnet_port, password, ftp_port)
 
     print(e1.uptime_list())
+    print(e1.dictInfo)
     # print(e1_status.over_all())
     # e1.get_trace('abc', 2)
     # e1.show_time()
