@@ -5,6 +5,7 @@ import sys
 import SANSW as sw
 import HAAP as haap
 import Source as s
+import Thread
 
 try:
     import configparser as cp
@@ -117,6 +118,7 @@ tlu = Time Last Update
     app.run(debug=False, use_reloader=False, host='127.0.0.1', port=5000)
 
 
+
 def job_update_interval(intInterval):
     t = s.Timing()
     db = DB_collHAAP()
@@ -132,10 +134,17 @@ def job_update_interval(intInterval):
     t.add_interval(do_it, intInterval)
     t.stt()
 
-
-# by klay
 confirm_status = 0
 
+
+def haap(interval_haap_update):
+    pass
+
+def sansw(interval_sansw_update):
+    pass
+
+def email_warning(interval_warning_check):
+    pass
 
 def job_update_interval_haap(intInterval):
     t = s.Timing()

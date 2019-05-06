@@ -138,6 +138,11 @@ def periodically_check():
     Action(ip, telnet_port, passwd, FTP_port).periodic_check(
         lstPCCommand, strPCFolder, )
 
+def check_HAAP():
+    for i in list_engines_IP:
+        s=warning(i,telnet_port,passwd,FTP_port)
+        print (s.lstwarning)
+
 
 class Action():
     '''
@@ -453,12 +458,13 @@ class Uptime(object):
 class Status(Action):
 
     def __init__(self, strIP, intTNPort, strPassword,
-                 intFTPPort, intTimeout=5):
+                 intFTPPort, intTimeout=1.5):
         Action.__init__(self, strIP, intTNPort, strPassword,
                         intFTPPort, intTimeout)
         # self._telnet_connect()
         self.dictInfo = self._get_info_to_dict()
         self.uptime = Uptime(self.dictInfo['vpd'])
+
 
     @s.deco_Exception
     def _get_info_to_dict(self):
@@ -573,6 +579,16 @@ class Status(Action):
             lstStatus.append(0)
         return lstStatus
 
+    def warning_list(self):
+        lstStatus=self.over_all_and_warning()
+
+            lstStatus=[lstStatus[i] for i in [0,4,5]]
+            lstStatus.append(self.uptime_second())
+        return lstStatus
+
+
+
+
     # 思路Step by Step。。。
     # 需要一个当前引擎状态的值，方便网页显示时候直接参考，显示不同颜色
     # 先写了warning_status，先用循环生成lstStatus，再用一行for写
@@ -583,9 +599,8 @@ class Status(Action):
 
 
 class DB_data():
-
     def __init__(self):
-
+        pass
 
     def get_uptime(self):
         pass
@@ -596,40 +611,63 @@ class DB_data():
     def get_status(self):
         pass
 
-class warning():
-    def __init__(self,Status,Uptime,Mirror):
-        self.uptime=Uptime
-        self.status=Status
-        self.mirror=Mirror
+class warning(Status):
+    def __init__(self, strIP, intTNPort, strPassword,
+                 intFTPPort, intTimeout=1.5):
+        Status.__init__(self, strIP, intTNPort, strPassword,
+                        intFTPPort, intTimeout)
         self.db_data=DB_data()
+        self.lstwarning = self.warning_list()
+        self.haap_info()
 
-    def restart(self):
+    def haap_info(self):
+        self.ip=self.lstwarning[0]
+        self.uptime=self.lstwarning[3]
+        self.mirror=self.lstwarning[2]
+        self.status=self.lstwarning[1]
+
+    def checkuptime(self):
         DB_uptime=self.db_data.get_uptime()
         if self.uptime:
-            if self.uptime < DB_uptime:
-                return 2
+            if self.uptime <= DB_uptime:
+                return 'engine restart'
             else :
-                return
+                return None
+        else:
+            return '--'
 
-    def haapstatus(self):
+    def checkstatus(self):
         DB_status=self.db_data.get_status()
         if self.status:
-            if self.status == "online":
-                return
-            elif DB_status != "online":
-                return
+            if self.status == None:
+                return None
+            elif DB_status != None:
+                return None
             else:
-                return 2
+                return 'engine offline'
+        else:
+            return '--'
 
-    def haapmirror(self):
+    def checkmirror(self):
         DB_mirror=self.db_data.get_mirror()
         if self.mirror:
             if self.mirror == 0:
-                return
+                return None
             elif DB_mirror != 0:
-                return
+                return None
             else :
-                return 2
+                return 'engine mirror not ok'
+        else:
+            return '--'
+
+    def all_check(self):
+        lstcheck=[]
+        lstcheck.append(self.checkstatus())
+        lstcheck.append(self.checkmirror())
+        lstcheck.append(self.checkuptime())
+        return lstcheck
+
+
 
 
 
@@ -743,9 +781,7 @@ if __name__ == '__main__':
     # print ('e',passwd)
     # print ('f',trace_level_cfg)
 
-    for i in list_engines_IP:
-        s=Status(i,telnet_port,passwd,FTP_port)
-        print (s.over_all_and_warning())
+    check_HAAP()
     # print(e1_status.over_all())
     # e1.get_trace('abc', 2)
     # e1.show_time()
