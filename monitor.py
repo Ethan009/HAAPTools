@@ -6,6 +6,7 @@ import SANSW as sw
 import HAAP as haap
 import Source as s
 import Thread
+import DB as db
 
 try:
     import configparser as cp
@@ -26,9 +27,6 @@ interval_warning_check = setting.interval_warning_check()
 
 def get_warning_unchecked_format():
     pass
-
-def get_status_haap():
-    return db.HAAP
 
 
 
