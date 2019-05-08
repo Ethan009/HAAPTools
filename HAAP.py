@@ -34,6 +34,13 @@ oddHAAPErrorDict = setting.oddRegularTrace()
 lstPCCommand = setting.PCEngineCommand()
 # <<<Get Config Field>>>
 
+# def lsthaap():
+#     
+#     lsthaap ={['10.203.1.221', 0, '1 Days 5 Hours 54 Minutes', 'M', None, 0, 107651],['10.203.1.221', 0, '1 Days 5 Hours 54 Minutes', 'M', None, 0, 107651]}
+#     return lsthaap
+
+
+
 def backup_config_all():
     folder = '%s/%s' % (strCFGFolder, s.time_now_folder())
     for ip in list_engines_IP:
@@ -587,9 +594,8 @@ class Status(Action):
 
     def warning_list(self):
         lstStatus=self.over_all_and_warning()
-
-            lstStatus=[lstStatus[i] for i in [0,4,5]]
-            lstStatus.append(self.uptime_second())
+        lstStatus=[lstStatus[i] for i in [0,4,5]]
+        lstStatus.append(self.uptime_second())
         return lstStatus
 
 
