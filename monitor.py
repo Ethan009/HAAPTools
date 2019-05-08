@@ -5,7 +5,12 @@ import sys
 import SANSW as sw
 import HAAP as haap
 import Source as s
-import Thread
+from threading import Thread
+from flask import Flask
+import time
+import DB as db
+
+import datetime
 
 try:
     import configparser as cp
@@ -22,13 +27,16 @@ interval_sansw_update = setting.interval_sansw_update()
 interval_warning_check = setting.interval_warning_check()
 
 
+haapcfg = gc.EngineConfig()
+list_engines_IP = haapcfg.list_engines_IP()
+
 # <<<Get Config Field>>>
 
 def get_warning_unchecked_format():
     pass
 
 def get_status_haap():
-    return db.HAAP
+    pass
 
 
 
@@ -68,10 +76,13 @@ lstDescHAAP = ('EngineIP', 'AH Status', 'Uptime',
                'Master', 'Cluster', 'Mirror')
 lstDescSANSW = ('SwitchIP', 'EncOut', 'DiscC3',
                 'LinkFail', 'LossSigle', 'LossSync')
+
+
 def start_web(mode):
-    '''
-tlu = Time Last Update
-    '''
+    pass
+'''
+#tlu = Time Last Update
+    
     app = Flask(__name__, template_folder='./web/templates',
                 static_folder='./web/static', static_url_path='')
 
@@ -117,8 +128,39 @@ tlu = Time Last Update
 
     app.run(debug=False, use_reloader=False, host='127.0.0.1', port=5000)
 
+'''
 
 
+
+
+def haap(interval_haap_update):
+    pass
+
+
+
+
+def sansw(interval_sansw_update):
+    pass
+
+def email_warning(interval_warning_check):
+    pass
+
+def real_haap(engineIP):
+    real_info=haap.haap_status_real(engineIP)
+    return real_info
+
+def DB_data():
+    db.
+
+def judge_haap():
+    for engine in list_engines_IP:
+        real_info=real_haap(engine)
+
+
+
+
+    pass
+'''
 def job_update_interval(intInterval):
     t = s.Timing()
     db = DB_collHAAP()
@@ -134,15 +176,6 @@ def job_update_interval(intInterval):
 
 confirm_status = 0
 
-
-def haap(interval_haap_update):
-    pass
-
-def sansw(interval_sansw_update):
-    pass
-
-def email_warning(interval_warning_check):
-    pass
 
 def job_update_interval_haap(intInterval):
     t = s.Timing()
@@ -205,7 +238,7 @@ def job_update_interval_email(intInterval):
 
     t.add_interval(do_it, intInterval)
     t.stt()
-
+'''
 
 def stopping_web(intSec):
     try:
@@ -217,10 +250,6 @@ def stopping_web(intSec):
         print('\n\nWeb Server Stopped.')
     except KeyboardInterrupt:
         print('\n\nWeb Server Stopped.')
-
-
-# by klay
-def start_warn_check():
 
 
 def thrd_web_rt():

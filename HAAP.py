@@ -127,7 +127,7 @@ def show_time_all():
     for ip in list_engines_IP:
         Action(ip, telnet_port, passwd, FTP_port).show_time()
 
-def show_time():
+def show_time(ip):
     Action(ip, telnet_port, passwd, FTP_port).show_time()
 
 
@@ -138,16 +138,22 @@ def periodically_check_all():
         Action(ip, telnet_port, passwd, FTP_port).periodic_check(
             lstPCCommand, strPCFolder, )
 
-def periodically_check():
+def periodically_check(ip):
     PCFile_name = 'PC_%s_Engine_%s.log' % (
         s.time_now_folder(), ip)
     Action(ip, telnet_port, passwd, FTP_port).periodic_check(
         lstPCCommand, strPCFolder, )
 
-def check_HAAP():
-    for i in list_engines_IP:
-        s=warning(i,telnet_port,passwd,FTP_port)
-        print (s.lstwarning)
+
+
+def haap_status_web_show():
+    for engine in list_engines_IP:
+        status=Status(engine,telnet_port,passwd,FTP_port)
+        status.over_all_and_warning()
+
+def haap_status_real(engine):
+    status=Status(engine,telnet_port,passwd,FTP_port)
+    return status.over_all_real()
 
 
 class Action():
@@ -464,7 +470,7 @@ class Uptime(object):
 class Status(Action):
 
     def __init__(self, strIP, intTNPort, strPassword,
-                 intFTPPort, intTimeout=1.5):
+                 intFTPPort, intTimeout=5):
         Action.__init__(self, strIP, intTNPort, strPassword,
                         intFTPPort, intTimeout)
         # self._telnet_connect()
@@ -585,10 +591,12 @@ class Status(Action):
             lstStatus.append(0)
         return lstStatus
 
-    def warning_list(self):
-        lstStatus=self.over_all_and_warning()
-
-            lstStatus=[lstStatus[i] for i in [0,4,5]]
+    def over_all_real(self):
+        lstStatus=self.over_all()
+        lstStatus=[lstStatus[i] for i in [0,1,4,5]]
+        if self.AHStatus:
+            lstStatus.append('--')
+        else:
             lstStatus.append(self.uptime_second())
         return lstStatus
 
@@ -779,6 +787,8 @@ class warning(Status):
     #     return {'ABTs': abts, 'Qfull': qf, 'Mirror':mirror,'Reboot':ut}
 
 if __name__ == '__main__':
+
+    print (haap_status_real('10.203.1.221'))
     # HAAP('10.203.1.111','23','21','password').has_abts_qfull()
     # print ('a',list_engines_IP)
     # print ('b',list_engines_alias)
