@@ -6,6 +6,7 @@ import SANSW as sw
 import HAAP as haap
 import Source as s
 import Thread
+import DB as db
 
 try:
     import configparser as cp
@@ -20,7 +21,9 @@ interval_web_refresh = setting.interval_web_refresh()
 interval_haap_update = setting.interval_haap_update()
 interval_sansw_update = setting.interval_sansw_update()
 interval_warning_check = setting.interval_warning_check()
-
+SWTotal_level=gc.threshold_total()
+swcfg = gc.SwitchConfig()
+sw_ID=swcfg.list_switch_alias()
 
 # <<<Get Config Field>>>
 
@@ -234,3 +237,14 @@ def thrd_web_rt():
             pass
     except KeyboardInterrupt:
         stopping_web(3)
+massage=''
+def get_sw_warning():
+    dic_all_sw = sw.get_dic_all_sw()
+    for i in sw_ID:
+        total_DB = db.get_Switch_Total(i)
+        if total_DB:
+            total=dic_all_sw[1][i]['PE_Total'] - total_DB
+            intlevel=s.is_Warning(total,SWTotal_level)
+            if intlevel:
+                db.insert_warning(time,intlevel,massage,confirm_status)
+    db.switch_insert(dic_all_sw[0][0],dic_all_sw[0][1],dic_all_sw[0][2])

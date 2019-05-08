@@ -48,8 +48,8 @@ def is_there_HAAP():
     return list_all_HAAP
 
 #SANSW
-def switch_insert():
-    SANSW().insert(n, origin, switch_summary, switch_status)
+def switch_insert(n, origin, switch_summary, switch_status):
+    SANSW().insert()
 
 def is_there_switch():
     dbswitch = SANSW()
