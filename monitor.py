@@ -30,9 +30,6 @@ sw_ID=swcfg.list_switch_alias()
 def get_warning_unchecked_format():
     pass
 
-def get_status_haap():
-    return db.HAAP
-
 
 
 def start_mnt_4Thread():
