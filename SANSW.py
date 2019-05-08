@@ -24,7 +24,8 @@ tuplThresholdTotal = swcfg.threshold_total()
 setting = gc.Setting()
 lstPCCommand = setting.PCEngineCommand()
 strPCFolder = setting.folder_PeriodicCheck()
-
+sw_ID=swcfg.list_switch_alias()
+level_sw=swcfg.threshold_total()
 # <<<Get Config Field>>>
 
 def clear_all():
@@ -382,39 +383,27 @@ class Status(Action):
         return sw_warnlevel,sw_warnlist
 
 
-def get_all_sw_warning():
-    all_sw_total={}
-    sw_ID=['SW01','SW02']
-    for i in range(len(list_sw_IP)):
-        all_sw_total[sw_ID[i]]=Status(list_sw_IP[i], ssh_port, user, passwd, list_sw_ports[0]).get_warning()
 
-    return all_sw_total
 
-def get_all_sw_origin():
-    all_sw_origin={}
-    sw_ID = ['SW01', 'SW02']
-    for i in range(len(list_sw_IP)):
-        port_porterr = Status(list_sw_IP[i], ssh_port, user, passwd, list_sw_ports[0])._dicPartPortError
-        port=port_porterr.keys()
-        porterr = port_porterr.values()
-        porterr_show = dict(zip(port,porterr))
-        origin_key = ['IP','strSwitchshow','porterrshow']
-        strSwitchshow=Status(list_sw_IP[i],ssh_port, user, passwd, list_sw_ports[0]).strSwitchshow
-        origin_values = [list_sw_IP[i], strSwitchshow, porterr_show]
-        origin = dict(zip(origin_key,origin_values))
-        all_sw_origin[sw_ID[i]]=origin
-    return all_sw_origin
+def get_dic_all_sw():
 
-def get_summary():
-    all_sw_sum_total = {}
-    sw_ID = ['SW01', 'SW02']
+    all_sw_origin = {}
+    all_sw_status = {}
+    all_sw_summary={}
     for i in range(len(list_sw_IP)):
-        summary_key = ['Ip','Sum','Total']
-        sum_and_total = Status(list_sw_IP[i], ssh_port, user, passwd, list_sw_ports[0]).sum_and_total()
-        swmmary_values = [list_sw_IP[i],sum_and_total[0],sum_and_total[1]]
-        summary = dict(zip(summary_key,swmmary_values))
-        all_sw_sum_total[sw_ID[i]]=summary
-    return all_sw_sum_total
+        status = Status(list_sw_IP[i], ssh_port, user, passwd, list_sw_ports[0])
+        sum_and_total = status.sum_and_total()
+        all_sw_origin[sw_ID[i]] = {'IP': list_sw_IP[i],
+                                   'strSwitchshow': status.strPorterrshow,
+                                   'porterrshow': status.strSwitchshow}
+        all_sw_summary[sw_ID[i]] = {'IP': list_sw_IP[i],
+                                    'PE_Sum': sum_and_total[0],
+                                    'PE_Total': sum_and_total[1]}
+        all_sw_status[sw_ID[i]] = {'IP':list_sw_IP[i],
+                                   'PE':status._dicPartPortError}
+
+    return [all_sw_origin,all_sw_summary,all_sw_status],sum_and_total[1]
+
 
 if __name__ == '__main__':
 
@@ -425,9 +414,9 @@ if __name__ == '__main__':
     user = swcfg.username()
     passwd = swcfg.password()
     list_sw_ports = swcfg.list_switch_ports()
-    level_sw=swcfg.threshold_total()#Ben
 
-    print(get_all_sw_origin())
+
+    #print(get_all_sw_origin())
 
     #print(Status(list_sw_IP[0], ssh_port, user, passwd, list_sw_ports[0]).strSwitchshow)
     #ben

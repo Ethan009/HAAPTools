@@ -38,43 +38,131 @@ connect(strDBName, host=strDBHost, port=intDBPort)
 
 # intialize 3 collections
 
-#HAAP
-def haap_insert(self):
-    HAAP().insert(n, lstSTS)
 
-def is_there_HAAP():
+def get_dict_value(in_dict, target_key, results=[], not_d=True):
+    for key in in_dict.keys():  
+        data = in_dict[key] 
+        if isinstance(data, dict):
+            get_dict_value(data, target_key, results=results, not_d=not_d) 
+        if key == target_key and isinstance(data, dict) != not_d:
+            results.append(in_dict[key])
+    return results
+
+# HAAP
+def haap_insert(n, engine_status,lst_status):
+    """
+    @note: HAAP数据插入
+    """
+    HAAP().insert(n, engine_status,lst_status)
+
+def get_list_HAAP():
+    """
+    @note: HAAP 展示的数据
+    """
     dbHAAP = HAAP()
     list_all_HAAP = dbHAAP.get_all_HAAP_status()
-    return list_all_HAAP
+    lst_HAAP = list_all_HAAP[1]
+    return lst_HAAP
 
-#SANSW
-def switch_insert():
+def get_HAAP_uptime_second(list_HAAP_alias):
+    """
+    @note: HAAP  需调用的数据-uptime_second
+    """
+    dbHAAP = HAAP()
+    list_all_HAAP = dbHAAP.get_all_HAAP_status()
+    list_HAAP = list_all_HAAP[2]
+    for key in list_HAAP.keys():
+        if key == list_HAAP_alias:
+            HAAP_uptime = get_dict_value(list_HAAP[key], 'uptime_second', results=[])
+    return HAAP_uptime
+
+def get_HAAP_mirror_status():
+    """
+    @note: HAAP  需调用的数据-mirror
+    """
+    dbHAAP = HAAP()
+    list_all_HAAP = dbHAAP.get_all_HAAP_status()
+    list_HAAP = list_all_HAAP[2]
+    for key in list_HAAP.keys():
+        if key == list_HAAP_alias:
+            HAAP_uptime = get_dict_value(list_HAAP[key], 'mirror_status', results=[])
+    return HAAP_uptime
+
+def get_HAAP_cluster_status():
+    """
+    @note: HAAP  需调用的数据-cluster_status
+    """
+    dbHAAP = HAAP()
+    list_all_HAAP = dbHAAP.get_all_HAAP_status()
+    list_HAAP = list_all_HAAP[2]
+    for key in list_HAAP.keys():
+        if key == list_HAAP_alias:
+            HAAP_uptime = get_dict_value(list_HAAP[key], 'cluster_status', results=[])
+    return HAAP_uptime
+
+
+# SANSW
+def switch_insert(n, origin, switch_summary, switch_status):
+    """
+    @note: SANSW数据插入
+    """
     SANSW().insert(n, origin, switch_summary, switch_status)
 
-def is_there_switch():
+
+def get_switch_total(list_switch_alias):
+    """
+    @note: SANSW-Total获取
+    """
     dbswitch = SANSW()
     list_all_switch = dbswitch.get_all_switch()
-    return list_all_switch
+    list_switch = list_all_switch[2]
+    for key in list_switch.keys():
+        if key == list_switch_alias:
+            switch_total = get_dict_value(list_switch[key], 'PE_Total', results=[])
+    return switch_total
 
-#Warning 
-def insert_warning():
+def get_list_switch():
+    """
+    @note: SANSW-网页部分展示
+    """
+    dbswitch = SANSW()
+    list_all_switch = dbswitch.get_all_switch()
+    list_switch = list_all_switch[2]
+    return list_switch
+
+
+# Warning 
+def insert_warning(n, level, warn_message, confirm_status):
+    """
+    @note: warning数据插入
+    """
     Warning().insert(n, level, warn_message, confirm_status)
 
+
 def update_warning():
+    """
+    @note: 更新warning数据库
+    """
     Warning().update_Warning()
 
+
 def is_there_unconfirm_warning():
+    """
+    @note: warning展示数据
+    """
     dbWarning = Warning()
     unconfirm_warnning = dbWarning.get_all_unconfirm_warning()
     if unconfirm_warnning:
         lstAllUCW = []
         for record in unconfirm_warnning:
             lstAllUCW.append([record.time, record.level, record.warn_message])
+    return lstAllUCW
             
-
+            
 class collHAAP(Document):
     time = DateTimeField(default=datetime.datetime.now())
-    engine_status = DictField()
+    engine_status = ListField()
+    lst_status = DictField()
 
 
 class collSANSW(Document):
@@ -93,25 +181,14 @@ class collWarning(Document):
 
 # DB opration of HAAP
 class HAAP(object):
-    
-    # def __init__(self):
-    #     self.last_record_list = get_last_record_list()
-    #     self.time_engine_last_record = self.last_record_list[0]
-    #     self.status_engine_last_record = self.last_record_list[1]
 
-    def insert(self, time_now, lstSTS):
-        t = collHAAP(time=time_now, engine_status=lstSTS)
+    def insert(self, time_now, engine_status, lst_status):
+        t = collHAAP(time=time_now, engine_status = engine_status, lst_status = lst_status)
         t.save()
 
     def query_range(self, time_start, time_end):
         collHAAP.objects(date__gte=time_start,
                          date__lt=time_end).order_by('-date')
-
-#     def query_all(self):
-#         return collHAAP.objects().order_by('-time')
-# 
-#     def query_N_records(self, intN):
-#         return collHAAP.objects().order_by('-time').limit(intN)
 
     def query_last_record(self):
         return collHAAP.objects().order_by('-time').first()
@@ -121,103 +198,12 @@ class HAAP(object):
 
     def get_all_HAAP_status(self):
         last_record = self.query_last_record()
-        lst_all_status = [last_record.time,last_record.engine_status]
-        print(lst_all_status)
+        lst_all_status = [last_record.time,last_record.engine_status,
+                          last_record.lst_status]
         return lst_all_status
 
 
 class SANSW(object):
-
-    '''
-    注意注意：只要两个关键dict filed：origin 和 summary
-    "_id" : ObjectId("5ca45497ff237792f883aaef"),
-    "time" : ISODate("2019-04-03T14:36:48.376Z"),
-
-    origin:{
-    "SW_UP":{
-    "IP":"1.1.1.1",
-    "switchshow":""
-    "porterrshow":""
-    }
-    "SW_Down":{
-    "IP":"1.1.1.1",
-    "switchshow":""
-    "porterrshow":""
-    }
-    }
-
-    Summary:{
-    "SW01":{
-    "IP":"1.1.1.1",
-    "PE_Sum":[
-        "0", 
-        "0", 
-        "0", 
-        "0", 
-        "0", 
-        "0", 
-        "4"]
-    ]
-    "PE_Total":578
-    }
-    "SW02":{
-    "IP":"1.1.1.2",
-    "PE_Sum":[
-        "0", 
-        "0", 
-        "0", 
-        "0", 
-        "0", 
-        "0", 
-        "4"]
-    ]
-    "PE_Total":578
-    }
-
-    Switch_Status:{
-    "SW1":{
-    "IP":"1.1.1.1",
-    "PE":{
-    "0":[
-        "0", 
-        "0", 
-        "0", 
-        "0", 
-        "0", 
-        "0", 
-        "4"],
-    "1":[
-        "0", 
-        "0", 
-        "1.2k", 
-        "0", 
-        "0", 
-        "0", 
-        "4"]
-    }
-
-    "SW_Down":{
-    "IP":"2.2.2.2"
-    "PE":{
-    "0":[
-        "0", 
-        "0", 
-        "0", 
-        "0", 
-        "0", 
-        "0", 
-        "4"],
-    "1":[
-        "0", 
-        "0", 
-        "0", 
-        "0", 
-        "0", 
-        "0", 
-        "4"]
-
-    }
-    '''
 
     def insert(self, time_now, origin, Summary, Switch_Status):
         t = collSANSW(time=time_now, origin=origin,
@@ -227,22 +213,16 @@ class SANSW(object):
     def query_range(self, time_start, time_end):
         collSANSW.objects(date__gte=time_start,
                           date__lt=time_end).order_by('-date')
-# 
-#     def query_all(self):
-#         return collSANSW.objects().order_by('-time')
-# 
-#     def query_N_records(self, intN):
-#         return collSANSW.objects().order_by('-time').limit(intN)
 
     def query_first_records(self):
         return collSANSW.objects().order_by('-time').first()
    
     def get_all_switch(self):
         last_record = self.query_first_records()
-        lstall = [last_record.time, last_record.origin,
-                last_record.switch_summary, last_record.switch_status]
+        lstall = [last_record.time,last_record.origin,
+                        last_record.switch_summary,last_record.switch_status]
         return lstall
-    
+
 
 class Warning(object):
     
@@ -254,12 +234,6 @@ class Warning(object):
     def query_range(self, time_start, time_end):
         collWARN.objects(date__gte=time_start,
                         date__lt=time_end).order_by('-date')
-# 
-#     def query_all(self):
-#         return collWARN.objects().order_by('-time')
-# 
-#     def query_N_records(self, intN):
-#         return collWARN.objects().order_by('-time').limit(intN)
 
     def query_first_records(self, intN):
         return collWARN.objects().order_by('-time').first()
@@ -276,12 +250,5 @@ class Warning(object):
 
 
 if __name__ == '__main__':
-    # SANSW().get_all_switch()
-  #  print(is_there_switch()[1])
-
-    #is_there_HAAP()
-    
-    
-    print("ok")
     pass
 
