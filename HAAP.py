@@ -156,7 +156,7 @@ def haap_status_real(engine_IP):
     status=Status(engine_IP,telnet_port,passwd,FTP_port)
     web_status=status.over_all_and_warning()
     db_status=status.over_all_real()
-    return [web_status,db_status]
+    return web_status,db_status
 
 
 
