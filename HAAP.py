@@ -152,15 +152,12 @@ def periodically_check(ip):
         lstPCCommand, strPCFolder, )
 
 
+def haap_status_real(engine_IP):
+    status=Status(engine_IP,telnet_port,passwd,FTP_port)
+    web_status=status.over_all_and_warning()
+    db_status=status.over_all_real()
+    return [web_status,db_status]
 
-def haap_status_web_show():
-    for engine in list_engines_IP:
-        status=Status(engine,telnet_port,passwd,FTP_port)
-        status.over_all_and_warning()
-
-def haap_status_real(engine):
-    status=Status(engine,telnet_port,passwd,FTP_port)
-    return status.over_all_real()
 
 
 class Action():
@@ -600,14 +597,16 @@ class Status(Action):
 
     def over_all_real(self):
         lstStatus=self.over_all()
-        lstStatus=[lstStatus[i] for i in [0,1,4,5]]
+        lstStatus=[lstStatus[i] for i in [0,1,3,4,5]]
         if self.AHStatus:
+        #if True:
             lstStatus[2]='--'
             lstStatus[3]='--'
             lstStatus[4]='--'
-            lstStatus[5]=None
+            lstStatus.append('--')
         else:
             lstStatus.append(self.uptime_second())
+        return lstStatus
 
 
 
@@ -797,7 +796,7 @@ class warning(Status):
 
 if __name__ == '__main__':
 
-    print (haap_status_real('10.203.1.221'))
+    #print (haap_status_real('10.203.1.221'))
     # HAAP('10.203.1.111','23','21','password').has_abts_qfull()
     # print ('a',list_engines_IP)
     # print ('b',list_engines_alias)

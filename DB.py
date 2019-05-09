@@ -12,11 +12,11 @@ from posix import lstat
 # read config and connet to the datebase
 cfgDB = gc.DBConfig()
 strDBName = cfgDB.name()
-print("strDBName:", strDBName)
+#print("strDBName:", strDBName)
 strDBHost = cfgDB.host()
-print("strDBName:", strDBHost)
+#print("strDBName:", strDBHost)
 intDBPort = cfgDB.port()
-print("strDBName:", intDBPort)
+#print("strDBName:", intDBPort)
 
 # <<<Get Config Field>>>
 # HAAP

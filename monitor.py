@@ -26,14 +26,25 @@ interval_web_refresh = setting.interval_web_refresh()
 interval_haap_update = setting.interval_haap_update()
 interval_sansw_update = setting.interval_sansw_update()
 interval_warning_check = setting.interval_warning_check()
-SWTotal_level=gc.threshold_total()
+
 swcfg = gc.SwitchConfig()
+SWTotal_level=swcfg.threshold_total()
 sw_ID=swcfg.list_switch_alias()
 
 haapcfg = gc.EngineConfig()
 list_engines_IP = haapcfg.list_engines_IP()
+list_haap_IP_alies = haapcfg._odd_engines()
+list_haap_alies = haapcfg.list_engines_alias()
 
 # <<<Get Config Field>>>
+
+##<<<email massage>>>
+str_engine_restart='Engine reboot'
+str_engine_mirror='Engine mirror not ok'
+str_engine_status='Engine offline'
+str_engine_AH='Engine AH'
+
+current_time=datetime.datetime.now()
 
 def get_warning_unchecked_format():
     pass
@@ -45,7 +56,7 @@ def get_status_haap():
 
 def start_mnt_4Thread():
     t1 = Thread(target=start_web, args=('db', interval_web_refresh))
-    t2 = Thread(target=haap, args=(interval_haap_update,))
+    t2 = Thread(target=haap_all, args=(interval_haap_update,))
     t3 = Thread(target=sansw, args=(interval_sansw_update,))
     t4 = Thread(target=email_warning, args=(interval_warning_check,))
 
@@ -134,9 +145,22 @@ def start_web(mode):
 '''
 
 
+def DB_haap_data(haap_alies,mode):
+    if mode=='uptime':
+        return db.get_HAAP_uptime(haap_alies)
+    elif mode=='mirror':
+        return db.get_HAAP_mirror(haap_alies)
+    elif mode=='status':
+        return db.get_HAAP_status(haap_alies)
+
+def IP_to_alies(engine_IP):
+    for alies in list_haap_alies:
+        if list_haap_IP_alies[alies] == engine_IP:
+            return alies
 
 
-def haap(interval_haap_update):
+
+def haap_all(interval_haap_update):
     pass
 
 
@@ -148,28 +172,84 @@ def sansw(interval_sansw_update):
 def email_warning(interval_warning_check):
     pass
 
-def real_haap(engineIP):
-    real_info=haap.haap_status_real(engineIP)
-    return real_info
+def real_haap(engine_IP):
+    real_haap_info=haap.haap_status_real(engine_IP)
+    return real_haap_info
 
-def DB_data(mode):
-    if mode=='uptime':
-        return db.getuptime()
-    elif mode=='mirror':
-        return db.getmirror()
-    elif mode=='status':
-        return db.getstatus()
-
-
-
-def judge_haap():
-    for engine in list_engines_IP:
-        real_info=real_haap(engine)
+# def real_haap_web_show(engine_IP):
+#     return real_haap(engine_IP)[0]
+#
+# def real_haap_judge(engine_IP):
+#     return real_haap(engine_IP)[1]
 
 
 
 
-    pass
+def judge_all_haap():
+    for engine_IP in list_engines_IP:
+        real_engine_status = real_haap(engine_IP)[1]
+        haap_alies = IP_to_alies(engine_IP)
+        if judge_AH(real_engine_status[1]):
+            real_uptime = real_engine_status[5]
+            real_mirror = real_engine_status[4]
+            real_status = real_engine_status[3]
+            db_uptime=DB_haap_data(haap_alies,'uptime')
+            db_mirror=DB_haap_data(haap_alies,'mirror')
+            db_status=DB_haap_data(haap_alies,'status')
+
+            if judge_uptime(real_uptime,db_uptime):
+                warning_info=judge_uptime(real_uptime,db_uptime)
+                db.insert_warning(current_time ,engine_IP ,warning_info[0] ,warning_info[1] ,warning_info[2])
+                #send email
+
+            if judge_mirror(real_mirror,db_mirror):
+                warning_info=judge_mirror(real_mirror,db_mirror)
+                db.insert_warning(current_time ,engine_IP ,warning_info[0] ,warning_info[1] ,warning_info[2])
+                #send email
+
+            if judge_status(real_status,db_status):
+                warning_info=judge_status(real_uptime,db_status)
+                db.insert_warning(current_time ,engine_IP ,warning_info[0] ,warning_info[1] ,warning_info[2])
+                #seng email
+
+        else:
+            db.insert_warning(current_time ,engine_IP ,)
+
+
+#haal_alies = IP_to_alies(engine_IP)
+#web_status=real_haap(engine_IP)[0]
+
+
+def judge_AH(real_AH_status):
+    if real_AH_status==0:
+        return None
+    else :
+        return [3 ,str_engine_AH ,0]
+
+def judge_uptime(real_uptime,db_uptime):
+    if real_uptime<=db_uptime:
+        return [2 ,str_engine_restart ,0]
+    else :
+        return None
+
+def judge_mirror(real_mirror,db_mirror):
+    if real_mirror==0:
+        return None
+    elif db_mirror!=0:
+        return None
+    else:
+        return [3 ,str_engine_mirror ,0]
+
+def judge_status(real_status,db_status):
+    if real_status==None:
+        return None
+    elif db_status!=None:
+        return None
+    else:
+        return [3 ,str_engine_status,0]
+
+judge_haap()
+
 '''
 def job_update_interval(intInterval):
     t = s.Timing()
@@ -282,3 +362,20 @@ def get_sw_warning():
             if intlevel:
                 db.insert_warning(time,intlevel,massage,confirm_status)
     db.switch_insert(dic_all_sw[0][0],dic_all_sw[0][1],dic_all_sw[0][2])
+
+
+# time:xxxxxxxxx
+# engine_status = {
+#         'engine0':['10.203.1.221',0,
+#         '1 Days 5 Hours 54 Minutes',
+#         'M', None, 0],
+#         'engine1':['10.203.1.221', 0,
+#          '1 Days 5 Hours 54 Minutes',
+#          'M', None, 0]
+#         }
+# lst_status = {
+#         'engine0':['10.203.1.221',0,
+#         'M', None, 0, 107651],
+#         'engine1':['10.203.1.221', 0,
+#          'M', None, 0, 107651]
+#         }

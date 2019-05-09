@@ -99,22 +99,22 @@ import datetime
     
 """
         n = datetime.datetime.now()
-    engine_status = [
-        ['10.203.1.221',0,
+    engine_status = {
+        'engine0':['10.203.1.221',0,
         '1 Days 5 Hours 54 Minutes', 
         'M', None, 0, 107651],
-        ['10.203.1.221', 0, 
+        'engine1':['10.203.1.221', 0, 
          '1 Days 5 Hours 54 Minutes', 
          'M', None, 0, 107651]
-        ]
+        }
     lst_status = {
-        "HAAP1":{"ip":32313131,
+        "engine0":{"ip":32313131,
          "ah":32313131,
          "uptime_second":32313131,
          "cluster_status":32313131,
          "mirror_status":32313131
             },
-        "HAAP2":{"ip":2222222,
+        "engine1":{"ip":2222222,
          "ah":32313131,
          "uptime_second":32313131,
          "cluster_status":32313131,
