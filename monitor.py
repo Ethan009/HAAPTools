@@ -152,6 +152,8 @@ def DB_haap_data(haap_alies,mode):
         return db.get_HAAP_mirror(haap_alies)
     elif mode=='status':
         return db.get_HAAP_status(haap_alies)
+    elif mode=='AH_status':
+        return db.get_HAAP_AH_status(haap_alies)
 
 def IP_to_alies(engine_IP):
     for alies in list_haap_alies:
@@ -183,51 +185,62 @@ def real_haap(engine_IP):
 #     return real_haap(engine_IP)[1]
 
 
-
-
 def judge_all_haap():
     for engine_IP in list_engines_IP:
-        real_engine_status = real_haap(engine_IP)[1]
-        haap_alies = IP_to_alies(engine_IP)
-        if judge_AH(real_engine_status[1]):
-            real_uptime = real_engine_status[5]
-            real_mirror = real_engine_status[4]
-            real_status = real_engine_status[3]
-            db_uptime=DB_haap_data(haap_alies,'uptime')
-            db_mirror=DB_haap_data(haap_alies,'mirror')
-            db_status=DB_haap_data(haap_alies,'status')
+        judge_haap(engine_IP)
 
-            if judge_uptime(real_uptime,db_uptime):
-                warning_info=judge_uptime(real_uptime,db_uptime)
-                db.insert_warning(current_time ,engine_IP ,warning_info[0] ,warning_info[1] ,warning_info[2])
-                #send email
 
-            if judge_mirror(real_mirror,db_mirror):
-                warning_info=judge_mirror(real_mirror,db_mirror)
-                db.insert_warning(current_time ,engine_IP ,warning_info[0] ,warning_info[1] ,warning_info[2])
-                #send email
+def judge_haap(engine_IP):
+    real_engine_status=real_haap(engine_IP)[1]
+    haap_alies=IP_to_alies(engine_IP)
+    if judge_AH(real_engine_status[1]):
+        real_uptime=real_engine_status[5]
+        real_mirror=real_engine_status[4]
+        real_status=real_engine_status[3]
+        db_uptime=DB_haap_data(haap_alies,'uptime')
+        db_mirror=DB_haap_data(haap_alies,'mirror')
+        db_status=DB_haap_data(haap_alies,'status')
+        db_AH_status=DB_haap_data(haap_alies,'AH_status')
 
-            if judge_status(real_status,db_status):
-                warning_info=judge_status(real_uptime,db_status)
+        if judge_uptime(real_uptime,db_uptime):
+            warning_info=judge_uptime(real_uptime,db_uptime)
+            if warning_info:
                 db.insert_warning(current_time ,engine_IP ,warning_info[0] ,warning_info[1] ,warning_info[2])
-                #seng email
+            #send email
+
+        if judge_mirror(real_mirror,db_mirror):
+            warning_info=judge_mirror(real_mirror,db_mirror)
+            if warning_info:
+                db.insert_warning(current_time ,engine_IP ,warning_info[0] ,warning_info[1] ,warning_info[2])
+            #send email
+
+        if judge_status(real_status,db_status):
+            warning_info=judge_status(real_uptime,db_status)
+            if warning_info:
+                db.insert_warning(current_time ,engine_IP ,warning_info[0] ,warning_info[1] ,warning_info[2])
+            #seng email
 
         else:
-            warning_info=judge_AH(real_AH_status,db_AH_status)
-            db.insert_warning(current_time ,engine_IP ,)
+            if judge_AH_last(db_AH_status):
+                warning_info=judge_AH(db_AH_status)
+                if warning_info:
+                    db.insert_warning(current_time ,engine_IP ,)
 
 
 #haal_alies = IP_to_alies(engine_IP)
 #web_status=real_haap(engine_IP)[0]
 
-
-def judge_AH(real_AH_status,db_AH_status):
-    if real_AH_status==0:
-        return None
-    elif db_AH_status==0:
-        return None
-    else :
+def judge_AH_last(db_AH_status):
+    if db_AH_status!=0:
         return [3 ,str_engine_AH ,0]
+    else:
+        return None
+
+def judge_AH(real_AH_status):
+    if real_AH_status==0:
+        return 0
+    else :
+        return None
 
 def judge_uptime(real_uptime,db_uptime):
     if real_uptime<=db_uptime:
