@@ -152,8 +152,15 @@ def real_haap(engineIP):
     real_info=haap.haap_status_real(engineIP)
     return real_info
 
-def DB_data():
-    db.
+def DB_data(mode):
+    if mode=='uptime':
+        return db.getuptime()
+    elif mode=='mirror':
+        return db.getmirror()
+    elif mode=='status':
+        return db.getstatus()
+
+
 
 def judge_haap():
     for engine in list_engines_IP:

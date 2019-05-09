@@ -602,7 +602,10 @@ class Status(Action):
         lstStatus=self.over_all()
         lstStatus=[lstStatus[i] for i in [0,1,4,5]]
         if self.AHStatus:
-            lstStatus.append('--')
+            lstStatus[2]='--'
+            lstStatus[3]='--'
+            lstStatus[4]='--'
+            lstStatus[5]=None
         else:
             lstStatus.append(self.uptime_second())
 
