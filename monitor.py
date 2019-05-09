@@ -213,6 +213,7 @@ def judge_all_haap():
                 #seng email
 
         else:
+            warning_info=judge_AH()
             db.insert_warning(current_time ,engine_IP ,)
 
 
@@ -220,8 +221,10 @@ def judge_all_haap():
 #web_status=real_haap(engine_IP)[0]
 
 
-def judge_AH(real_AH_status):
+def judge_AH(real_AH_status,db_AH_status):
     if real_AH_status==0:
+        return None
+    elif db_AH_status==0:
         return None
     else :
         return [3 ,str_engine_AH ,0]
@@ -248,7 +251,6 @@ def judge_status(real_status,db_status):
     else:
         return [3 ,str_engine_status,0]
 
-judge_haap()
 
 '''
 def job_update_interval(intInterval):
@@ -352,6 +354,7 @@ def thrd_web_rt():
     except KeyboardInterrupt:
         stopping_web(3)
 massage=''
+
 def get_sw_warning():
     dic_all_sw = sw.get_dic_all_sw()
     for i in sw_ID:
