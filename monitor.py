@@ -213,7 +213,7 @@ def judge_all_haap():
                 #seng email
 
         else:
-            warning_info=judge_AH()
+            warning_info=judge_AH(real_AH_status,db_AH_status)
             db.insert_warning(current_time ,engine_IP ,)
 
 
