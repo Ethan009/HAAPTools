@@ -145,7 +145,7 @@ if __name__ == '__main__':
 #     db.switch_insert(n,origin,Summary,Switch_Status)
 #     print(db.get_switch_total("SW02"))
 #     db.insert_warning(n,ip,level,warn_message,confirm_status)
-#     print(db.get_unconfirm_warning())
+    print(db.get_unconfirm_warning())
     print("ok")
     pass
     

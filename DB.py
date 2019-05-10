@@ -33,7 +33,6 @@ print("strDBName:", intDBPort)
 # user = swcfg.username()
 # passwd = swcfg.password()
 # list_sw_ports = swcfg.list_switch_ports()
-
 connect(strDBName, host=strDBHost, port=intDBPort)
 
 # intialize 3 collections
@@ -51,6 +50,13 @@ def get_list_HAAP():
     @note: HAAP 展示的数据
     """
     return HAAP().query_last_record().status_to_show
+
+def get_HAAP_AH_status(list_HAAP_alias):
+    """
+    @note:需调用的数据-AH [1]AH
+    
+    """
+    return HAAP().query_last_record().status_for_judging[list_HAAP_alias][1]
 
 
 def get_HAAP_status(list_HAAP_alias):
