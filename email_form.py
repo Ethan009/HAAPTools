@@ -10,10 +10,23 @@ from email import encoders
 import sys
 import os
 from datetime import *
+import GetConfig as gc
+
+
 try:
     import configparser as cp
 except Exception:
     import ConfigParser as cp
+
+
+
+emailcfg=gc.EmailConfig()
+email_host=emailcfg.email_host()
+email_sender=emailcfg.email_sender()
+email_password=emailcfg.email_password()
+email_receiver=emailcfg.email_receiver()
+email_host_port=emailcfg.email_host_port()
+
 
 '''warninfo_email = [{'confirm_status':'0',
                    'level':'2',
@@ -22,6 +35,8 @@ except Exception:
                    'level':'2',
                    'time_of_send_Email':'2019/1/25 15:00:10',
                    'message':'Engine \'192.168.0.7\' Mirrir Degrade'}]'''
+
+
 objCFG = cp.ConfigParser(allow_no_value=True)
 objCFG.read('Conf2.ini')
 sub= "用户未确认信息"

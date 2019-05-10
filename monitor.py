@@ -6,8 +6,9 @@ import SANSW as sw
 import HAAP as haap
 import Source as s
 from threading import Thread
-from flask import Flask
+from flask import Flask,render_template
 import time
+import SendEmail as SE
 
 import datetime
 import DB as db
@@ -43,23 +44,29 @@ str_engine_restart='Engine reboot'
 str_engine_mirror='Engine mirror not ok'
 str_engine_status='Engine offline'
 str_engine_AH='Engine AH'
+user_unconfirm=0
+mirror_level=3
+status_level=3
+uptime_level=2
+
+##<<web show-from name>>
+lstDescHAAP = ('EngineIP', 'AH Status', 'Uptime',
+               'Master', 'Cluster', 'Mirror')
+lstDescSANSW = ('SwitchIP', 'EncOut', 'DiscC3',
+                'LinkFail', 'LossSigle', 'LossSync')
 
 def current_time():
     return datetime.datetime.now()
 
 def get_warning_unchecked_format():
-    pass
-
-def get_status_haap():
-    pass
-
-
+    unconfirm_info = db.get_unconfirm_warning()
+    return unconfirm_info
 
 def start_mnt_4Thread():
     t1 = Thread(target=start_web, args=('db', interval_web_refresh))
-    t2 = Thread(target=haap_all, args=(interval_haap_update,))
-    t3 = Thread(target=sansw, args=(interval_sansw_update,))
-    t4 = Thread(target=email_warning, args=(interval_warning_check,))
+    t2 = Thread(target=judge_haap_all_status, args=(interval_haap_update,))
+    t3 = Thread(target=judge_SANSW_all_status, args=(interval_sansw_update,))
+    t4 = Thread(target=judge_db_confirm, args=(interval_warning_check,))
 
     t1.setDaemon(True)
     t2.setDaemon(True)
@@ -87,15 +94,9 @@ def start_mnt_4Thread():
 # same as HAAP.py
 
 
-lstDescHAAP = ('EngineIP', 'AH Status', 'Uptime',
-               'Master', 'Cluster', 'Mirror')
-lstDescSANSW = ('SwitchIP', 'EncOut', 'DiscC3',
-                'LinkFail', 'LossSigle', 'LossSync')
-
 
 def start_web(mode):
-    pass
-'''
+
 #tlu = Time Last Update
     
     app = Flask(__name__, template_folder='./web/templates',
@@ -103,10 +104,6 @@ def start_web(mode):
 
     @app.route("/", methods=['GET', 'POST'])
     def home():
-
-        # Transfer lstDescHAAP, lstDescSANSW, lstStatusHAAP, \
-        # lstStatusSANSW, interval_refresh, haap_status, \
-        # sansw_status, warning_status
 
         if mode == 'rt':
             StatusHAAP = 
@@ -116,7 +113,7 @@ def start_web(mode):
             status_warning = 
 
         elif mode == 'db':
-            StatusHAAP = 
+            StatusHAAP =
             StatusSANSW = 
             tlu_haap = 
             tlu_sansw = 
@@ -125,6 +122,7 @@ def start_web(mode):
         return render_template("monitor.html",
                                Title_HAAP=lstDescHAAP,
                                Title_SANSW=lstDescSANSW,
+
                                StatusHAAP=lstStatusHAAP,
                                StatusSANSW=lstStatusSANSW,
                                haap_last_update=tlu_haap,
@@ -143,8 +141,38 @@ def start_web(mode):
 
     app.run(debug=False, use_reloader=False, host='127.0.0.1', port=5000)
 
-'''
 
+
+
+def judge_haap_all_status(interval_haap_update):
+    t=s.Timing()
+    t.add_interval(judge_all_haap, interval_haap_update)
+    t.stt()
+
+def judge_SANSW_all_status(interval_sansw_update):
+    t = s.Timing()
+    t.add_interval(get_sw_warning, interval_sansw_update)
+    t.stt()
+
+def judge_db_confirm(interval_warning_check):
+    t=s.Timing()
+    t.add_interval(judge_user_confirm, interval_warning_check)
+    t.stt()
+
+
+def real_haap(engine_IP):
+    real_haap_info=haap.haap_status_real(engine_IP)
+    return real_haap_info
+
+def show_haap_status():
+    pass
+
+
+# def real_haap_web_show(engine_IP):
+#     return real_haap(engine_IP)[0]
+#
+# def real_haap_judge(engine_IP):
+#     return real_haap(engine_IP)[1]
 
 def DB_haap_data(haap_alies,mode):
     if mode=='uptime':
@@ -161,31 +189,7 @@ def IP_to_alies(engine_IP):
         if list_haap_IP_alies[alies] == engine_IP:
             return alies
 
-
-
-def haap_all(interval_haap_update):
-    pass
-
-
-
-
-def sansw(interval_sansw_update):
-    pass
-
-def email_warning(interval_warning_check):
-    pass
-
-def real_haap(engine_IP):
-    real_haap_info=haap.haap_status_real(engine_IP)
-    return real_haap_info
-
-# def real_haap_web_show(engine_IP):
-#     return real_haap(engine_IP)[0]
-#
-# def real_haap_judge(engine_IP):
-#     return real_haap(engine_IP)[1]
-
-
+#缺少获取引擎失败的处理机制
 def judge_all_haap():
     status_to_show={}
     status_for_judging={}
@@ -193,12 +197,14 @@ def judge_all_haap():
         haap_status=judge_haap(engine_IP)
         status_to_show[IP_to_alies(engine_IP)]=haap_status[0]
         status_for_judging[IP_to_alies(engine_IP)]=haap_status[1]
-
+    db.insert_haap_status(s.time_now_folder(),status_to_show ,status_for_judging)
 
 def judge_haap(engine_IP):
     real_haap_info=real_haap(engine_IP)
+
     real_engine_status = real_haap_info[1]
     real_engine_status_web =real_haap_info[0]
+
     haap_alies = IP_to_alies(engine_IP)
 
     if real_engine_status[1] == 0:
@@ -228,8 +234,6 @@ def judge_haap(engine_IP):
         judge_AH_last(engine_IP, DB_haap_data(haap_alies, 'AH_status'))
 
     return real_engine_status_web,real_engine_status
-
-
 
 
 '''
@@ -274,20 +278,21 @@ def judge_haap(engine_IP):
 '''
 
 
-
 #haal_alies = IP_to_alies(engine_IP)
-#web_status=real_haap(engine_IP)[0]
 
 def judge_AH_last(engine_IP,db_AH_status):
     if db_AH_status==0:
-        db.insert_warning(current_time() ,engine_IP ,3 ,str_engine_AH ,0 )
+        db.insert_warning(s.time_now_folder() ,engine_IP ,3 ,str_engine_AH ,user_unconfirm )
         #send email
 
 
 def judge_uptime(engine_IP,real_uptime,db_uptime):
     if real_uptime<=db_uptime:
-        db.insert_warning(current_time() ,engine_IP ,2 ,str_engine_restart ,0 )
+        db.insert_warning(s.time_now_folder() ,engine_IP ,2 ,str_engine_restart ,user_unconfirm )
         #send email
+    else:
+        return
+
 
 def judge_mirror(engine_IP,real_mirror,db_mirror):
     if real_mirror==0:
@@ -295,7 +300,7 @@ def judge_mirror(engine_IP,real_mirror,db_mirror):
     elif db_mirror!=0:
         return
     else:
-        db.insert_warning(current_time() ,engine_IP ,3 ,str_engine_mirror ,0 )
+        db.insert_warning(s.time_now_folder() ,engine_IP ,3 ,str_engine_mirror ,user_unconfirm )
         #send email
 
 def judge_status(engine_IP,real_status,db_status):
@@ -304,11 +309,11 @@ def judge_status(engine_IP,real_status,db_status):
     elif db_status!=None:
         return None
     else:
-        db.insert_warning(current_time() ,engine_IP ,3 ,str_engine_status ,0 )
+        db.insert_warning(s.time_now_folder() ,engine_IP ,3 ,str_engine_status ,user_unconfirm )
         #send email
 
-def to_haap_status_db(haap_alies ,status_to_show ,status_for_judging):
-
+# def to_haap_status_db(status_to_show ,status_for_judging):
+#     db.insert_haap_status(current_time(),status_to_show,status_for_judging)
 
 
 
@@ -317,6 +322,13 @@ def to_haap_status_db(haap_alies ,status_to_show ,status_for_judging):
 #         return 0
 #     else :
 #         return None
+
+
+#执行查询数据库，并在发现用户未确认信息后，发送警报邮件
+def judge_user_confirm():
+    #[[time,IP,level,massage],[],[]]
+    if get_warning_unchecked_format():
+        SE.send_warnmail(get_warning_unchecked_format())
 
 '''
 def job_update_interval(intInterval):
@@ -430,6 +442,7 @@ def get_sw_warning():
             intlevel=s.is_Warning(total,SWTotal_level)
             if intlevel:
                 db.insert_warning(time,intlevel,massage,confirm_status)
+                #send email
     db.switch_insert(dic_all_sw[0][0],dic_all_sw[0][1],dic_all_sw[0][2])
 
 

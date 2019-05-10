@@ -137,8 +137,8 @@ class EmailConfig(object):
 
     def email_receiver(self):
         return str(self.cfg.get('EmailSetting', 'receiver'))
-
-    def email_host(self):
+    #发送邮件的端口 
+    def email_host_port(self):
         return self.cfg.getint('EmailSetting', 'host_port')
 
 
