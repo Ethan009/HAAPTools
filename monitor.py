@@ -48,6 +48,7 @@ user_unconfirm=0
 mirror_level=3
 status_level=3
 uptime_level=2
+AH_level=3
 
 ##<<web show-from name>>
 lstDescHAAP = ('EngineIP', 'AH Status', 'Uptime',
@@ -58,9 +59,11 @@ lstDescSANSW = ('SwitchIP', 'EncOut', 'DiscC3',
 def current_time():
     return datetime.datetime.now()
 
+
 def get_warning_unchecked_format():
     unconfirm_info = db.get_unconfirm_warning()
     return unconfirm_info
+
 
 def start_mnt_4Thread():
     t1 = Thread(target=start_web, args=('db', interval_web_refresh))
@@ -282,13 +285,13 @@ def judge_haap(engine_IP):
 
 def judge_AH_last(engine_IP,db_AH_status):
     if db_AH_status==0:
-        db.insert_warning(s.time_now_folder() ,engine_IP ,3 ,str_engine_AH ,user_unconfirm )
+        db.insert_warning(s.time_now_folder() ,engine_IP ,AH_level ,str_engine_AH ,user_unconfirm )
         #send email
 
 
 def judge_uptime(engine_IP,real_uptime,db_uptime):
     if real_uptime<=db_uptime:
-        db.insert_warning(s.time_now_folder() ,engine_IP ,2 ,str_engine_restart ,user_unconfirm )
+        db.insert_warning(s.time_now_folder() ,engine_IP ,uptime_level ,str_engine_restart ,user_unconfirm )
         #send email
     else:
         return
@@ -300,7 +303,7 @@ def judge_mirror(engine_IP,real_mirror,db_mirror):
     elif db_mirror!=0:
         return
     else:
-        db.insert_warning(s.time_now_folder() ,engine_IP ,3 ,str_engine_mirror ,user_unconfirm )
+        db.insert_warning(s.time_now_folder() ,engine_IP ,mirror_level ,str_engine_mirror ,user_unconfirm )
         #send email
 
 def judge_status(engine_IP,real_status,db_status):
@@ -309,7 +312,7 @@ def judge_status(engine_IP,real_status,db_status):
     elif db_status!=None:
         return None
     else:
-        db.insert_warning(s.time_now_folder() ,engine_IP ,3 ,str_engine_status ,user_unconfirm )
+        db.insert_warning(s.time_now_folder() ,engine_IP ,status_level ,str_engine_status ,user_unconfirm )
         #send email
 
 # def to_haap_status_db(status_to_show ,status_for_judging):
