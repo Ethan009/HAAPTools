@@ -365,7 +365,6 @@ class Status(Action):
                 "0",
                 "0",
                 "4"],
-
         "PE_Total":578
                     }
         }

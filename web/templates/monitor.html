@@ -125,13 +125,13 @@
                             </thead>
                             <tbody>
                             {% for i in Status %}
-                                {% if warns[i[0]]==1 %}
+                                {% if StatusHAAP[6]==0 %}
                                     <tr class="success">
                                         {% for s in i %}
                                             <td>{{ s }}</td>
                                         {% endfor %}
                                     </tr>
-                                {% elif warns[i[0]]==2 %}
+                                {% elif StatusHAAP[6]==2 %}
                                     <tr class="warning">
                                         {% for s in i %}
                                             <td>{{ s }}</td>
@@ -152,7 +152,6 @@
                     {% endif %}
                 </div>
             </div>
-
 
             <div class="row clearfix">
                 <div class="col-md-12 column">
