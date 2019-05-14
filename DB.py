@@ -18,42 +18,33 @@ print("strDBName:", strDBHost)
 intDBPort = cfgDB.port()
 print("strDBName:", intDBPort)
 
-# <<<Get Config Field>>>
-# # HAAP
-# haapcfg = gc.EngineConfig()
-# list_engines_IP = haapcfg.list_engines_IP()[0]
-# telnet_port = haapcfg.telnet_port()
-# FTP_port = haapcfg.FTP_port()
-# passwd = haapcfg.password()
-# # switch
-# swcfg = gc.SwitchConfig()
-# list_sw_IP = swcfg.list_switch_IP()
-# list_sw_alias = swcfg.list_switch_alias()
-# ssh_port = swcfg.SSH_port()
-# user = swcfg.username()
-# passwd = swcfg.password()
-# list_sw_ports = swcfg.list_switch_ports()
 connect(strDBName, host=strDBHost, port=intDBPort)
-
-# intialize 3 collections
 
 # HAAP
 def haap_insert(n, engine_status, lst_status):
     """
-    @note: HAAP数据插入
+    @note: monitoHAAP数据插入
     """
     HAAP().insert(n, engine_status, lst_status)
+    
+    
+def get_HAAP_time():
+    """
+    @note: monitor-HAAP网页展示的时间
+    """
+    return HAAP().query_last_record().time
 
 
 def get_list_HAAP():
     """
-    @note: HAAP 展示的数据
+    @note: HAAP-网页展示的数据
     """
     return HAAP().query_last_record().status_to_show
 
+
 def get_HAAP_AH_status(list_HAAP_alias):
     """
-    @note:需调用的数据-AH [1]AH
+    @note:HAAP模块需调用的数据-AH [1]AH
     
     """
     return HAAP().query_last_record().status_for_judging[list_HAAP_alias][1]
@@ -61,7 +52,7 @@ def get_HAAP_AH_status(list_HAAP_alias):
 
 def get_HAAP_status(list_HAAP_alias):
     """
-    @note:需调用的数据-status [3]status
+    @note:HAAP模块需调用的数据-status [3]status
     
     """
     return HAAP().query_last_record().status_for_judging[list_HAAP_alias][3]
@@ -69,14 +60,14 @@ def get_HAAP_status(list_HAAP_alias):
 
 def get_HAAP_mirror(list_HAAP_alias):
     """
-    @note:需调用的数据-mirror [4]mirror
+    @note:HAAP模块需调用的数据-mirror [4]mirror
     """
     return HAAP().query_last_record().status_for_judging[list_HAAP_alias][4]
 
 
 def get_HAAP_uptime(list_HAAP_alias):
     """
-    @note:需调用的数据-uptime [5]uptime
+    @note:HAAP模块需调用的数据-uptime [5]uptime
     """
     return HAAP().query_last_record().status_for_judging[list_HAAP_alias][5]
 
@@ -91,16 +82,23 @@ def switch_insert(n, origin, switch_summary, switch_status):
 
 def get_switch_total(list_switch_alias):
     """
-    @note: SANSW-Total获取
+    @note: SANSW模块调用-Total获取
     """
     return SANSW().query_first_records().switch_summary[list_switch_alias]["PE_Total"]
 
 
-def get_list_switch(list_switch_alias):
+def get_switch_time():
     """
     @note: SANSW-网页部分展示
     """
-    return SANSW().query_first_records().switch_summary[list_switch_alias]["PE_Sum"]
+    return SANSW().query_first_records().time
+
+
+def get_list_switch():
+    """
+    @note: SANSW-网页部分展示
+    """
+    return SANSW().query_first_records().switch_summary
 
 
 # Warning 
@@ -120,15 +118,15 @@ def update_warning():
 
 def get_unconfirm_warning():
     """
-    @note: warning展示数据
+    @note: warning网页部分展示
     """
     unconfirm_warnning = Warning().get_all_unconfirm_warning()
     if unconfirm_warnning:
         lstAllUCW = []
         for record in unconfirm_warnning:
-            lstAllUCW.append([record.time,record.ip, record.level, record.warn_message])
+            lstAllUCW.append([record.time, record.ip, record.level, record.warn_message])
     return lstAllUCW
-            
+
             
 class collHAAP(Document):
     time = DateTimeField(default=datetime.datetime.now())
@@ -183,7 +181,7 @@ class SANSW(object):
 class Warning(object):
     
     def insert(self, time_now, lstip, lstdj, lstSTS, confirm):
-        t = collWarning(time=time_now, ip = lstip, level=lstdj,
+        t = collWarning(time=time_now, ip=lstip, level=lstdj,
                         warn_message=lstSTS, confirm_status=confirm)
         t.save()
     

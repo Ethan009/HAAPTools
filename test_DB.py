@@ -138,14 +138,16 @@ if __name__ == '__main__':
 #     db.switch_insert(n,origin,Summary,Switch_Status)
 #     db.haap_insert(n,status_to_show,status_for_judging)
 #     print(db.get_list_HAAP())
-#     db.get_list_HAAP()
+#     print(db.get_HAAP_time())
+#     print(db.get_list_switch())
+#     print(db.get_switch_time())
 #     print(db.get_HAAP_status("engine1"))
 #     print(db.get_HAAP_mirror("engine1"))
 #     print(db.get_HAAP_uptime("engine1"))
 #     db.switch_insert(n,origin,Summary,Switch_Status)
 #     print(db.get_switch_total("SW02"))
 #     db.insert_warning(n,ip,level,warn_message,confirm_status)
-    print(db.get_unconfirm_warning())
+#     print(db.get_unconfirm_warning())
     print("ok")
     pass
     
