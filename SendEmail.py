@@ -83,12 +83,9 @@ def send_warnmail(warninfo_email):
         print "Send mail failed!"
 
 
-def Timely_send(warn_message, warn_level):
-    s = ''
+def Timely_send(engine_IP,warn_message):
 
-    ##email massage
-    for i in range(len(warn_message)):
-        s += str(warn_message[i]) + '********' + 'Warning level is ' + str(warn_level[i]) + '\n'
+
     message = MIMEText('This is HA Appliance emailing for getting help.' + '\n' + \
                        'status is : ' + '\n' + s, 'plain', 'utf-8')
 
