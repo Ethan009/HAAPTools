@@ -133,13 +133,18 @@ import datetime
         ]
     }
 }
+[[IP1,encout,discc3,dfdf],[IP2,sss]]
     """
 if __name__ == '__main__':
+#     Switch = db.get_list_switch()
+#     lstSWSum=[[i["IP"]] + i["PE_Sum"]for i in Switch.values()]
+#     print(lstSWSum)
+#     
 #     db.switch_insert(n,origin,Summary,Switch_Status)
 #     db.haap_insert(n,status_to_show,status_for_judging)
 #     print(db.get_list_HAAP())
 #     print(db.get_HAAP_time())
-#     print(db.get_list_switch())
+#     print(db.get_list_switch()["SW02"]["PE_Sum"])
 #     print(db.get_switch_time())
 #     print(db.get_HAAP_status("engine1"))
 #     print(db.get_HAAP_mirror("engine1"))

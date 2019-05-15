@@ -28,7 +28,10 @@ interval_warning_check = setting.interval_warning_check()
 def get_warning_unchecked_format():
     pass
 
-
+def show_switch_status_DB():
+    Switch = db.get_list_switch()
+    lstSWSum=[[i["IP"]] + i["PE_Sum"]for i in Switch.values()]
+    return lstSWSum
 
 def start_mnt_4Thread():
     t1 = Thread(target=start_web, args=('db', interval_web_refresh))
