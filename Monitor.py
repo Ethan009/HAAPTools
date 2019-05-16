@@ -58,7 +58,13 @@ def current_time():
 
 def get_warning_unchecked_format():
     return db.get_unconfirm_warning()
-[[],[],[]]
+
+
+
+def show_switch_status_DB():
+    Switch = db.get_list_switch()
+    lstSWSum=[[i["IP"]] + i["PE_Sum"]for i in Switch.values()]
+    return lstSWSum
 
 
 def start_mnt_4Thread():
