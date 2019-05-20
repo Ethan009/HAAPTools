@@ -7,6 +7,7 @@ import HAAP as haap
 import Source as s
 import Thread
 import DB as db
+import email_form as e
 
 try:
     import configparser as cp
@@ -237,14 +238,17 @@ def thrd_web_rt():
             pass
     except KeyboardInterrupt:
         stopping_web(3)
-massage=''
+
+
+massage='\' s port error has reached'
+
 def get_sw_warning():
     dic_all_sw = sw.get_dic_all_sw()
-    for i in sw_ID:
-        total_DB = db.get_Switch_Total(i)
+    for i in range(len(sw_ID)):
+        total_DB = db.get_Switch_Total(sw_ID[i])
         if total_DB:
-            total=dic_all_sw[1][i]['PE_Total'] - total_DB
-            intlevel=s.is_Warning(total,SWTotal_level)
+            intlevel=s.is_Warning(dic_all_sw[1][sw_ID[i]]['PE_Total'] - total_DB,SWTotal_level)
             if intlevel:
-                db.insert_warning(time,intlevel,massage,confirm_status)
-    db.switch_insert(dic_all_sw[0][0],dic_all_sw[0][1],dic_all_sw[0][2])
+                db.insert_warning(s.time_now_folder(),intlevel,sw.list_sw_IP[i]+massage,confirm_status)
+                e.send_warnmail([s.time_now_floder(),intlevel,sw.list_sw_IP[i]+massage])
+    db.switch_insert(dic_all_sw[0],dic_all_sw[1],dic_all_sw[2])
