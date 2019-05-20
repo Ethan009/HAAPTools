@@ -101,7 +101,7 @@
                                     <h3 class="text-left text-info">Engine Status</h3>
                                 </th>
                                 <th>
-                                    <h3>Last Update:&nbsp; {{ engine_refresh_time }} </h3>
+                                    <h3>Last Update:&nbsp; {{ tlu_haap }} </h3>
                                 </th>
                                 <th>
                                     <a class="btn btn-primary btn-large" href="javascript:location.reload();">Refresh</a>
@@ -118,29 +118,29 @@
                         <table class="table">
                             <thead>
                                 <tr>
-                                    {% for t in Title %}
-                                    <th>{{t}}</th>
+                                    {% for tielehaap in TitleHAAP %}
+                                    <th>{{tielehaap}}</th>
                                     {% endfor %}
                                 </tr>
                             </thead>
                             <tbody>
-                            {% for i in Status %}
-                                {% if warns[i[0]]==1 %}
+                            {% for statushaap in StatusHAAP %}
+                                {% if statushaap[6]==0 %}
                                     <tr class="success">
-                                        {% for s in i %}
-                                            <td>{{ s }}</td>
+                                        {% for status in statushaap %}
+                                            <td>{{ status }}</td>
                                         {% endfor %}
                                     </tr>
-                                {% elif warns[i[0]]==2 %}
+                                {% elif StatusHAAP[6]==2 %}
                                     <tr class="warning">
-                                        {% for s in i %}
-                                            <td>{{ s }}</td>
+                                        {% for status in statushaap %}
+                                            <td>{{ status }}</td>
                                         {% endfor %}
                                     </tr>
                                 {% else %}
                                     <tr class="danger">
-                                        {% for s in i %}
-                                            <td>{{ s }}</td>
+                                        {% for status in statushaap %}
+                                            <td>{{ status }}</td>
                                         {% endfor %}
                                     </tr>
                                 {% endif %}
@@ -153,7 +153,6 @@
                 </div>
             </div>
 
-
             <div class="row clearfix">
                 <div class="col-md-12 column">
                     <table class="table">
@@ -163,7 +162,7 @@
                                     <h3 class="text-left text-info">Switch Status</h3>
                                 </th>
                                 <th>
-                                    <h3>Last Update:&nbsp; {{ switch_refresh_time }} </h3>
+                                    <h3>Last Update:&nbsp; {{ tlu_switch }} </h3>
                                 </th>
                                 <th>
                                     <a class="btn btn-primary btn-large" href="javascript:location.reload();">Refresh</a>
@@ -180,29 +179,29 @@
                         <table class="table">
                             <thead>
                                 <tr>
-                                    {% for t in Title_switches %}
-                                        <th>{{ t }}</th>
+                                    {% for titlesansw in TitleSANSW %}
+                                        <th>{{ titlesansw }}</th>
                                     {% endfor %}
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for i in Status_switch %}
-                                    {% if warns[i[0]]==1 %}
+                                {% for statussansw in StatusSANSW %}
+                                    {% if statussansw[xxx] == 0 %}
                                         <tr class="success">
-                                            {% for s in i %}
-                                                <td>{{ s }}</td>
+                                            {% for status in statussansw %}
+                                                <td>{{ status }}</td>
                                             {% endfor %}
                                         </tr>
                                     {% elif warns[i[0]]==2 %}
                                         <tr class="warning">
-                                            {% for s in i %}
-                                                <td>{{ s }}</td>
+                                            {% for status in statussansw %}
+                                                <td>{{ status }}</td>
                                             {% endfor %}
                                         </tr>
                                     {% else %}
                                         <tr class="danger">
-                                            {% for s in i %}
-                                                <td>{{ s }}</td>
+                                            {% for status in statussansw %}
+                                                <td>{{ status }}</td>
                                             {% endfor %}
                                         </tr>
                                     {% endif %}

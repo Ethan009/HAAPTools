@@ -295,12 +295,6 @@ class Status(Action):
         _print_description()
         _print_status_in_line(self._dicPartPortError)
     
-   ### Paul
-
-
-    ####
-
-    ###
     def switch_status(self):
         dicIntPE_key = self.sum_and_total()[2].keys()
         dicIntPE_values = self.sum_and_total()[2].values()
@@ -342,6 +336,7 @@ def get_Portershow(status):
     for port in sw_PE:
         DicPE[port] = sw_PE[port]
     return DicPE
+
 
 def get_sw_origin(status,sw_ID):
     return {sw_ID: {'IP': status._host,

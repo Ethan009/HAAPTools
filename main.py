@@ -1538,12 +1538,15 @@ def start_web(mode):
                 warns[i[0]] = 1
             for i in Status_switch:
                 warns[i[0]] = 1
+            #warns=={'10.203.1.1':1,'10.203.1.2':1}
+            #error_message==[{'message':'Engine 10.203.1.1 reboot','level':2}]
             for i in error_message:
                 for j in warns:
                     if j in i['message'] and warns[j] < int(i['level']):
                         warns[j] = int(i['level'])
                     else:
                         pass
+            #warns=={'10.203.1.1':2,'10.203.1.2':1}
         except:
             pass
 
@@ -1996,17 +1999,5 @@ def main():
 
 
 if __name__ == '__main__':
-    #get_engine_from_db()
-    # get_HAAP_status_list()
-    # get_all_recond()sb
-    # get_Switch_from_db()
-    #get_Switch_Total()
-    # get_HAAP_status_list()
-    get_Switch_status_list()
-    #main()
-    # email_send()
-    # job_update_interva(10,)
-    # job_update_interval4(10,)P't't
-    # start_web('db')
-    # get_all_recond()
->>>>>>> f22b707ba47b0938572a9211244fc6126705ef12
+    main()
+
