@@ -609,8 +609,6 @@ class Status(Action):
         return lstStatus
 
 
-
-
     # 思路Step by Step。。。
     # 需要一个当前引擎状态的值，方便网页显示时候直接参考，显示不同颜色
     # 先写了warning_status，先用循环生成lstStatus，再用一行for写
@@ -637,7 +635,7 @@ class warning(Status):
     def __init__(self, strIP, intTNPort, strPassword,
                  intFTPPort, intTimeout=1.5):
         Status.__init__(self, strIP, intTNPort, strPassword,
-                        intFTPPort, intTimeout)
+                        intFTPPort, intTimeout) 
         self.db_data=DB_data()
         self.lstwarning = self.warning_list()
         self.haap_info()

@@ -58,8 +58,6 @@ def current_time():
 
 def get_warning_unchecked_format():
     return db.get_unconfirm_warning()
-[[],[],[]]
-
 
 def start_mnt_4Thread():
     t1 = Thread(target=start_web, args=('db', interval_web_refresh))
@@ -181,8 +179,6 @@ def IP_to_alies(engine_IP):
             return alies
 
 # 缺少获取引擎失败的处理机制
-
-
 def judge_all_haap():
     status_to_show = {}
     status_for_judging = {}
