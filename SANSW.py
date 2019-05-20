@@ -253,9 +253,7 @@ class Status(Action):
             return dicIntPE
 
     def sum_and_total(self):
-        print("13213:",self._dicPartPortError)
         dicIntPE = self._dict_string_to_int(self._dicPartPortError)
-        print("222:",dicIntPE)
         lstSum = []
         total = 0
         for type in range(6):
@@ -338,71 +336,44 @@ class Status(Action):
                 print('Please Correct the Port Number...')
 
 
-    def get_warning(self):
-        #total=3000
-        total = self.sum_and_total()[1]
-        sw_e={
-            "SW01": {
-                "IP": "1.1.1.1",
-                "PE_Sum": [
-                    "0",
-                    "0",
-                    "0",
-                    "0",
-                    "0",
-                    "0",
-                    "4"],
+def get_Portershow(status):
+    DicPE = {}
+    sw_PE = status._dicPartPortError
+    for port in sw_PE:
+        DicPE[port] = sw_PE[port]
+    return DicPE
 
-        "PE_Total":578
-                    },
-        "SW02":{
-            "IP": "1.1.1.2",
-            "PE_Sum": [
-                "0",
-                "0",
-                "0",
-                "0",
-                "0",
-                "0",
-                "4"],
+def get_sw_origin(status,sw_ID):
+    return {sw_ID: {'IP': status._host,
+                    'strSwitchshow': status.strPorterrshow,
+                    'porterrshow': status.strSwitchshow}}
 
-        "PE_Total":578
-                    }
-        }
 
-        total_DB=sw_e['SW01']['PE_Total']
-        if total - total_DB > level_sw[2]:
-                sw_warnlist='Switch' + self.strIP + '\' s port error has reached '
-                sw_warnlevel='3'
-        elif total - total_DB > level_sw[1]:
-                sw_warnlist = 'Switch' + self.strIP + '\' s port error has reached '
-                sw_warnlevel = '2'
-        elif total - total_DB > level_sw[0]:
-                sw_warnlist = 'Switch' + self.strIP + '\' s port error has reached '
-                sw_warnlevel = '1'
-        return sw_warnlevel,sw_warnlist
+def get_sw_summary(status,sw_ID):
+    sum_and_total = status.sum_and_total()
+    return {sw_ID: {'IP': status._host,
+                    'PE_Sum': sum_and_total[0],
+                    'PE_Total': sum_and_total[1]}}
 
+
+def get_sw_status(status,sw_ID):
+    return{sw_ID: {'IP': status._host,
+                   'PE': get_Portershow(status)}}
 
 
 
 def get_dic_all_sw():
-
     all_sw_origin = {}
+    all_sw_summary = {}
     all_sw_status = {}
-    all_sw_summary={}
     for i in range(len(list_sw_IP)):
-        status = Status(list_sw_IP[i], ssh_port, user, passwd, list_sw_ports[0])
-        sum_and_total = status.sum_and_total()
-        all_sw_origin[sw_ID[i]] = {'IP': list_sw_IP[i],
-                                   'strSwitchshow': status.strPorterrshow,
-                                   'porterrshow': status.strSwitchshow}
-        all_sw_summary[sw_ID[i]] = {'IP': list_sw_IP[i],
-                                    'PE_Sum': sum_and_total[0],
-                                    'PE_Total': sum_and_total[1]}
-        all_sw_status[sw_ID[i]] = {'IP':list_sw_IP[i],
-                                   'PE':status._dicPartPortError}
+        status = Status(list_sw_IP[i],ssh_port,user,passwd,list_sw_ports[0])
+        all_sw_origin.update(get_sw_origin(status, sw_ID[i]))
+        all_sw_summary.update(get_sw_summary(status, sw_ID[i]))
+        all_sw_status.update(get_sw_status(status, sw_ID[i]))
+    return [all_sw_origin,all_sw_summary,all_sw_status]
 
-    return [all_sw_origin,all_sw_summary,all_sw_status],sum_and_total[1]
+
 
 
 if __name__ == '__main__':
@@ -416,9 +387,12 @@ if __name__ == '__main__':
     list_sw_ports = swcfg.list_switch_ports()
 
 
-    #print(get_all_sw_origin())
+    print(get_dic_all_sw())
 
-    #print(Status(list_sw_IP[0], ssh_port, user, passwd, list_sw_ports[0]).strSwitchshow)
+    #dic = Status(list_sw_IP[0], ssh_port, user, passwd, list_sw_ports[0])
+    #print(get_Portershow(dic))
+
+
     #ben
     #print(Status(list_sw_IP[0], ssh_port, user, passwd, list_sw_ports[0]).print_porterror_formated)
 
