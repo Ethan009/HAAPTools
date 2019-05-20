@@ -84,9 +84,11 @@ def get_switch_total(list_switch_alias):
     """
     @note: SANSW模块调用-Total获取
     """
-    return SANSW().query_first_records().switch_summary[list_switch_alias]["PE_Total"]
+    if SANSW().query_first_records():
+        return switch_summary[list_switch_alias]["PE_Total"]
 
-
+        
+        
 def get_switch_time():
     """
     @note: SANSW-网页部分展示
@@ -204,5 +206,6 @@ class Warning(object):
 
 
 if __name__ == '__main__':
+    print(get_switch_total("SW01"))
     pass
 
