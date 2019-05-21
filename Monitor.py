@@ -367,18 +367,4 @@ def get_sw_warning():
                 # send email
     db.switch_insert(dic_all_sw[0][0], dic_all_sw[0][1], dic_all_sw[0][2])
 
-# time:xxxxxxxxx
-# engine_status = {
-#         'engine0':['10.203.1.221',0,
-#         '1 Days 5 Hours 54 Minutes',
-#         'M', None, 0],
-#         'engine1':['10.203.1.221', 0,
-#          '1 Days 5 Hours 54 Minutes',
-#          'M', None, 0]
-#         }
-# lst_status = {
-#         'engine0':['10.203.1.221',0,
-#         'M', None, 0, 107651],
-#         'engine1':['10.203.1.221', 0,
-#          'M', None, 0, 107651]
-#         }
+111111111

@@ -48,6 +48,9 @@ def deco_Exception(func):
 def time_now_folder():
     return datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 
+def time_now_to_show():
+    return datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
 def is_Warning(intValue, data):
     '''
     data is int or a tuple

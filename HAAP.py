@@ -854,6 +854,61 @@ def haap_status_real(engine_IP):
     db_status=status.over_all_real()
     return web_status,db_status
 
+def real_time_status():
+    lstStatusAllEngnine = []
+    for ip in list_engines_IP:
+        lstStatusAllEngnine.append(Status(ip, telnet_port, passwd, FTP_port).over_all())
+    return lstStatusAllEngnine
+
+
+### check status interval
+
+class haap_judge(object):
+    """docstring for haap_judge"""
+    def __init__(self, statusRT, statusDB):
+        # super(haap_judge, self).__init__()
+        self.host = statusRT[0]
+        self.statusRT = statusRT
+        self.statusDB = statusDB
+
+    def judge_reboot(self, uptime_second_rt, uptime_second_db):
+        if uptime_second_rt < uptime_second_db:
+            db.insert_warning()
+            waring_list.append(self.host, 'reboot')
+
+    def judge_Status(self, Status_rt, Status_db):
+        if Status_rt and not '--':
+            if Status_rt != Status_db:
+                db.insert_warning()
+                waring_list.append(self.host, )
+
+    def judge_Mirror(self, MirrorStatus_rt, MirrorStatus_db):
+        if MirrorStatus_rt:
+            if MirrorStatus_rt != MirrorStatus_db:
+                db.insert_warning()
+                waring_list.append(self.host, 'mirror')
+
+    def Check():
+        if statusDB:
+            judge_reboot(lstStatusRT[8],lstStatusDB[8])
+            judge_Status(lstStatusRT[1],lstStatusDB[1])
+            judge_Mirror(lstStatusRT[5],lstStatusDB[5])
+
+[['1.11.1',0,'0s',0,0],['1.11.1',0,'0s',0,0],['1.11.1',0,'0s',0,0],['1.11.1',0,'0s',0,0]]
+
+SRT = real_time_status()
+SDB = db.xxxx()
+for i in range(len(list_engines_alias)):
+    haap_judge(SRT[i], SDB[i]).Check()
+
+
+db = db.get_last_record_haap().status
+
+a = {'engine1':['1.1.1.1',0,'0s',0,0],
+'engine2':['1.1.1.1',0,'0s',0,0]}
+
+db.values()
+
 
 
 class Action():
