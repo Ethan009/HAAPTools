@@ -369,3 +369,5 @@ def get_sw_warning():
                 db.insert_warning(time, intlevel, user_unconfirm)
                 # send email
     db.switch_insert(dic_all_sw[0][0], dic_all_sw[0][1], dic_all_sw[0][2])
+
+111111111
