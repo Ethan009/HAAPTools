@@ -36,6 +36,10 @@ def get_list_HAAP():
     status_to_show = all_status.status_to_show
     return time,status_to_show
 
+def we():
+    a = get_list_HAAP()[1].values()
+    return a
+
 
 def get_HAAP_status(list_HAAP_alias):
     """

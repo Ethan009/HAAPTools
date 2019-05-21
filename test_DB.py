@@ -136,6 +136,7 @@ import datetime
 [[IP1,encout,discc3,dfdf],[IP2,sss]]
     """
 if __name__ == '__main__':
+    print(db.we())
 #     print(db.get_HAAP_status("engine1"))
 #     Switch = db.get_list_switch()
 #     lstSWSum=[[i["IP"]] + i["PE_Sum"]for i in Switch.values()]
