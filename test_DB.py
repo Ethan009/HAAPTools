@@ -136,12 +136,48 @@ import datetime
 [[IP1,encout,discc3,dfdf],[IP2,sss]]
     """
 if __name__ == '__main__':
+#     print(db.get_HAAP_status("engine1"))
 #     Switch = db.get_list_switch()
 #     lstSWSum=[[i["IP"]] + i["PE_Sum"]for i in Switch.values()]
 #     print(lstSWSum)
 #     
 #     db.switch_insert(n,origin,Summary,Switch_Status)
-#     db.haap_insert(n,status_to_show,status_for_judging)
+#     db.haap_insert(datetime.datetime.now(),{
+#         "engine1" : [ 
+#             "10.203.1.221", 
+#             0, 
+#             "1 Days 5 Hours 54 Minutes", 
+#             "M", 
+#             "null", 
+#             0
+#         ],
+#         "engine0" : [ 
+#             "10.203.1.221", 
+#             0, 
+#             "1 Days 5 Hours 54 Minutes", 
+#             "M", 
+#             "null", 
+#             0
+#         ]
+#     },{
+#         "engine1" : [ 
+#             "10.203.1.221", 
+#             0, 
+#             "M", 
+#             "null", 
+#             0, 
+#             107651
+#         ],
+#         "engine0" : [ 
+#             "10.203.1.221", 
+#             0, 
+#             "M", 
+#             "null", 
+#             0, 
+#             107651
+#         ]
+#     }
+# )
 #     print(db.get_list_HAAP())
 #     print(db.get_HAAP_time())
 #     print(db.get_list_switch()["SW02"]["PE_Sum"])
