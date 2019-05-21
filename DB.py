@@ -26,50 +26,22 @@ def haap_insert(n, engine_status, lst_status):
     @note: monitoHAAP数据插入
     """
     HAAP().insert(n, engine_status, lst_status)
-    
-    
-def get_HAAP_time():
-    """
-    @note: monitor-HAAP网页展示的时间
-    """
-    return HAAP().query_last_record().time
-
 
 def get_list_HAAP():
     """
     @note: HAAP-网页展示的数据
     """
-    return HAAP().query_last_record().status_to_show
-
-
-def get_HAAP_AH_status(list_HAAP_alias):
-    """
-    @note:HAAP模块需调用的数据-AH [1]AH
-    
-    """
-    return HAAP().query_last_record().status_for_judging[list_HAAP_alias][1]
+    all_status = HAAP().query_last_record()
+    time = all_status.time
+    status_to_show = all_status.status_to_show
+    return time,status_to_show
 
 
 def get_HAAP_status(list_HAAP_alias):
     """
-    @note:HAAP模块需调用的数据-status [3]status
-    
+    @note:HAAP模块需调用的数据
     """
-    return HAAP().query_last_record().status_for_judging[list_HAAP_alias][3]
-
-
-def get_HAAP_mirror(list_HAAP_alias):
-    """
-    @note:HAAP模块需调用的数据-mirror [4]mirror
-    """
-    return HAAP().query_last_record().status_for_judging[list_HAAP_alias][4]
-
-
-def get_HAAP_uptime(list_HAAP_alias):
-    """
-    @note:HAAP模块需调用的数据-uptime [5]uptime
-    """
-    return HAAP().query_last_record().status_for_judging[list_HAAP_alias][5]
+    return HAAP().query_last_record().status_for_judging[list_HAAP_alias]
 
 
 # SANSW
