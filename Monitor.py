@@ -26,7 +26,7 @@ interval_warning_check = setting.interval_warning_check()
 swcfg = gc.SwitchConfig()
 SWTotal_level = swcfg.threshold_total()
 sw_ID = swcfg.list_switch_alias()
-
+list_sw_IP = swcfg.list_switch_IP
 haapcfg = gc.EngineConfig()
 list_engines_IP = haapcfg.list_engines_IP()
 list_haap_IP_alies = haapcfg._odd_engines()
@@ -354,17 +354,23 @@ def thrd_web_rt():
     except KeyboardInterrupt:
         stopping_web(3)
 
+massage = ""
+
+def judge_PE_total(total_DB,total_sw,sw_IP):
+    if total_DB:
+        intlevel = s.is_Warning(total_sw - total_DB, SWTotal_level)
+        if intlevel:
+            db.insert_warning(s.time_now_to_show(),intlevel,sw_IP + massage,confirm_status=0)
+            e.send_warnmail([s.time_now_to_show(),intlevel,sw_IP + massage])
+
 
 def get_sw_warning():
     dic_all_sw = sw.get_dic_all_sw()
-    for i in sw_ID:
-        total_DB = db.get_Switch_Total(i)
-        if total_DB:
-            total = dic_all_sw[1][i]['PE_Total'] - total_DB
-            intlevel = s.is_Warning(total, SWTotal_level)
-            if intlevel:
-                db.insert_warning(time, intlevel, user_unconfirm)
-                # send email
-    db.switch_insert(dic_all_sw[0][0], dic_all_sw[0][1], dic_all_sw[0][2])
+    for i in range(len(sw_ID)):
+        total_DB = db.get_Switch_Total(sw_ID[i])
+        all_sw_summary = dic_all_sw[1]
+        sw_summary = all_sw_summary[sw_ID[i]]
+        judge_PE_total(total_DB, sw_summary['PE_Total'])
+    db.switch_insert(dic_all_sw[0],dic_all_sw[1],dic_all_sw[2])
 
-111111111
+
