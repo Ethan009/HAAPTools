@@ -26,20 +26,15 @@ def haap_insert(n, engine_status, lst_status):
     @note: monitoHAAP数据插入
     """
     HAAP().insert(n, engine_status, lst_status)
-    
-    
-def get_HAAP_time():
-    """
-    @note: monitor-HAAP网页展示的时间
-    """
-    return HAAP().query_last_record().time
-
 
 def get_list_HAAP():
     """
     @note: HAAP-网页展示的数据
     """
-    return HAAP().query_last_record().status_to_show
+    all_status = HAAP().query_last_record()
+    time = all_status.time
+    status_to_show = all_status.status_to_show
+    return time,status_to_show
 
 
 def get_HAAP_status(list_HAAP_alias):
