@@ -66,7 +66,6 @@ def show_switch_status_DB():
     lstSWSum=[[i["IP"]] + i["PE_Sum"]for i in Switch.values()]
     return lstSWSum
 
-
 def start_mnt_4Thread():
     t1 = Thread(target=start_web, args=('db', interval_web_refresh))
     t2 = Thread(target=judge_haap_all_status, args=(interval_haap_update,))
@@ -187,8 +186,6 @@ def IP_to_alies(engine_IP):
             return alies
 
 # 缺少获取引擎失败的处理机制
-
-
 def judge_all_haap():
     status_to_show = {}
     status_for_judging = {}
