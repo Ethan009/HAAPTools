@@ -370,7 +370,7 @@ def get_sw_warning():
         total_DB = db.get_Switch_Total(sw_ID[i])
         all_sw_summary = dic_all_sw[1]
         sw_summary = all_sw_summary[sw_ID[i]]
-        judge_PE_total(total_DB, sw_summary['PE_Total'])
+        judge_PE_total(total_DB, sw_summary['PE_Total'],list_sw_IP[i])
     db.switch_insert(dic_all_sw[0],dic_all_sw[1],dic_all_sw[2])
 
 
