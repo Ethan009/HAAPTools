@@ -664,8 +664,6 @@ class Status(Action):
         return lstStatus
 
 
-
-
     # 思路Step by Step。。。
     # 需要一个当前引擎状态的值，方便网页显示时候直接参考，显示不同颜色
     # 先写了warning_status，先用循环生成lstStatus，再用一行for写
@@ -675,76 +673,8 @@ class Status(Action):
     # 为了原来程序正常运行，在over_all返回时，不返回最后一个值
 
 
-class DB_data():
-    def __init__(self):
-        pass
-
-    def get_uptime(self):
-        pass
-
-    def get_mirror(self):
-        pass
-
-    def get_status(self):
-        pass
-
-class warning(Status):
-    def __init__(self, strIP, intTNPort, strPassword,
-                 intFTPPort, intTimeout=1.5):
-        Status.__init__(self, strIP, intTNPort, strPassword,
-                        intFTPPort, intTimeout)
-        self.db_data=DB_data()
-        self.lstwarning = self.warning_list()
-        self.haap_info()
-
-    def haap_info(self):
-        self.ip=self.lstwarning[0]
-        self.uptime=self.lstwarning[3]
-        self.mirror=self.lstwarning[2]
-        self.status=self.lstwarning[1]
-
-    def checkuptime(self):
-        DB_uptime=self.db_data.get_uptime()
-        if self.uptime:
-            if self.uptime <= DB_uptime:
-                return 'engine restart'
-            else :
-                return None
-        else:
-            return '--'
-
-    def checkstatus(self):
-        DB_status=self.db_data.get_status()
-        if self.status:
-            if self.status == None:
-                return None
-            elif DB_status != None:
-                return None
-            else:
-                return 'engine offline'
-        else:
-            return '--'
-
-    def checkmirror(self):
-        DB_mirror=self.db_data.get_mirror()
-        if self.mirror:
-            if self.mirror == 0:
-                return None
-            elif DB_mirror != 0:
-                return None
-            else :
-                return 'engine mirror not ok'
-        else:
-            return '--'
-
-    def all_check(self):
-        lstcheck=[]
-        lstcheck.append(self.checkstatus())
-        lstcheck.append(self.checkmirror())
-        lstcheck.append(self.checkuptime())
-        return lstcheck
-
 
 
 if __name__ == '__main__':
     pass
+

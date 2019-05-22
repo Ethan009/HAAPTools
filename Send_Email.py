@@ -39,9 +39,8 @@ email_host_port=emailcfg.email_host_port()
 
 objCFG = cp.ConfigParser(allow_no_value=True)
 objCFG.read('Conf2.ini')
-sub= "用户未确认信息"
 mailto_list = objCFG.get('EmailSetting','receiver')
-def send_warnmail(mailto_list, sub,warninfo_email):
+def send_warnmail(warninfo_email):
         mail_host = objCFG.get('EmailSetting','host')
         mail_user = objCFG.get('EmailSetting','sender')
         mail_pass = objCFG.get('EmailSetting','password')
@@ -51,7 +50,7 @@ def send_warnmail(mailto_list, sub,warninfo_email):
 
         me = mail_user
         msg = MIMEMultipart()
-        msg['Subject'] = sub
+        msg['Subject'] = '用户未确认信息'
         msg['From'] = me
         msg['To'] = ",".join(mailto_list)
 #创造数据
