@@ -354,14 +354,14 @@ def thrd_web_rt():
     except KeyboardInterrupt:
         stopping_web(3)
 
-massage = ""
+sw_massage = "switch\'s error has reached"
 
 def judge_PE_total(total_DB,total_sw,sw_IP):
     if total_DB:
         intlevel = s.is_Warning(total_sw - total_DB, SWTotal_level)
         if intlevel:
-            db.insert_warning(s.time_now_to_show(),intlevel,sw_IP + massage,confirm_status=0)
-            e.send_warnmail([s.time_now_to_show(),intlevel,sw_IP + massage])
+            db.insert_warning(s.time_now_to_show(),intlevel,sw_IP + sw_massage,confirm_status=0)
+            e.send_warnmail([s.time_now_to_show(),intlevel,sw_IP + sw_massage])
 
 
 def get_sw_warning():
