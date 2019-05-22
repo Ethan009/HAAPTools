@@ -83,7 +83,7 @@ def send_warnmail(warninfo_email):
         print "Send mail failed!"
 
 
-def Timely_send(engine_IP,warn_message):
+def Timely_send():
 
 
     message = MIMEText('This is HA Appliance emailing for getting help.' + '\n' + \

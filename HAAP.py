@@ -158,12 +158,28 @@ def haap_status_real(engine_IP):
     db_status=status.over_all_real()
     return web_status,db_status
 
+
 def real_time_status():
     lstStatusAllEngnine = []
     for ip in list_engines_IP:
-        lstStatusAllEngnine.append(Status(ip, telnet_port, passwd, FTP_port).over_all())
+        lstStatusAllEngnine.append(Status(ip, telnet_port, passwd, FTP_port).over_all_real())
     return lstStatusAllEngnine
 
+def real_time_status_show():
+    lstStatusAllEngnine = []
+    for ip in list_engines_IP:
+        lstStatusAllEngnine.append(Status(ip, telnet_port, passwd, FTP_port).over_all_and_warning())
+    return lstStatusAllEngnine
+
+def real_time_status():
+    lstStatusAllEngnine = []
+    lstStatusAllEngnine_show = []
+    for ip in list_engines_IP:
+        status=Status(ip, telnet_port, passwd, FTP_port)
+        lstStatusAllEngnine.append(status.over_all_real())
+        lstStatusAllEngnine_show.append(status.over_all_and_warning())
+    return lstStatusAllEngnine,lstStatusAllEngnine_show
+([[],[]],[[],[]])
 
 
 class Action():
@@ -603,15 +619,9 @@ class Status(Action):
 
     def over_all_real(self):
         lstStatus=self.over_all()
-        lstStatus=[lstStatus[i] for i in [0,1,3,4,5]]
+        lstStatus[2]=self.uptime_second()
         if self.AHStatus:
-        #if True:
-            lstStatus[2]='--'
-            lstStatus[3]='--'
-            lstStatus[4]='--'
-            lstStatus.append('--')
-        else:
-            lstStatus.append(self.uptime_second())
+            lstStatus[2] = '--'
         return lstStatus
 
 
