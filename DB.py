@@ -31,22 +31,19 @@ def get_list_HAAP():
     """
     @note: HAAP-网页展示的数据
     """
-    all_status = HAAP().query_last_record()
-    time = all_status.time
-    status_to_show = all_status.status_to_show
-    return time,status_to_show
-
-def we():
-    a = get_list_HAAP()[1].values()
-    return a
-
-
-def get_HAAP_status(list_HAAP_alias):
+    list_status = HAAP().query_last_record()
+    if list_status:
+        time = list_status.time
+        status_to_show = list_status.status_to_show.values()
+        return time,status_to_show
+ 
+def get_HAAP_status():
     """
     @note:HAAP模块需调用的数据
     """
-    return HAAP().query_last_record().status_for_judging[list_HAAP_alias]
-
+    all_status = HAAP().query_last_record()
+    if all_status:
+        return all_status.status_for_judging.values()
 
 # SANSW
 def switch_insert(n, origin, switch_summary, switch_status):
@@ -56,27 +53,27 @@ def switch_insert(n, origin, switch_summary, switch_status):
     SANSW().insert(n, origin, switch_summary, switch_status)
 
 
+
 def get_switch_total(list_switch_alias):
     """
     @note: SANSW模块调用-Total获取
     """
-    return SANSW().query_first_records().switch_summary[list_switch_alias]["PE_Total"]
+    list_switch = SANSW().query_first_records().switch_summary
+    if list_switch:
+        total = list_switch[list_switch_alias]["PE_Total"]
+        return total
 
 
-def get_switch_time():
+def get_switch_status():
     """
     @note: SANSW-网页部分展示
     """
-    return SANSW().query_first_records().time
-
-
-def get_list_switch():
-    """
-    @note: SANSW-网页部分展示
-    """
-    return SANSW().query_first_records().switch_summary
-
-
+    switch_status = SANSW().query_first_records()
+    if switch_status:
+        time = switch_status.time
+        switch_summary = switch_status.switch_summary
+        return time,switch_summary
+ 
 # Warning 
 def insert_warning(n, ip, level, warn_message, confirm_status):
     """
