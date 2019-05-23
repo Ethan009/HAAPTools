@@ -24,7 +24,7 @@ interval_sansw_update = setting.interval_sansw_update()
 interval_warning_check = setting.interval_warning_check()
 
 swcfg = gc.SwitchConfig()
-threshold_total = swcfg.threshold_total()
+tuplThresholdTotal = swcfg.threshold_total()
 lst_sansw_Alias = swcfg.list_switch_alias()
 lst_sansw_IP = swcfg.list_switch_IP()
 
@@ -32,7 +32,6 @@ haapcfg = gc.EngineConfig()
 oddEngines = haapcfg._odd_engines()
 lst_haap_IP = oddEngines.values()
 lst_haap_Alias = oddEngines.keys()
-
 
 # <<<Get Config Field>>>
 
@@ -43,7 +42,6 @@ str_engine_status = 'Engine offline'
 str_engine_AH = 'Engine AH'
 user_unconfirm = 0
 
-
 # <<web show-from name>>
 lstDescHAAP = ('EngineIP', 'AH Status', 'Uptime',
                'Master', 'Cluster', 'Mirror')
@@ -51,20 +49,23 @@ lstDescSANSW = ('SwitchIP', 'Encout', 'DiscC3',
                 'LinkFail', 'LossSigle', 'LossSync')
 lstWarning = ('Time', 'Level', 'Message')
 
+
 def show_engine_status_DB():
     engine = db.get_list_haap()
-    return engine[0],engine[1]
+    return engine[0], engine[1]
+
 
 def show_switch_status_DB():
     Switch = db.get_list_switch()
-    lstSWSum=[[i["IP"]] + i["PE_Sum"]for i in Switch[1].values()]
-    return Switch[0],lstSWSum
+    lstSWSum = [[i["IP"]] + i["PE_Sum"]for i in Switch[1].values()]
+    return Switch[0], lstSWSum
+
 
 def start_mnt_4Thread():
     t1 = Thread(target=start_web, args=('db', interval_web_refresh))
     t2 = Thread(target=judge_haap_all_status, args=(interval_haap_update,))
     t3 = Thread(target=judge_SANSW_all_status, args=(interval_sansw_update,))
-    t4 = Thread(target=judge_db_confirm, args=(interval_warning_check,))
+    t4 = Thread(target=send_unconfirm_waring, args=(interval_warning_check,))
     t1.setDaemon(True)
     t2.setDaemon(True)
     t3.setDaemon(True)
@@ -153,12 +154,14 @@ def IP_to_alies(engine_IP):
         if list_haap_IP_alies[alies] == engine_IP:
             return alies
 
+
 def list_to_dic(lstAllStatus):
-    dictAllStatus={}
+    dictAllStatus = {}
     for lstStatus in lstAllStatus:
         engine_alies = IP_to_alies(lstStatus[0])
         dictAllStatus[engine_alies] = lstStatus
     return dictAllStatus
+
 
 def judge_all_haap():
     SRT = haap.real_time_status()
@@ -166,14 +169,16 @@ def judge_all_haap():
     SRT_show = haap.real_time_status_show()
     for i in range(len(list_haap_alias)):
         haap_judge(SRT[i], SDB[i])
-    db.haap_insert(s.time_now_to_show(),list_to_dic(SRT_show),list_to_dic(SRT))
+    db.haap_insert(s.time_now_to_show(), list_to_dic(
+        SRT_show), list_to_dic(SRT))
 
 
-### check status interval
+# check status interval
 
 
 class haap_judge(object):
     """docstring for haap_judge"""
+
     def __init__(self, statusRT, statusDB):
         self.host = statusRT[0]
         self.statusRT = statusRT
@@ -183,40 +188,53 @@ class haap_judge(object):
     def judge_AH(self, AHstatus_rt, AHstatus_db):
         if AHstatus_rt:
             if AHstatus_rt != AHstatus_db:
-                db.insert_warning(s.time_now_to_show(),self.host,reboot_errlevel,str_engine_restart,user_unconfirm)
-                SE.Timely_send(s.time_now_to_show(),self.host,AH_errlevel,str_engine_AH)
+                db.insert_warning(s.time_now_to_show(), self.host,
+                                  reboot_errlevel, str_engine_restart, user_unconfirm)
+                SE.Timely_send(s.time_now_to_show(), self.host,
+                               AH_errlevel, str_engine_AH)
                 return
         return True
 
     def judge_reboot(self, uptime_second_rt, uptime_second_db):
         if uptime_second_rt <= uptime_second_db:
-            db.insert_warning(s.time_now_to_show(),self.host,reboot_errlevel,str_engine_restart,user_unconfirm)
-            SE.Timely_send(s.time_now_to_show(),self.host,reboot_errlevel,str_engine_restart)
+            db.insert_warning(s.time_now_to_show(), self.host,
+                              reboot_errlevel, str_engine_restart, user_unconfirm)
+            SE.Timely_send(s.time_now_to_show(), self.host,
+                           reboot_errlevel, str_engine_restart)
 
     def judge_Status(self, Status_rt, Status_db):
-        if Status_rt :
+        if Status_rt:
             if Status_rt != Status_db:
-                db.insert_warning(s.time_now_to_show(),self.host,status_errlevel,str_engine_status,user_unconfirm)
-                SE.Timely_send(s.time_now_to_show(),self.host,status_errlevel,str_engine_status)
+                db.insert_warning(s.time_now_to_show(), self.host,
+                                  status_errlevel, str_engine_status, user_unconfirm)
+                SE.Timely_send(s.time_now_to_show(), self.host,
+                               status_errlevel, str_engine_status)
 
     def judge_Mirror(self, MirrorStatus_rt, MirrorStatus_db):
-        if MirrorStatus_rt :
+        if MirrorStatus_rt:
             if MirrorStatus_rt != MirrorStatus_db:
-                db.insert_warning(s.time_now_to_show(),self.host,mirror_errlevel,str_engine_mirror,user_unconfirm)
-                SE.Timely_send(s.time_now_to_show(),self.host,mirror_errlevel,str_engine_mirror)
+                db.insert_warning(s.time_now_to_show(), self.host,
+                                  mirror_errlevel, str_engine_mirror, user_unconfirm)
+                SE.Timely_send(s.time_now_to_show(), self.host,
+                               mirror_errlevel, str_engine_mirror)
 
-    #如果数据库没有信息，当引擎发生问题的时候，是否直接发送警报
+    # 如果数据库没有信息，当引擎发生问题的时候，是否直接发送警报
     def All_judge(self):
         if self.statusDB:
-            if self.judge_AH(self.lstStatusRT[1],self.lstStatusDB[1]):
-                self.judge_reboot(self.lstStatusRT[2],self.lstStatusDB[2])
-                self.judge_Status(self.lstStatusRT[4],self.lstStatusDB[4])
-                self.judge_Mirror(self.lstStatusRT[5],self.lstStatusDB[5])
+            if self.judge_AH(self.lstStatusRT[1], self.lstStatusDB[1]):
+                self.judge_reboot(self.lstStatusRT[2], self.lstStatusDB[2])
+                self.judge_Status(self.lstStatusRT[4], self.lstStatusDB[4])
+                self.judge_Mirror(self.lstStatusRT[5], self.lstStatusDB[5])
 
 # 执行查询数据库，并在发现用户未确认信息后，发送警报邮件
-def judge_user_confirm():
-    if get_warning_unchecked_format():
-        SE.send_warnmail(get_warning_unchecked_format())
+
+
+def send_unconfirm_waring():
+    unconfirm_warning = db.get_unconfirm_warning()
+    if unconfirm_warning:
+        SE.send_warnmail(unconfirm_warning)
+    else:
+        print('No Unconfirm Warning Found...')
 
 
 def stopping_web(intSec):
@@ -241,14 +259,28 @@ def thrd_web_rt():
     except KeyboardInterrupt:
         stopping_web(3)
 
-sw_massage = "switch\'s error has reached"
 
-def judge_PE_total(total_DB,total_sw,sw_IP):
+def warning_message_sansw(intWarninglevel):
+    if intWarninglevel == 3:
+        strLevel = 'Notify'
+    if intWarninglevel == 2:
+        strLevel = 'Warning'
+    if intWarninglevel == 1:
+        strLevel = 'Alarm'
+    return 'Total Error Count Increase Reach Level %s' % strLevel
+
+
+def judge_PE_total(total_sw, total_DB, sw_IP):
+    strTimeNow = s.time_now_to_show()
     if total_DB:
-        intlevel = s.is_Warning(total_sw - total_DB, SWTotal_level)
-        if intlevel:
-            db.insert_warning(s.time_now_to_show(),intlevel,sw_IP + sw_massage,confirm_status=0)
-            e.send_warnmail([s.time_now_to_show(),intlevel,sw_IP + sw_massage])
+        intErrorIncrease = total_sw - total_DB
+        intWarninglevel = s.is_Warning(intErrorIncrease, SWTotal_level)
+        if intWarninglevel:
+            msg = warning_message_sansw(intWarninglevel)
+            db.insert_warning(strTimeNow, intWarninglevel, sw_IP, msg)
+            # 这部分发送应该是有一个特定的格式吧。。。
+            e.send_warnmail(
+                [strTimeNow, intWarninglevel, sw_IP + sw_massage])
 
 def get_sw_warning():
     dic_all_sw = sw.get_dic_all_sw()
@@ -257,8 +289,6 @@ def get_sw_warning():
         total_DB = db.get_Switch_Total(sw_ID[i])
         all_sw_summary = dic_all_sw[1]
         sw_summary = all_sw_summary[sw_ID[i]]
-        judge_PE_total(total_DB, sw_summary['PE_Total'],list_sw_IP[i])
-    db.switch_insert(s.time_now_to_show(),dic_all_sw[0],dic_all_sw[1],dic_all_sw[2])
-
-
-
+        judge_PE_total(total_DB, sw_summary['PE_Total'], list_sw_IP[i])
+    db.switch_insert(s.time_now_to_show(),
+                     dic_all_sw[0], dic_all_sw[1], dic_all_sw[2])

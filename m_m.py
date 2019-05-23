@@ -53,9 +53,6 @@ lstDescSANSW = ('SwitchIP', 'Encout', 'DiscC3',
 lstWarning = ('Time', 'Level', 'Message')
 
 
-def get_warning_unchecked_format():
-    return db.get_unconfirm_warning()
-
 def start_mnt_4Thread():
     t1 = Thread(target=start_web, args=('db', interval_web_refresh))
     t2 = Thread(target=judge_haap_all_status, args=(interval_haap_update,))

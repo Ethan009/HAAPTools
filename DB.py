@@ -116,9 +116,9 @@ class collSANSW(Document):
 
 
 class collWarning(Document):
-    time = DateTimeField(default=datetime.datetime.now())
-    ip = StringField()
+    time = StringField()
     level = IntField()
+    ip = StringField()
     warn_message = StringField()
     confirm_status = IntField()
 
@@ -154,7 +154,7 @@ class SANSW(object):
 
 class Warning(object):
     
-    def insert(self, time_now, lstip, lstdj, lstSTS, confirm):
+    def insert(self, time_now, lstip, lstdj, lstSTS, confirm = 0):
         t = collWarning(time=time_now, ip=lstip, level=lstdj,
                         warn_message=lstSTS, confirm_status=confirm)
         t.save()
