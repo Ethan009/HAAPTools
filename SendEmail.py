@@ -82,23 +82,25 @@ def send_warnmail(warninfo_email):
     except  send_smtp.SMTPException:
         print "Send mail failed!"
 
-
-def Timely_send():
-
+def Timely_send(time_now,IP,errlevel,error_massage):
 
     message = MIMEText('This is HA Appliance emailing for getting help.' + '\n' + \
-                       'status is : ' + '\n' + s, 'plain', 'utf-8')
-
+                       'status is : '  + error_massage + '\n' + \
+                        'The time the alarm occurred is' + time_now + '\n' + \
+                       'IP is ：' + IP + '\n' + \
+                        'The alert level is : ' + str(errlevel) + '\n' + \
+                       'plain', 'utf-8')
     message['From'] = email_sender
     message['To'] = ','.join(email_receiver_list)
-    message['Subject'] = Header(
-        'Location: ' + 'objCFG.get'('General', 'location') + '.' + 'SAN Warning......' + '\n ', 'utf-8')  # status 之后从数据库拿
+    message['Subject'] = Header('Your local Data Center have '+ error_massage + '.' ,'utf-8')
     try:
         smtpObj = smtplib.SMTP()
         smtpObj.connect(email_host)  # 25 为 SMTP 端口号
         smtpObj.ehlo()
         smtpObj.starttls()
+
         smtpObj.login(email_sender, email_password)
+
         smtpObj.sendmail(email_sender, email_receiver_list, message.as_string())
 
     except smtplib.SMTPException:
