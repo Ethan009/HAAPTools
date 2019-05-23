@@ -24,13 +24,15 @@ interval_sansw_update = setting.interval_sansw_update()
 interval_warning_check = setting.interval_warning_check()
 
 swcfg = gc.SwitchConfig()
-SWTotal_level = swcfg.threshold_total()
-sw_ID = swcfg.list_switch_alias()
-list_sw_IP = swcfg.list_switch_IP()
+threshold_total = swcfg.threshold_total()
+lst_sansw_Alias = swcfg.list_switch_alias()
+lst_sansw_IP = swcfg.list_switch_IP()
+
 haapcfg = gc.EngineConfig()
-list_engines_IP = haapcfg.list_engines_IP()
-list_haap_IP_alies = haapcfg._odd_engines()
-list_haap_alias = haapcfg.list_engines_alias()
+oddEngines = haapcfg._odd_engines()
+lst_haap_IP = oddEngines.values()
+lst_haap_Alias = oddEngines.keys()
+
 
 # <<<Get Config Field>>>
 
@@ -40,10 +42,7 @@ str_engine_mirror = 'Engine mirror not ok'
 str_engine_status = 'Engine offline'
 str_engine_AH = 'Engine AH'
 user_unconfirm = 0
-mirror_errlevel = 3
-status_errlevel = 3
-reboot_errlevel = 2
-AH_errlevel = 3
+
 
 # <<web show-from name>>
 lstDescHAAP = ('EngineIP', 'AH Status', 'Uptime',
@@ -51,13 +50,6 @@ lstDescHAAP = ('EngineIP', 'AH Status', 'Uptime',
 lstDescSANSW = ('SwitchIP', 'Encout', 'DiscC3',
                 'LinkFail', 'LossSigle', 'LossSync')
 lstWarning = ('Time', 'Level', 'Message')
-
-
-def current_time():
-    return datetime.datetime.now()
-
-def get_warning_unchecked_format():
-    return db.get_unconfirm_warning()
 
 def show_engine_status_DB():
     engine = db.get_list_haap()
@@ -110,7 +102,6 @@ def start_web(mode):
             tlu_sansw = show_switch_status_DB()[0]
             StatusHAAP = show_engine_status_DB()[1]
             StatusSANSW = show_switch_status_DB()[1]
-
         # 预警提示弹出为0，不弹出为1
         if request.method == 'GET' and get_warning_unchecked_format():
             error = 1
@@ -141,6 +132,7 @@ def start_web(mode):
 def judge_haap_all_status(interval_haap_update):
     t = s.Timing()
     t.add_interval(judge_all_haap, interval_haap_update)
+
     t.stt()
 
 
@@ -178,6 +170,7 @@ def judge_all_haap():
 
 
 ### check status interval
+
 
 class haap_judge(object):
     """docstring for haap_judge"""
@@ -219,11 +212,6 @@ class haap_judge(object):
                 self.judge_reboot(self.lstStatusRT[2],self.lstStatusDB[2])
                 self.judge_Status(self.lstStatusRT[4],self.lstStatusDB[4])
                 self.judge_Mirror(self.lstStatusRT[5],self.lstStatusDB[5])
-
-
-
-
-
 
 # 执行查询数据库，并在发现用户未确认信息后，发送警报邮件
 def judge_user_confirm():
@@ -271,5 +259,6 @@ def get_sw_warning():
         sw_summary = all_sw_summary[sw_ID[i]]
         judge_PE_total(total_DB, sw_summary['PE_Total'],list_sw_IP[i])
     db.switch_insert(s.time_now_to_show(),dic_all_sw[0],dic_all_sw[1],dic_all_sw[2])
+
 
 

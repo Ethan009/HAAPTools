@@ -136,6 +136,9 @@ import datetime
 [[IP1,encout,discc3,dfdf],[IP2,sss]]
     """
 if __name__ == '__main__':
+#     print(db.get_HAAP_status())
+#     print(db.get_HAAP_status())
+    
 #     print(db.get_HAAP_status("engine1"))
 #     Switch = db.get_list_switch()
 #     lstSWSum=[[i["IP"]] + i["PE_Sum"]for i in Switch.values()]
@@ -185,10 +188,87 @@ if __name__ == '__main__':
 #     print(db.get_HAAP_status("engine1"))
 #     print(db.get_HAAP_mirror("engine1"))
 #     print(db.get_HAAP_uptime("engine1"))
-#     db.switch_insert(n,origin,Summary,Switch_Status)
-#     print(db.get_switch_total("SW02"))
+#     db.switch_insert(datetime.datetime.now(),{
+#     "SW_UP":{
+#     "IP":"1.1.1.1",
+#     "switchshow":"",
+#     "porterrshow":"",
+#     },
+#     "SW_Down":{
+#     "IP":"1.1.1.1",
+#     "switchshow":"",
+#     "porterrshow":"",
+#     }
+#     },{
+#     "SW01":{
+#     "IP":"1.1.1.1",
+#     "PE_Sum":[
+#         "0", 
+#         "0", 
+#         "0", 
+#         "0", 
+#         "0", 
+#         "0", 
+#         "4"],
+#     "PE_Total":578
+#     },
+#     "SW02":{
+#     "IP":"1.1.1.2",
+#     "PE_Sum":[
+#         "0", 
+#         "0", 
+#         "0", 
+#         "0", 
+#         "0", 
+#         "0", 
+#         "4"],
+#     "PE_Total":578
+#     }},{
+#     "SW1":{
+#     "IP":"1.1.1.1",
+#     "PE":{
+#     "0":[
+#         "0", 
+#         "0", 
+#         "0", 
+#         "0", 
+#         "0", 
+#         "0", 
+#         "4"],
+#     "1":[
+#         "0", 
+#         "0", 
+#         "1.2", 
+#         "0", 
+#         "0", 
+#         "0", 
+#         "4"]
+#     }},
+#     "SW2":{
+#     "IP":"2.2.2.2",
+#     "PE":{
+#     "0":[
+#         "0", 
+#         "0", 
+#         "0", 
+#         "0", 
+#         "0", 
+#         "0", 
+#         "4"],
+#     "1":[
+#         "0", 
+#         "0", 
+#         "0", 
+#         "0", 
+#         "0", 
+#         "0", 
+#         "4"]
+#  
+#     }}})
+#     print(db.get_switch_total("SW01"))
 #     db.insert_warning(n,ip,level,warn_message,confirm_status)
 #     print(db.get_unconfirm_warning())
+#     print(db.get_switch_status())
     print("ok")
     pass
     
