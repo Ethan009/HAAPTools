@@ -105,9 +105,9 @@ class SwitchConfig(object):
 
     def threshold_total(self):
         lstThreshold = []
-        level1 = self.cfg.getint('Threshold', 'SWTotal_level1')
-        level2 = self.cfg.getint('Threshold', 'SWTotal_level2')
-        level3 = self.cfg.getint('Threshold', 'SWTotal_level3')
+        level1 = self.cfg.getint('Threshold', 'SWTotal_increase_Notify')
+        level2 = self.cfg.getint('Threshold', 'SWTotal_increase_Warning')
+        level3 = self.cfg.getint('Threshold', 'SWTotal_increase_Notify')
         lstThreshold.append(level1)
         lstThreshold.append(level2)
         lstThreshold.append(level3)
