@@ -270,25 +270,27 @@ def warning_message_sansw(intWarninglevel):
         strLevel = 'Alarm'
     return 'Total Error Count Increase Reach Level %s' % strLevel
 
+def get_total(dic_all_sw, sw_Alias):
+    all_sw_summary = dic_all_sw[1]
+    sw_summary = all_sw_summary[sw_Alias]
+    return sw_summary['PE_Total']
 
-def judge_PE_total(total_sw, total_DB, sw_IP):
+def judge_PE_total(total_sw, total_DB, sansw_IP):
     strTimeNow = s.time_now_to_show()
     if total_DB:
         intErrorIncrease = total_sw - total_DB
-        intWarninglevel = s.is_Warning(intErrorIncrease, SWTotal_level)
+        intWarninglevel = s.is_Warning(intErrorIncrease, tuplThresholdTotal)
         if intWarninglevel:
             msg = warning_message_sansw(intWarninglevel)
-            db.insert_warning(strTimeNow, intWarninglevel, sw_IP, msg)
+            db.insert_warning(strTimeNow, sansw_IP, intWarninglevel, msg)
             # 这部分发送应该是有一个特定的格式吧。。。
-            e.send_warnmail(
-                [strTimeNow, intWarninglevel, sw_IP + sw_massage])
+            SE.Timely_send(strTimeNow, sansw_IP, intWarninglevel, msg)
 
 def get_sw_warning():
     dic_all_sw = sw.get_dic_all_sw()
-    for i in range(len(sw_ID)):
-        total_DB = db.get_Switch_Total(sw_ID[i])
-        all_sw_summary = dic_all_sw[1]
-        sw_summary = all_sw_summary[sw_ID[i]]
-        judge_PE_total(total_DB, sw_summary['PE_Total'], list_sw_IP[i])
+    for i in range(len(lst_sansw_Alias)):
+        total_DB = db.get_Switch_Total(lst_sansw_Alias[i])
+        sw_total = get_total(dic_all_sw, lst_sansw_Alias[i])
+        judge_PE_total(total_DB, sw_total, lst_sansw_IP[i])
     db.switch_insert(s.time_now_to_show(),
                      dic_all_sw[0], dic_all_sw[1], dic_all_sw[2])
