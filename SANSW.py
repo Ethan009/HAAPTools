@@ -59,9 +59,9 @@ def print_porterror_formated(ip):
     id = get_index(ip, list_sw_IP)
     if id is not None:
         Status(list_sw_IP[id],
-         ssh_port,
-          user,
-           passwd,
+            ssh_port,
+            user,
+            passwd,
             list_sw_ports[id]).print_porterror_formated()
 
 
@@ -87,6 +87,63 @@ def periodically_check(ip):
         s.time_now_folder(), ip)
     Action(ip, ssh_port, user, passwd, []).periodic_check(
         lstPCCommand, strPCFolder, PCFile_name)
+
+def dict_for_DB():
+    for i in range(len(lst_sansw_Alias)):
+        lst_dicOrigin = []
+        lst_dicPEFormated = []
+        lst_summary_total = []
+        objSANSWInfo = InfoForDB(lst_sansw_Alias[i], lst_sansw_IP[i])
+        lst_origin.append(objSANSWInfo.get_dicOrigin())
+        lst_dicPEFormated.append(objSANSWInfo.get_dicPEFormated())
+        lst_summary_total.append(objSANSWInfo.get_summary_total())
+    return lst_dicOrigin, lst_dicPEFormated, lst_summary_total
+
+
+
+class InfoForDB(object):
+    """docstring for InfoForDB"""
+    def __init__(self, strAlias, strIP):
+        # super(InfoForDB, self).__init__()
+        self._ip = strIP
+        self._alias = strAlias
+        self._objSANSW = Status(
+            lst_sansw_IP[i],ssh_port, user, passwd, list_sw_ports)
+
+    def get_dicOrigin(self):
+        return {'porterrshow': self._objSANSW.strPorterrshow
+            'switchshow': self._objSANSW.strSwitchshow}
+
+    def get_dicPEFormated(self):
+        return self._objSANSW.dicPE
+
+    def get_summary_total(self):
+        return self._objSANSW.sum_total_and_warning()
+
+def dict_for_DB2():
+    for i in range(len(lst_sansw_Alias)):
+        lst_dicOrigin = []
+        lst_dicPEFormated = []
+        lst_summary_total = []
+        objSW = Status(lst_sansw_IP[i],ssh_port, user, passwd, list_sw_ports)
+        dicOrigin = {'porterrshow': objSW.strPorterrshow
+            'switchshow': objSW.strSwitchshow}
+        lst_origin.append(dicOrigin)
+        lst_dicPEFormated.append(objSW.dicPE)
+        lst_summary_total.append(objSW.sum_total_and_warning())
+        return lst_dicOrigin, lst_dicPEFormated, lst_summary_total
+
+
+# def get_origin_dict():
+#     dic_sansw_origin = odd()
+#     for i in range(len(lst_sansw_Alias)):
+#         objSANSW = Status(lst_sansw_IP[i],ssh_port, user, passwd, [])
+#         dic_sansw_origin[lst_sansw_Alias[i]] = {
+#         'porterrshow': objSANSW.strPorterrshow
+#         'switchshow': objSANSW.strSwitchshow
+#         }
+#     return dic_sansw_origin
+
 
 
 class Action():
@@ -256,10 +313,11 @@ class Status(Action):
         dicIntPE = self._dict_string_to_int(self._dicPartPortError)
         lstSum = []
         total = 0
-        for type in range(6):
+        for idxType in range(6):
             sum = 0
-            for lstPort in dicIntPE.values():
-                sum += lstPort[type]
+            lstPE = dicIntPE.values()
+            for lstPort in lstPE:
+                sum += lstPort[idxType]
             lstSum.append(sum)
         for sum in lstSum:
             total += sum
@@ -267,7 +325,6 @@ class Status(Action):
 
     def sum_total_and_warning(self):
         lstSumTotal = list(self.sum_and_total())
-        #return lstSumTotal.append(s.is_Warning(lstSumTotal[1], tuplThresholdTotal))
         intTotal = lstSumTotal[1]
         intWarningLevel = s.is_Warning(intTotal, tuplThresholdTotal)
         lstSumTotalWarning = lstSumTotal.append(intWarningLevel)
@@ -286,6 +343,8 @@ class Status(Action):
         def _print_status_in_line(dicPE):
             if dicPE:
                 for port in range(len(dicPE)):
+                    #dicPE.keys() means port number
+                    #dicPE.values() means port error list
                     print(str(dicPE.keys()[port]).ljust(tuplWidth[0]), end='')
                     for i in range(len(dicPE.values()[port])):
                         print(dicPE.values()[port][i].ljust(tuplWidth[i+1]), end='')
@@ -362,9 +421,9 @@ def get_dic_all_sw():
     all_sw_summary = {}
     all_sw_status = {}
     for i in range(len(list_sw_IP)):
-        sw_status = Status(list_sw_IP[i],ssh_port,user,passwd,list_sw_ports[0])
-        all_sw_origin.update(get_sw_origin(sw_status, sw_ID[i]))
-        all_sw_summary.update(get_sw_summary(sw_status, sw_ID[i]))
+        objSANSWStatus = Status(list_sw_IP[i],ssh_port,user,passwd,list_sw_ports[0])
+        all_sw_origin.update(get_sw_origin(objSANSWStatus, sw_ID[i]))
+        all_sw_summary.update(get_sw_summary(objSANSWStatus, sw_ID[i]))
         all_sw_status.update(get_sw_status(sw_status, sw_ID[i]))
     return [all_sw_origin,all_sw_summary,all_sw_status]
 

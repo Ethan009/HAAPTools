@@ -181,6 +181,40 @@ def real_time_status():
     return lstStatusAllEngnine,lstStatusAllEngnine_show
 ([[],[]],[[],[]])
 
+'''origin:{'engine1':{'ip': '1.1.1.1', 'vpd': 'xxxx','engine': 'yyyy', 'mirror': 'yyyy'},
+'engine2':{'ip': '1.1.1.1','vpd': 'xxxx','engine': 'yyyy', 'mirror': 'yyyy'}
+}
+info:{
+    'engine1':{'status':['1.1.1.1',0,'2d','M',0,0],'up_sec':7283,'level':0},
+    'engine2':{'status':['1.1.1.1',0,'2d','M',0,0],'up_sec':7283,'level':0}
+}
+'''
+
+
+def origin(haap_alias, objEngine):
+    dicOrigin = {haap_alias: {'ip': objEngine._host}}
+    dicOrigin[haap_alias].update(objEnginel.dictInfo)
+    return dicOrigin
+
+def info(haap_alias, objEngine):
+    lstStatus = objEngine.status_warning()
+    intUpTimeSec = objEngine.uptime_second()
+
+    dicInfo = {haap_alias: {'status': lstStatus[:-1],
+                           'up_sec': intUpTimeSec,
+                            'level':lstStatus[-1]}}
+    return dicInfo
+                    
+
+def data_for_db():
+    dicInfo = odd()
+    dicOrigin = odd()
+    for i in range(len(lst_haap_Alias)):
+        objEngine = Status(lst_haap_IP[i], telnet_port, passwd, FTP_port)
+        dicInfo.update(info(haap_alias[i], objEngine))
+        dicOrigin.update(origin(haap_alias[i], objEngine))
+    return dicInfo, dicOrigin
+
 
 class Action():
     '''

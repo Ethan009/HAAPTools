@@ -104,23 +104,63 @@ def get_unconfirm_warning():
             
 class collHAAP(Document):
     time = DateTimeField(default=datetime.datetime.now())
-    status_to_show = DictField()
-    status_for_judging = DictField()
+    origin = DictField()
+    info = DictField()
+    '''
+origin:{'engine1':{'ip': '1.1.1.1', 'vpd': 'xxxx','engine': 'yyyy', 'mirror': 'yyyy'},
+'engine2':{'ip': '1.1.1.1','vpd': 'xxxx','engine': 'yyyy', 'mirror': 'yyyy'}
+}
+info:{
+    'engine1':{'status':['1.1.1.1',0,'2d','M',0,0],'up_sec':7283,'level':0},
+    'engine2':{'status':['1.1.1.1',0,'2d','M',0,0],'up_sec':7283,'level':0}
+}
+    '''
 
 
 class collSANSW(Document):
     time = DateTimeField(default=datetime.datetime.now())
     origin = DictField()
-    switch_summary = DictField()
-    switch_status = DictField()
+    dicPEFormated = DictField()
+    summary_total = DictField()
+    '''
+origin:[{'ip':'x.x.x.x', 'porterrshow': 'xxxx','switchshow': 'yyyy'},
+        {'ip':'x.x.x.x', 'porterrshow': 'xxxx','switchshow': 'yyyy'}]
+dicPEFormated:[{'2': ['x', 'x', 'x', 'x', 'x', 'x', 'x'],
+                '3': ['x', 'x', 'x', 'x', 'x', 'x', 'x']},
+               {'2': ['x', 'x', 'x', 'x', 'x', 'x', 'x'],
+                '3': ['x', 'x', 'x', 'x', 'x', 'x', 'x']}]
+summary_total:[[6,7,5,4,2,8,27],
+               [6,7,5,4,2,8,27]]
+
+or
+
+origin:{'sw1':{'ip':'x.x.x.x', 'porterrshow': 'xxxx','switchshow': 'yyyy'},
+        'sw2':{'ip':'x.x.x.x', 'porterrshow': 'xxxx','switchshow': 'yyyy'}}
+dicPEFormated:{'sw1':{'2': ['x', 'x', 'x', 'x', 'x', 'x', 'x'],
+                '3': ['x', 'x', 'x', 'x', 'x', 'x', 'x']},
+               'sw2':{'2': ['x', 'x', 'x', 'x', 'x', 'x', 'x'],
+                '3': ['x', 'x', 'x', 'x', 'x', 'x', 'x']}}
+summary_total:{'sw1':[6,7,5,4,2,8,27],
+               'sw2':[6,7,5,4,2,8,27]}
+    '''
+
 
 
 class collWarning(Document):
     time = StringField()
     level = IntField()
+    device = StringField()
     ip = StringField()
-    warn_message = StringField()
-    confirm_status = IntField()
+    msg = StringField()
+    confirm = IntField()
+    '''
+time:'2019-05-20 15:20'
+level:2
+device: 'engine' or 'san switch'
+ip:'1.1.1.1'
+msg:'Engine Reboot 5 secends ago'
+confirm:1
+    '''
 
 
 class HAAP(object):

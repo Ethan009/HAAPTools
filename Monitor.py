@@ -25,8 +25,9 @@ interval_warning_check = setting.interval_warning_check()
 
 swcfg = gc.SwitchConfig()
 tuplThresholdTotal = swcfg.threshold_total()
-lst_sansw_Alias = swcfg.list_switch_alias()
 lst_sansw_IP = swcfg.list_switch_IP()
+lst_sansw_Alias = swcfg.list_switch_alias()
+
 
 haapcfg = gc.EngineConfig()
 oddEngines = haapcfg._odd_engines()
@@ -284,7 +285,6 @@ def judge_PE_total(total_sw, total_DB, sw_IP):
 
 def get_sw_warning():
     dic_all_sw = sw.get_dic_all_sw()
-
     for i in range(len(sw_ID)):
         total_DB = db.get_Switch_Total(sw_ID[i])
         all_sw_summary = dic_all_sw[1]
