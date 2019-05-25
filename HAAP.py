@@ -193,7 +193,7 @@ info:{
 
 def origin(haap_alias, objEngine):
     dicOrigin = {haap_alias: {'ip': objEngine._host}}
-    dicOrigin[haap_alias].update(objEnginel.dictInfo)
+    dicOrigin[haap_alias].update(objEngine.dictInfo)
     return dicOrigin
 
 def info(haap_alias, objEngine):
@@ -207,12 +207,12 @@ def info(haap_alias, objEngine):
                     
 
 def data_for_db():
-    dicInfo = odd()
-    dicOrigin = odd()
-    for i in range(len(lst_haap_Alias)):
-        objEngine = Status(lst_haap_IP[i], telnet_port, passwd, FTP_port)
-        dicInfo.update(info(haap_alias[i], objEngine))
-        dicOrigin.update(origin(haap_alias[i], objEngine))
+    dicInfo = {}
+    dicOrigin = {}
+    for i in range(len(list_engines_alias)):
+        objEngine = Status(list_engines_IP[i], telnet_port, passwd, FTP_port)
+        dicInfo.update(info(list_engines_alias, objEngine))
+        dicOrigin.update(origin(list_engines_alias, objEngine))
     return dicInfo, dicOrigin
 
 
@@ -671,5 +671,5 @@ class Status(Action):
 
 
 if __name__ == '__main__':
-    pass
+    print(data_for_db())
 

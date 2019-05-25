@@ -168,7 +168,7 @@ def judge_all_haap():
     SRT = haap.real_time_status()
     SDB = db.get_HAAP_status()
     SRT_show = haap.real_time_status_show()
-    for i in range(len(list_haap_alias)):
+    for i in range(len(lst_haap_Alias)):
         haap_judge(SRT[i], SDB[i])
     db.haap_insert(s.time_now_to_show(), list_to_dic(
         SRT_show), list_to_dic(SRT))
@@ -294,3 +294,5 @@ def get_sw_warning():
         judge_PE_total(total_DB, sw_total, lst_sansw_IP[i])
     db.switch_insert(s.time_now_to_show(),
                      dic_all_sw[0], dic_all_sw[1], dic_all_sw[2])
+
+def get_haap_warning():

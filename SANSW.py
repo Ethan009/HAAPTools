@@ -88,50 +88,50 @@ def periodically_check(ip):
     Action(ip, ssh_port, user, passwd, []).periodic_check(
         lstPCCommand, strPCFolder, PCFile_name)
 
-def dict_for_DB():
-    for i in range(len(lst_sansw_Alias)):
-        lst_dicOrigin = []
-        lst_dicPEFormated = []
-        lst_summary_total = []
-        objSANSWInfo = InfoForDB(lst_sansw_Alias[i], lst_sansw_IP[i])
-        lst_origin.append(objSANSWInfo.get_dicOrigin())
-        lst_dicPEFormated.append(objSANSWInfo.get_dicPEFormated())
-        lst_summary_total.append(objSANSWInfo.get_summary_total())
-    return lst_dicOrigin, lst_dicPEFormated, lst_summary_total
-
-
-
-class InfoForDB(object):
-    """docstring for InfoForDB"""
-    def __init__(self, strAlias, strIP):
-        # super(InfoForDB, self).__init__()
-        self._ip = strIP
-        self._alias = strAlias
-        self._objSANSW = Status(
-            lst_sansw_IP[i],ssh_port, user, passwd, list_sw_ports)
-
-    def get_dicOrigin(self):
-        return {'porterrshow': self._objSANSW.strPorterrshow
-            'switchshow': self._objSANSW.strSwitchshow}
-
-    def get_dicPEFormated(self):
-        return self._objSANSW.dicPE
-
-    def get_summary_total(self):
-        return self._objSANSW.sum_total_and_warning()
-
-def dict_for_DB2():
-    for i in range(len(lst_sansw_Alias)):
-        lst_dicOrigin = []
-        lst_dicPEFormated = []
-        lst_summary_total = []
-        objSW = Status(lst_sansw_IP[i],ssh_port, user, passwd, list_sw_ports)
-        dicOrigin = {'porterrshow': objSW.strPorterrshow
-            'switchshow': objSW.strSwitchshow}
-        lst_origin.append(dicOrigin)
-        lst_dicPEFormated.append(objSW.dicPE)
-        lst_summary_total.append(objSW.sum_total_and_warning())
-        return lst_dicOrigin, lst_dicPEFormated, lst_summary_total
+# def dict_for_DB():
+#     for i in range(len(lst_sansw_Alias)):
+#         lst_dicOrigin = []
+#         lst_dicPEFormated = []
+#         lst_summary_total = []
+#         objSANSWInfo = InfoForDB(lst_sansw_Alias[i], lst_sansw_IP[i])
+#         lst_origin.append(objSANSWInfo.get_dicOrigin())
+#         lst_dicPEFormated.append(objSANSWInfo.get_dicPEFormated())
+#         lst_summary_total.append(objSANSWInfo.get_summary_total())
+#     return lst_dicOrigin, lst_dicPEFormated, lst_summary_total
+#
+#
+#
+# class InfoForDB(object):
+#     """docstring for InfoForDB"""
+#     def __init__(self, strAlias, strIP):
+#         # super(InfoForDB, self).__init__()
+#         self._ip = strIP
+#         self._alias = strAlias
+#         self._objSANSW = Status(
+#             lst_sansw_IP[i],ssh_port, user, passwd, list_sw_ports)
+#
+#     def get_dicOrigin(self):
+#         return {'porterrshow': self._objSANSW.strPorterrshow
+#             'switchshow': self._objSANSW.strSwitchshow}
+#
+#     def get_dicPEFormated(self):
+#         return self._objSANSW.dicPE
+#
+#     def get_summary_total(self):
+#         return self._objSANSW.sum_total_and_warning()
+#
+# def dict_for_DB2():
+#     for i in range(len(lst_sansw_Alias)):
+#         lst_dicOrigin = []
+#         lst_dicPEFormated = []
+#         lst_summary_total = []
+#         objSW = Status(lst_sansw_IP[i],ssh_port, user, passwd, list_sw_ports)
+#         dicOrigin = {'porterrshow': objSW.strPorterrshow
+#             'switchshow': objSW.strSwitchshow}
+#         lst_origin.append(dicOrigin)
+#         lst_dicPEFormated.append(objSW.dicPE)
+#         lst_summary_total.append(objSW.sum_total_and_warning())
+#         return lst_dicOrigin, lst_dicPEFormated, lst_summary_total
 
 
 # def get_origin_dict():
@@ -353,15 +353,7 @@ class Status(Action):
         print('\nPort Error Show for SAN Switch "%s":\n' % self._host)
         _print_description()
         _print_status_in_line(self._dicPartPortError)
-    
-    def switch_status(self):
-        dicIntPE_key = self.sum_and_total()[2].keys()
-        dicIntPE_values = self.sum_and_total()[2].values()
-        dicIntPE  = dict(zip(dicIntPE_key,dicIntPE_values))
-        switch_status_key = ['IP',"port"]
-        switch_status_values = [host,dicIntPE]
-        switch_status = dict(zip(switch_status_key,switch_status_values))
-        return switch_status
+
 
     @s.deco_Exception
     def get_linkfail_by_port(self, intSWPort):
@@ -435,7 +427,7 @@ if __name__ == '__main__':
     list_sw_ports = swcfg.list_switch_ports()
 
 
-    print(get_dic_all_sw())
+    print(get_dic_all_sw()[2])
 
     #dic = Status(list_sw_IP[0], ssh_port, user, passwd, list_sw_ports[0])
     #print(get_Portershow(dic))
