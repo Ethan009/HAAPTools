@@ -98,8 +98,6 @@ def is_port(intPortNum):
                 return True
     return False
 
-
-
 def ShowErr(*argvs):
     '''
     Four argv:
