@@ -224,7 +224,7 @@ def main():
             print(strPTCLHelp)
         elif sys.argv[2] == 'all':
             if num_argv > 3:
-                if is_trace_level(trace_level):
+                if s.is_trace_level(trace_level):
                     haap.analyse_trace_all(trace_level)
                 else:
                     print('Trace Level Must Be "1" or "2" or "3"')
@@ -232,7 +232,7 @@ def main():
                 haap.analyse_trace_all(0)
         elif s.is_IP(sys.argv[2]):
             if num_argv > 3:
-                if is_trace_level(trace_level):
+                if s.is_trace_level(trace_level):
                     haap.analyse_trace(sys.argv[2], trace_level)
                 else:
                     print('Trace Level Must Be "1" or "2" or "3"')
