@@ -216,6 +216,8 @@ def data_for_db():
     return dicInfo, dicOrigin
 
 
+
+
 class Action():
     '''
 get_trace
@@ -657,7 +659,6 @@ class Status(Action):
         if self.AHStatus:
             lstStatus[2] = '--'
         return lstStatus
-
 
     # 思路Step by Step。。。
     # 需要一个当前引擎状态的值，方便网页显示时候直接参考，显示不同颜色

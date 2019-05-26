@@ -163,15 +163,22 @@ def list_to_dic(lstAllStatus):
         dictAllStatus[engine_alies] = lstStatus
     return dictAllStatus
 
+def engineList_for_judging(engine_info, haap_Alias):
+    list_info = engine_info[haap_Alias]
+    list_status = list_info['status']
+    list_status_judge = [list_status[i] for i in [0,1,4,5]]
+    list_status_judge.insert(2, list_status['up_sec'])
+    return list_status_judge
 
 def judge_all_haap():
-    SRT = haap.real_time_status()
-    SDB = db.get_HAAP_status()
-    SRT_show = haap.real_time_status_show()
+    Info_from_engine, Origin_from_engine = haap.data_for_db()
+    Info_from_DB = db.get_HAAP_status()
     for i in range(len(lst_haap_Alias)):
-        haap_judge(SRT[i], SDB[i])
-    db.haap_insert(s.time_now_to_show(), list_to_dic(
-        SRT_show), list_to_dic(SRT))
+        engineList_for_judging = engineList_for_judging(Info_from_engine,
+                                                        lst_haap_Alias[i])
+        haap_judge(engineList_for_judging, Info_from_DB)
+    db.haap_insert(s.time_now_to_show(),
+                   Info_from_engine, Origin_from_engine)
 
 
 # check status interval
@@ -185,47 +192,47 @@ class haap_judge(object):
         self.statusRT = statusRT
         self.statusDB = statusDB
         self.All_judge()
-
+        self.time_now_to_show = s.time_now_to_show()
     def judge_AH(self, AHstatus_rt, AHstatus_db):
         if AHstatus_rt:
             if AHstatus_rt != AHstatus_db:
-                db.insert_warning(s.time_now_to_show(), self.host,
+                db.insert_warning(self.time_now_to_show, self.host,
                                   reboot_errlevel, str_engine_restart, user_unconfirm)
-                SE.Timely_send(s.time_now_to_show(), self.host,
+                SE.Timely_send(self.time_now_to_show, self.host,
                                AH_errlevel, str_engine_AH)
                 return
         return True
 
     def judge_reboot(self, uptime_second_rt, uptime_second_db):
         if uptime_second_rt <= uptime_second_db:
-            db.insert_warning(s.time_now_to_show(), self.host,
+            db.insert_warning(self.time_now_to_show, self.host,
                               reboot_errlevel, str_engine_restart, user_unconfirm)
-            SE.Timely_send(s.time_now_to_show(), self.host,
+            SE.Timely_send(self.time_now_to_show, self.host,
                            reboot_errlevel, str_engine_restart)
 
     def judge_Status(self, Status_rt, Status_db):
         if Status_rt:
             if Status_rt != Status_db:
-                db.insert_warning(s.time_now_to_show(), self.host,
+                db.insert_warning(self.time_now_to_show, self.host,
                                   status_errlevel, str_engine_status, user_unconfirm)
-                SE.Timely_send(s.time_now_to_show(), self.host,
+                SE.Timely_send(self.time_now_to_show, self.host,
                                status_errlevel, str_engine_status)
 
     def judge_Mirror(self, MirrorStatus_rt, MirrorStatus_db):
         if MirrorStatus_rt:
             if MirrorStatus_rt != MirrorStatus_db:
-                db.insert_warning(s.time_now_to_show(), self.host,
+                db.insert_warning(self.time_now_to_show, self.host,
                                   mirror_errlevel, str_engine_mirror, user_unconfirm)
-                SE.Timely_send(s.time_now_to_show(), self.host,
+                SE.Timely_send(self.time_now_to_show, self.host,
                                mirror_errlevel, str_engine_mirror)
 
     # 如果数据库没有信息，当引擎发生问题的时候，是否直接发送警报
     def All_judge(self):
         if self.statusDB:
-            if self.judge_AH(self.lstStatusRT[1], self.lstStatusDB[1]):
-                self.judge_reboot(self.lstStatusRT[2], self.lstStatusDB[2])
-                self.judge_Status(self.lstStatusRT[4], self.lstStatusDB[4])
-                self.judge_Mirror(self.lstStatusRT[5], self.lstStatusDB[5])
+            if self.judge_AH(self.statusRT[1], self.statusDB[1]):
+                self.judge_reboot(self.statusRT[2], self.statusDB[2])
+                self.judge_Status(self.statusRT[3], self.statusDB[3])
+                self.judge_Mirror(self.statusRT[4], self.statusDB[4])
 
 # 执行查询数据库，并在发现用户未确认信息后，发送警报邮件
 
@@ -295,4 +302,4 @@ def get_sw_warning():
     db.switch_insert(s.time_now_to_show(),
                      dic_all_sw[0], dic_all_sw[1], dic_all_sw[2])
 
-def get_haap_warning():
+
