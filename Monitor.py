@@ -67,8 +67,8 @@ def haap_status_for_judging(lstStatus,uptime_second):
     lstStatus[2]=uptime_second
     return lstStatus
 
-lstStatus, uptime_second = status_for_judging_realtime()
-haap_status_for_judging(lstStatus, uptime_second)
+#lstStatus, uptime_second = status_for_judging_realtime()
+#haap_status_for_judging(lstStatus, uptime_second)
 
 a = db.get_haap_last()
 info_engine1 = a.info['engnie1']
@@ -165,23 +165,23 @@ def judge_db_confirm(interval_warning_check):
     t.stt()
 
 
-def IP_to_alies(engine_IP):
-    for alies in list_haap_alias:
-        if list_haap_IP_alies[alies] == engine_IP:
-            return alies
+# def IP_to_alies(engine_IP):
+#     for alies in list_haap_alias:
+#         if list_haap_IP_alies[alies] == engine_IP:
+#             return alies
+#
+#
+# def list_to_dic(lstAllStatus):
+#     dictAllStatus = {}
+#     for lstStatus in lstAllStatus:
+#         engine_alies = IP_to_alies(lstStatus[0])
+#         dictAllStatus[engine_alies] = lstStatus
+#     return dictAllStatus
 
-
-def list_to_dic(lstAllStatus):
-    dictAllStatus = {}
-    for lstStatus in lstAllStatus:
-        engine_alies = IP_to_alies(lstStatus[0])
-        dictAllStatus[engine_alies] = lstStatus
-    return dictAllStatus
-
-def engineList_for_judging(engine_info, haap_Alias):
+def engineList_judge(engine_info, haap_Alias):
     list_info = engine_info[haap_Alias]
     list_status = list_info['status']
-    list_status_judge = [list_status[i] for i in [0,1,4,5]]
+    list_status_judge = [list_status[i] for i in [0, 1, 4, 5]]
     list_status_judge.insert(2, list_status['up_sec'])
     return list_status_judge
 
@@ -189,9 +189,8 @@ def judge_all_haap():
     Info_from_engine, Origin_from_engine = haap.data_for_db()
     Info_from_DB = db.get_HAAP_status()
     for i in range(len(lst_haap_Alias)):
-        engineList_for_judging = engineList_for_judging(Info_from_engine,
-                                                        lst_haap_Alias[i])
-        haap_judge(engineList_for_judging, Info_from_DB)
+        list_judge = engineList_judge(Info_from_engine,lst_haap_Alias[i])
+        haap_judge(list_judge, Info_from_DB)
     db.haap_insert(s.time_now_to_show(),
                    Info_from_engine, Origin_from_engine)
 
@@ -309,12 +308,12 @@ def judge_PE_total(total_sw, total_DB, sansw_IP):
             SE.Timely_send(strTimeNow, sansw_IP, intWarninglevel, msg)
 
 def get_sw_warning():
-    dic_all_sw = sw.get_dic_all_sw()
+    info_for_DB = sw.get_info_for_DB()
     for i in range(len(lst_sansw_Alias)):
         total_DB = db.get_Switch_Total(lst_sansw_Alias[i])
-        sw_total = get_total(dic_all_sw, lst_sansw_Alias[i])
-        judge_PE_total(total_DB, sw_total, lst_sansw_IP[i])
+        sansw_total = get_total(info_for_DB, lst_sansw_Alias[i])
+        judge_PE_total(total_DB, sansw_total, lst_sansw_IP[i])
     db.switch_insert(s.time_now_to_show(),
-                     dic_all_sw[0], dic_all_sw[1], dic_all_sw[2])
+                     info_for_DB[0], info_for_DB[1], info_for_DB[2])
 
 
