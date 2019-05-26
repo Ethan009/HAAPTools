@@ -61,6 +61,21 @@ def show_switch_status_DB():
     lstSWSum = [[i["IP"]] + i["PE_Sum"]for i in Switch[1].values()]
     return Switch[0], lstSWSum
 
+def haap_status_for_judging(lstStatus,uptime_second):
+    lstAllStatus=lstStatus
+    lstStatus = [lstAllStatus[i] for i in [0,1,2,4,5]]
+    lstStatus[2]=uptime_second
+    return lstStatus
+
+lstStatus, uptime_second = status_for_judging_realtime()
+haap_status_for_judging(lstStatus, uptime_second)
+
+a = db.get_haap_last()
+info_engine1 = a.info['engnie1']
+lst = info_engine1['status']
+up_sec = info_engine1['up_sec']
+haap_status_for_judging(lst,up_sec)
+
 
 def start_mnt_4Thread():
     t1 = Thread(target=start_web, args=('db', interval_web_refresh))
@@ -95,10 +110,10 @@ def start_web(mode):
     @app.route("/", methods=['GET', 'POST'])
     def home():
         if mode == 'rt':
-            StatusHAAP = haap.real_time_status_show()
+            StatusHAAP = haap.list_status_for_realtime_show()
             #StatusSANSW = show_switch_status()
-            tlu_haap = s.time_now_folder()
-            tlu_sansw = s.time_now_folder()
+            tlu_haap = s.time_now_to_show()
+            tlu_sansw = s.time_now_to_show()
         elif mode == 'db':
             tlu_haap = show_engine_status_DB()[0]
             tlu_sansw = show_switch_status_DB()[0]

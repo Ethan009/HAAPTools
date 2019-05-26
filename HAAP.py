@@ -152,34 +152,63 @@ def periodically_check(ip):
         lstPCCommand, strPCFolder, )
 
 
-def haap_status_real(engine_IP):
-    status=Status(engine_IP,telnet_port,passwd,FTP_port)
-    web_status=status.over_all_and_warning()
-    db_status=status.over_all_real()
-    return web_status,db_status
+
+def status_for_judging_realtime(ip):
+    objEngine = Status(ip, telnet_port, passwd, FTP_port)
+    lstStatus = objEngine.over_all_and_warning()
+    intUpTimeSec = objEngine.uptime_second()
+    return lstStatus,intUpTimeSec
+
+# def list_status_for_realtime_show():
+#     '''
+# [['engine1', '1.1.1.1',0,'2d','M',0,0,0],['engine2', '1.1.1.1',0,'2d','M',0,1,2]]
+#     '''
+#     lstStatus = []
+#     for i in list_engines_alias:
+#         objEngine = Status(list_engines_IP[i], telnet_port, passwd, FTP_port)
+#         lstStatusWarning = list(objEngine.over_all_and_warning())
+#         lstStatus.append(lstStatusWarning.insert(0, list_engines_alias[i]))
+#     return lstStatus
+
+def list_status_for_realtime_show():
+    '''
+[['1.1.1.1',0,'2d','M',0,0,0],['1.1.1.1',0,'2d','M',0,1,2]]
+    '''
+    lstStatus = []
+    for i in list_engines_alias:
+        objEngine = Status(list_engines_IP[i], telnet_port, passwd, FTP_port)
+        lstStatusWarning = list(objEngine.over_all_and_warning())
+    return lstStatus
 
 
-def real_time_status():
-    lstStatusAllEngnine = []
-    for ip in list_engines_IP:
-        lstStatusAllEngnine.append(Status(ip, telnet_port, passwd, FTP_port).over_all_real())
-    return lstStatusAllEngnine
+# def haap_status_real(engine_IP):
+#     status=Status(engine_IP,telnet_port,passwd,FTP_port)
+#     web_status=status.over_all_and_warning()
+#     db_status=status.over_all_real()
+#     return web_status,db_status
 
-def real_time_status_show():
-    lstStatusAllEngnine = []
-    for ip in list_engines_IP:
-        lstStatusAllEngnine.append(Status(ip, telnet_port, passwd, FTP_port).over_all_and_warning())
-    return lstStatusAllEngnine
 
-def real_time_status():
-    lstStatusAllEngnine = []
-    lstStatusAllEngnine_show = []
-    for ip in list_engines_IP:
-        status=Status(ip, telnet_port, passwd, FTP_port)
-        lstStatusAllEngnine.append(status.over_all_real())
-        lstStatusAllEngnine_show.append(status.over_all_and_warning())
-    return lstStatusAllEngnine,lstStatusAllEngnine_show
-([[],[]],[[],[]])
+# def real_time_status():
+#     lstStatusAllEngnine = []
+#     for ip in list_engines_IP:
+#         lstStatusAllEngnine.append(Status(ip, telnet_port, passwd, FTP_port).over_all_real())
+#     return lstStatusAllEngnine
+
+# def real_time_status_show():
+#     lstStatusAllEngnine = []
+#     for ip in list_engines_IP:
+#         lstStatusAllEngnine.append(Status(ip, telnet_port, passwd, FTP_port).over_all_and_warning())
+#     return lstStatusAllEngnine
+
+# def real_time_status():
+#     lstStatusAllEngnine = []
+#     lstStatusAllEngnine_show = []
+#     for ip in list_engines_IP:
+#         status=Status(ip, telnet_port, passwd, FTP_port)
+#         lstStatusAllEngnine.append(status.over_all_real())
+#         lstStatusAllEngnine_show.append(status.over_all_and_warning())
+#     return lstStatusAllEngnine,lstStatusAllEngnine_show
+# ([[],[]],[[],[]])
 
 '''origin:{'engine1':{'ip': '1.1.1.1', 'vpd': 'xxxx','engine': 'yyyy', 'mirror': 'yyyy'},
 'engine2':{'ip': '1.1.1.1','vpd': 'xxxx','engine': 'yyyy', 'mirror': 'yyyy'}
@@ -653,22 +682,11 @@ class Status(Action):
             lstStatus.append(0)
         return lstStatus
 
-    def over_all_real(self):
-        lstStatus=self.over_all()
-        lstStatus[2]=self.uptime_second()
-        if self.AHStatus:
-            lstStatus[2] = '--'
+    def status_for_judging(lstStatus,uptime_second):
+        lstAllStatus=lstStatus
+        lstStatus = [lstAllStatus[i] for i in [0,1,2,4,5]]
+        lstStatus[2]=uptime_second
         return lstStatus
-
-    # 思路Step by Step。。。
-    # 需要一个当前引擎状态的值，方便网页显示时候直接参考，显示不同颜色
-    # 先写了warning_status，先用循环生成lstStatus，再用一行for写
-    # 后面状态返回，先用循环方式写，后发现可以用any写
-    # 再后来，发现这个状态最好是附加在over_all之上，然后将any写在over_all里面
-    # 再后来，发现最好是用一个新的方法用来专门给网页调用，就另外写一个方法，调用over_all
-    # 为了原来程序正常运行，在over_all返回时，不返回最后一个值
-
-
 
 
 if __name__ == '__main__':
