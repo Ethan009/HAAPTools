@@ -1,13 +1,16 @@
 # coding:utf-8
 
-from mongoengine import Document, connect
-import GetConfig as gc
-from mongoengine.fields import *
 import datetime
-import Source as s
-import SANSW as sw
-import HAAP as haap
 from posix import lstat
+
+from mongoengine import Document, connect
+from mongoengine.fields import *
+
+import GetConfig as gc
+import HAAP as haap
+import SANSW as sw
+import Source as s
+
 
 # read config and connet to the datebase
 cfgDB = gc.DBConfig()
@@ -26,54 +29,44 @@ def haap_insert(n, engine_status, lst_status):
     @note: monitoHAAP数据插入
     """
     HAAP().insert(n, engine_status, lst_status)
+    
+def HAAP_last_info():
+    """
+    @note: HAAP最后一次所有的数据
+    """
+    return HAAP().query_last_record()
 
-def get_list_HAAP():
-    """
-    @note: HAAP-网页展示的数据
-    """
-    list_status = HAAP().query_last_record()
-    if list_status:
-        time = list_status.time
-        status_to_show = list_status.status_to_show.values()
-        return time,status_to_show
- 
-def get_HAAP_status():
-    """
-    @note:HAAP模块需调用的数据
-    """
-    all_status = HAAP().query_last_record()
-    if all_status:
-        return all_status.status_for_judging.values()
+# def get_list_HAAP():
+#     """
+#     @note: HAAP-网页展示的数据
+#     """
+#     list_status = HAAP().query_last_record()
+#     if list_status:
+#         time = list_status.time
+#         status_to_show = list_status.status_to_show.values()
+#         return time,status_to_show
+#  
+# def get_HAAP_status():
+#     """
+#     @note:HAAP模块需调用的数据
+#     """
+#     all_status = HAAP().query_last_record()
+#     if all_status:
+#         return all_status.status_for_judging.values()
 
 # SANSW
-def switch_insert(n, origin, switch_summary, switch_status):
+def switch_insert(n, origin, dicPEFormated, summary_total):
     """
     @note: SANSW数据插入
     """
-    SANSW().insert(n, origin, switch_summary, switch_status)
-
-
-
-def get_switch_total(list_switch_alias):
+    SANSW().insert(n, origin, dicPEFormated, summary_total)
+    
+def switch_last_info():
     """
-    @note: SANSW模块调用-Total获取
+    @note: SANSW最后一次所有的数据
     """
+    return SANSW().query_first_records()
 
-    list_switch = SANSW().query_first_records().switch_summary
-    if list_switch:
-        total = list_switch[list_switch_alias]["PE_Total"]
-        return total
-
-
-def get_switch_status():
-    """
-    @note: SANSW-网页部分展示
-    """
-    switch_status = SANSW().query_first_records()
-    if switch_status:
-        time = switch_status.time
-        switch_summary = switch_status.switch_summary
-        return time,switch_summary
  
 # Warning 
 def insert_warning(n, ip, level, warn_message, confirm_status):
@@ -166,7 +159,7 @@ confirm:1
 class HAAP(object):
 
     def insert(self, time_now, engine_status, lst_status):
-        t = collHAAP(time=time_now, status_to_show=engine_status, status_for_judging=lst_status)
+        t = collHAAP(time=time_now, origin=engine_status, info=lst_status)
         t.save()
 
     def query_range(self, time_start, time_end):
@@ -179,9 +172,9 @@ class HAAP(object):
 
 class SANSW(object):
 
-    def insert(self, time_now, origin, Summary, Switch_Status):
+    def insert(self, time_now, origin, Switch_Status, Summary):
         t = collSANSW(time=time_now, origin=origin,
-                      switch_summary=Summary, switch_status=Switch_Status)
+                       dicPEFormated=Switch_Status,summary_total=Summary)
         t.save()
 
     def query_range(self, time_start, time_end):

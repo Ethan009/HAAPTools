@@ -3,7 +3,7 @@ from threading import Thread
 import thread
 import Source as s
 import DB as db
-import M
+import Monitor as mn
 import datetime
 
 """
@@ -145,42 +145,12 @@ if __name__ == '__main__':
 #     print(lstSWSum)
 #     
 #     db.switch_insert(n,origin,Summary,Switch_Status)
-#     db.haap_insert(datetime.datetime.now(),{
-#         "engine1" : [ 
-#             "10.203.1.221", 
-#             0, 
-#             "1 Days 5 Hours 54 Minutes", 
-#             "M", 
-#             "null", 
-#             0
-#         ],
-#         "engine0" : [ 
-#             "10.203.1.221", 
-#             0, 
-#             "1 Days 5 Hours 54 Minutes", 
-#             "M", 
-#             "null", 
-#             0
-#         ]
-#     },{
-#         "engine1" : [ 
-#             "10.203.1.221", 
-#             0, 
-#             "M", 
-#             "null", 
-#             0, 
-#             107651
-#         ],
-#         "engine0" : [ 
-#             "10.203.1.221", 
-#             0, 
-#             "M", 
-#             "null", 
-#             0, 
-#             107651
-#         ]
-#     }
-# )
+#     db.haap_insert(datetime.datetime.now(),{'engine1':{'ip': '1.1.1.1', 'vpd': 'xxxx','engine': 'yyyy', 'mirror': 'yyyy'},
+# 'engine2':{'ip': '1.1.1.1','vpd': 'xxxx','engine': 'yyyy', 'mirror': 'yyyy'}
+# },{
+#     'engine1':{'status':['1.1.1.1',0,'2d','M',0,0],'up_sec':7283,'level':0},
+#     'engine2':{'status':['1.1.1.2',0,'2d','M',0,0],'up_sec':7283,'level':0}
+# })
 #     print(db.get_list_HAAP())
 #     print(db.get_HAAP_time())
 #     print(db.get_list_switch()["SW02"]["PE_Sum"])
@@ -200,8 +170,8 @@ if __name__ == '__main__':
 #     "porterrshow":"",
 #     }
 #     },{
-#     "SW01":{
-#     "IP":"1.1.1.1",
+#     'SW01':{
+#     'IP':"1.1.1.1",
 #     "PE_Sum":[
 #         "0", 
 #         "0", 
@@ -263,12 +233,16 @@ if __name__ == '__main__':
 #         "0", 
 #         "0", 
 #         "4"]
-#  
+#   
 #     }}})
 #     print(db.get_switch_total("SW01"))
 #     db.insert_warning(n,ip,level,warn_message,confirm_status)
 #     print(db.get_unconfirm_warning())
 #     print(db.get_switch_status())
+#     print(db.switch_last_info().summary_total)
+#     print(mn.get_switch_total_db("switch1"))
+#     print(mn.get_switch_show_db())
+    print(mn.get_HAAP_show_db())
     print("ok")
     pass
     
