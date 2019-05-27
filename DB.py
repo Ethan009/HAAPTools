@@ -1,7 +1,6 @@
 # coding:utf-8
 
 import datetime
-from posix import lstat
 
 from mongoengine import Document, connect
 from mongoengine.fields import *

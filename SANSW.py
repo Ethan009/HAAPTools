@@ -305,11 +305,12 @@ class Status(Action):
         lstSum = []
         total = 0
         if dicIntPE:
-            for idxType in range(6):
+            for idxType in range(5):
                 sum = 0
                 lstPE = dicIntPE.values()
                 for lstPort in lstPE:
-                    sum += lstPort[idxType]
+                    lstError = lstPort[2:]
+                    sum += lstError[idxType]
                 lstSum.append(sum)
             for sum in lstSum:
                 total += sum
@@ -415,7 +416,7 @@ class Status(Action):
 
 class InfoForDB(object):
     """docstring for InfoForDB"""
-    def __init__(self, strAlias, strIP):
+    def __init__(self, strAlias, strIP, list_sw_ports):
         # super(InfoForDB, self).__init__()
         self._ip = strIP
         self._alias = strAlias
@@ -446,21 +447,21 @@ def get_info_for_DB():
     sum_and_total = {}
     PEFormated = {}
     for i in range(len(list_sw_alias)):
-        objSANSW = InfoForDB(list_sw_alias[i], list_sw_ip[i])
+        objSANSW = InfoForDB(list_sw_alias[i], list_sw_ip[i], list_sw_ports[i])
         origin.update(objSANSW.get_dicOrigin())
         sum_and_total.update(objSANSW.get_summary_total())
         PEFormated.update(objSANSW.get_dicPEFormated())
     return origin,sum_and_total,PEFormated
 
 
+
 if __name__ == '__main__':
+    import pprint
 #     print(get_dic_all_sw()[1])
 #     print(get_dic_all_sw()[0])
 #     db.switch_insert(datetime.datetime.now(),get_dic_all_sw()[0],
 #                      get_dic_all_sw()[1],get_dic_all_sw()[2])
-    
-
-    print(get_info_for_DB())
+    pprint.pprint(get_info_for_DB())
     print("ok")
 # {'switch1': {'IP': '10.203.1.212', 'PE': {1: ['0', '0', '0', '0', '0', '0', '1'], 2: ['1.1m', '131.2k', '0', '0', '10', '18', '19'], 3: ['168', '158', '0', '0', '9', '10', '11'], 4: ['2.6k', '6.4k', '0', '0', '10', '11', '12'], 5: ['187', '177', '0', '0', '9', '10', '11'], 6: ['0', '0', '0', '0', '0', '0', '1']}}, 
 # 'switch0': {'IP': '10.203.1.211', 'PE': {1: ['0', '0', '0', '0', '0', '0', '1'], 2: ['802', '922', '0', '0', '10', '11', '12'], 3: ['175.1k', '1.1m', '3', '11', '9', '10', '11'], 4: ['505.4k', '84.1k', '0', '0', '10', '11', '12'], 5: ['118.6k', '522.5k', '0', '1', '9', '10', '11'], 6: ['0', '0', '0', '0', '0', '0', '1']}}}
@@ -474,7 +475,7 @@ if __name__ == '__main__':
     list_sw_alias = swcfg.list_switch_alias()
 
     # xx = InfoForDB(list_sw_alias[0], list_sw_IP[1])
-    print(get_info_for_DB())
+    #print(get_info_for_DB())
     # ssh_port = swcfg.SSH_port()
     # user = swcfg.username()
     # passwd = swcfg.password()
