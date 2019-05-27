@@ -363,43 +363,43 @@ class Status(Action):
                 print('Please Correct the Port Number...')
 
 
-# def get_Portershow(sw_status):
-#     DicPE = {}
-#     sw_PE = sw_status._dicPartPortError
-#     for port in sw_PE:
-#         DicPE[port] = sw_PE[port]
-#     return DicPE
+def get_Portershow(sw_status):
+    DicPE = {}
+    sw_PE = sw_status._dicPartPortError
+    for port in sw_PE:
+        DicPE[port] = sw_PE[port]
+    return DicPE
 
 
-# def get_sw_origin(sw_status,sw_ID):
-#     return {sw_ID: {'IP': sw_status._host,
-#                     'strSwitchshow': sw_status.strPorterrshow,
-#                     'porterrshow': sw_status.strSwitchshow}}
+def get_sw_origin(sw_status,sw_ID):
+    return {sw_ID: {'IP': sw_status._host,
+                    'strSwitchshow': sw_status.strPorterrshow,
+                    'porterrshow': sw_status.strSwitchshow}}
 
 
-# def get_sw_summary(sw_status,sw_ID):
-#     sum_and_total = sw_status.sum_and_total()
-#     return {sw_ID: {'IP': sw_status._host,
-#                     'PE_Sum': sum_and_total[0],
-#                     'PE_Total': sum_and_total[1]}}
+def get_sw_summary(sw_status,sw_ID):
+    sum_and_total = sw_status.sum_and_total()
+    return {sw_ID: {'IP': sw_status._host,
+                    'PE_Sum': sum_and_total[0],
+                    'PE_Total': sum_and_total[1]}}
 
 
-# def get_sw_status(sw_status,sw_ID):
-#     return{sw_ID: {'IP': sw_status._host,
-#                    'PE': get_Portershow(sw_status)}}
+def get_sw_status(sw_status,sw_ID):
+    return{sw_ID: {'IP': sw_status._host,
+                   'PE': get_Portershow(sw_status)}}
 
 
 
-# def get_dic_all_sw():
-#     all_sw_origin = {}
-#     all_sw_summary = {}
-#     all_sw_status = {}
-#     for i in range(len(list_sw_IP)):
-#         objSANSWStatus = Status(list_sw_IP[i],ssh_port,user,passwd,list_sw_ports[0])
-#         all_sw_origin.update(get_sw_origin(objSANSWStatus, sw_ID[i]))
-#         all_sw_summary.update(get_sw_summary(objSANSWStatus, sw_ID[i]))
-#         all_sw_status.update(get_sw_status(objSANSWStatus, sw_ID[i]))
-#     return [all_sw_origin,all_sw_summary,all_sw_status]
+def get_dic_all_sw():
+    all_sw_origin = {}
+    all_sw_summary = {}
+    all_sw_status = {}
+    for i in range(len(list_sw_IP)):
+        objSANSWStatus = Status(list_sw_IP[i],ssh_port,user,passwd,list_sw_ports[0])
+        all_sw_origin.update(get_sw_origin(objSANSWStatus, sw_ID[i]))
+        all_sw_summary.update(get_sw_summary(objSANSWStatus, sw_ID[i]))
+        all_sw_status.update(get_sw_status(objSANSWStatus, sw_ID[i]))
+    return [all_sw_origin,all_sw_summary,all_sw_status]
 
 
 class InfoForDB(object):
