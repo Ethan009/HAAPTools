@@ -11,6 +11,7 @@ import SendEmail as SE
 import datetime
 import DB as db
 import GetConfig as gc
+import operator
 import types
 from Carbon import AH
 try:
@@ -38,11 +39,10 @@ lst_haap_Alias = oddEngines.keys()
 # <<<Get Config Field>>>
 
 # <<<email massage>>>
-str_engine_restart = 'Engine reboot'
+
 str_engine_mirror = 'Engine mirror not ok'
 str_engine_status = 'Engine offline'
 str_engine_AH = 'Engine AH'
-user_unconfirm = 0
 
 # <<web show-from name>>
 lstDescHAAP = ('EngineIP', 'AH Status', 'Uptime',
@@ -62,15 +62,6 @@ def haap_status_for_judging(lstStatus, uptime_second):
     lstStatus = [lstAllStatus[i] for i in [0, 1, 2, 4, 5]]
     lstStatus[2] = uptime_second
     return lstStatus
-
-# lstStatus, uptime_second = status_for_judging_realtime()
-# haap_status_for_judging(lstStatus, uptime_second)
-# 
-# a = db.get_haap_last()
-# info_engine1 = a.info['engnie1']
-# lst = info_engine1['status']
-# up_sec = info_engine1['up_sec']
-# haap_status_for_judging(lst,up_sec)
 
 
 def start_mnt_4Thread():
@@ -106,12 +97,6 @@ def start_web(mode):
     @app.route("/", methods=['GET', 'POST'])
     def home():
         if mode == 'rt':
-# <<<<<<< HEAD
-#             StatusHAAP = haap.real_time_status_show()
-#             # StatusSANSW = show_switch_status()
-#             tlu_haap = s.time_now_folder()
-#             tlu_sansw = s.time_now_folder()
-# =======
             StatusHAAP = haap.list_status_for_realtime_show()
             # StatusSANSW = show_switch_status()
             tlu_haap = s.time_now_to_show()
@@ -167,29 +152,43 @@ def judge_db_confirm(interval_warning_check):
     t.stt()
 
 
-def IP_to_alies(engine_IP):
-    for alies in list_haap_alias:
-        if list_haap_IP_alies[alies] == engine_IP:
-            return alies
+# def IP_to_alies(engine_IP):
+#     for alies in list_haap_alias:
+#         if list_haap_IP_alies[alies] == engine_IP:
+#             return alies
+#
+#
+# def list_to_dic(lstAllStatus):
+#     dictAllStatus = {}
+#     for lstStatus in lstAllStatus:
+#         engine_alies = IP_to_alies(lstStatus[0])
+#         dictAllStatus[engine_alies] = lstStatus
+#     return dictAllStatus
 
-
-def list_to_dic(lstAllStatus):
-    dictAllStatus = {}
-    for lstStatus in lstAllStatus:
-        engine_alies = IP_to_alies(lstStatus[0])
-        dictAllStatus[engine_alies] = lstStatus
-    return dictAllStatus
-
+def engineList_judge(engine_info, haap_Alias):
+    list_info = engine_info[haap_Alias]
+    list_status = list_info['status']
+    list_status_judge = [list_status[i] for i in [0, 1, 4, 5]]
+    list_status_judge.insert(2, list_status['up_sec'])
+    return list_status_judge
 
 def judge_all_haap():
-    SRT = haap.real_time_status()
-    # IP,AHStatus,uptime_sec,cluster_status,mirror_status
-    SDB = db.get_HAAP_status()
-    SRT_show = haap.real_time_status_show()
-    for i in range(len(list_haap_alias)):
-        haap_judge(SRT[i], SDB[i])
-    db.haap_insert(s.time_now_to_show(), list_to_dic(
-        SRT_show), list_to_dic(SRT))
+
+#     SRT = haap.real_time_status()
+#     # IP,AHStatus,uptime_sec,cluster_status,mirror_status
+#     SDB = db.get_HAAP_status()
+#     SRT_show = haap.real_time_status_show()
+#     for i in range(len(list_haap_alias)):
+#         haap_judge(SRT[i], SDB[i])
+#     db.haap_insert(s.time_now_to_show(), list_to_dic(
+#         SRT_show), list_to_dic(SRT))
+    Info_from_engine, Origin_from_engine = haap.data_for_db()
+    Info_from_DB = db.get_HAAP_status()
+    for i in range(len(lst_haap_Alias)):
+        list_judge = engineList_judge(Info_from_engine,lst_haap_Alias[i])
+        haap_judge(list_judge, Info_from_DB)
+    db.haap_insert(s.time_now_to_show(),
+                   Info_from_engine, Origin_from_engine)
 
 # check status interval
 
@@ -201,48 +200,55 @@ class haap_judge(object):
         self.host = statusRT[0]
         self.statusRT = statusRT
         self.statusDB = statusDB
-        self.All_judge()
+        self.strTimeNow = s.time_now_to_show()
+        self.lstWarningToSend = []
+        #self.All_judge()
 
     def judge_AH(self, AHstatus_rt, AHstatus_db):
         if AHstatus_rt:
             if AHstatus_rt != AHstatus_db:
-                db.insert_warning(s.time_now_to_show(), self.host,
-                                  reboot_errlevel, str_engine_restart, user_unconfirm)
-                SE.Timely_send(s.time_now_to_show(), self.host,
+                db.insert_warning(self.strTimeNow, self.host,
+                                  level, 'engine', str_engine_AH)
+                self.lstWarningToSend.apend(self.strTimeNow, self.host,
                                AH_errlevel, str_engine_AH)
                 return
         return True
 
     def judge_reboot(self, uptime_second_rt, uptime_second_db):
+        str_engine_restart = 'Engine Reboot %d secends ago'
         if uptime_second_rt <= uptime_second_db:
-            db.insert_warning(s.time_now_to_show(), self.host,
-                              reboot_errlevel, str_engine_restart, user_unconfirm)
-            SE.Timely_send(s.time_now_to_show(), self.host,
+            restart_time = uptime_second_db - uptime_second_rt
+            db.insert_warning(self.strTimeNow, self.host, 2,
+                              'engine',  str_engine_restart%(restart_time))
+            self.lstWarningToSend.apend(self.strTimeNow, self.host,
                            reboot_errlevel, str_engine_restart)
 
     def judge_Status(self, Status_rt, Status_db):
         if Status_rt:
             if Status_rt != Status_db:
-                db.insert_warning(s.time_now_to_show(), self.host,
-                                  status_errlevel, str_engine_status, user_unconfirm)
-                SE.Timely_send(s.time_now_to_show(), self.host,
+                db.insert_warning(self.strTimeNow, self.host,
+                                  2, 'engine', str_engine_status)
+                self.lstWarningToSend.apend(self.strTimeNow, self.host,
                                status_errlevel, str_engine_status)
 
     def judge_Mirror(self, MirrorStatus_rt, MirrorStatus_db):
         if MirrorStatus_rt:
             if MirrorStatus_rt != MirrorStatus_db:
-                db.insert_warning(s.time_now_to_show(), self.host,
-                                  mirror_errlevel, str_engine_mirror, user_unconfirm)
-                SE.Timely_send(s.time_now_to_show(), self.host,
+                db.insert_warning(self.strTimeNow, self.host,
+                                  2, 'engine', str_engine_mirror)
+                self.lstWarningToSend.apend(self.strTimeNow, self.host,
                                mirror_errlevel, str_engine_mirror)
 
     # 如果数据库没有信息，当引擎发生问题的时候，是否直接发送警报
     def All_judge(self):
-        if self.statusDB:
-            if self.judge_AH(self.lstStatusRT[1], self.lstStatusDB[1]):
-                self.judge_reboot(self.lstStatusRT[2], self.lstStatusDB[2])
-                self.judge_Status(self.lstStatusRT[4], self.lstStatusDB[4])
-                self.judge_Mirror(self.lstStatusRT[5], self.lstStatusDB[5])
+        try:
+            if self.statusDB:
+                if self.judge_AH(self.statusRT[1], self.statusDB[1]):
+                    self.judge_reboot(self.statusRT[2], self.statusDB[2])
+                    self.judge_Status(self.statusRT[3], self.statusDB[3])
+                    self.judge_Mirror(self.statusRT[4], self.statusDB[4])
+        finally:
+            SE.xxx(self.lstWarningToSend)
 
 # 执行查询数据库，并在发现用户未确认信息后，发送警报邮件
 
@@ -295,19 +301,22 @@ def judge_PE_total(total_sw, total_DB, sansw_IP):
         intWarninglevel = s.is_Warning(intErrorIncrease, tuplThresholdTotal)
         if intWarninglevel:
             msg = warning_message_sansw(intWarninglevel)
-            db.insert_warning(strTimeNow, sansw_IP, intWarninglevel, msg)
+            db.insert_warning(strTimeNow, sansw_IP, intWarninglevel,
+                              'san_switch', warning_message_sansw(intWarninglevel))
             # 这部分发送应该是有一个特定的格式吧。。。
             SE.Timely_send(strTimeNow, sansw_IP, intWarninglevel, msg)
 
 
 def get_sw_warning():
-    dic_all_sw = sw.get_dic_all_sw()
+    info_for_DB = sw.get_info_for_DB()
     for i in range(len(lst_sansw_Alias)):
         total_DB = db.get_Switch_Total(lst_sansw_Alias[i])
-        sw_total = get_total(dic_all_sw, lst_sansw_Alias[i])
-        judge_PE_total(total_DB, sw_total, lst_sansw_IP[i])
+        sansw_total = get_total(info_for_DB, lst_sansw_Alias[i])
+        judge_PE_total(total_DB, sansw_total, lst_sansw_IP[i])
     db.switch_insert(s.time_now_to_show(),
-                     dic_all_sw[0], dic_all_sw[1], dic_all_sw[2])
+                     info_for_DB[0], info_for_DB[1], info_for_DB[2])
+
+
     
 # 最新方法
 
@@ -321,17 +330,25 @@ def get_switch_total_db(list_switch_alias):
         db_total = list_switch[list_switch_alias]["PE_Total"]
         return db_total
 
-
-# zaixiu  
 def get_switch_show_db():
     """
     @note: 获取数据库SANSW要展示的内容（时间，status）
     """
     lst_switch = db.switch_last_info()
+    switch_show = []
     if lst_switch:
         time_switch = lst_switch.time
-        lst_show_switch = [[i["IP"]] + i["PE_Sum"]for i in lst_switch.summary_total.values()]
-        return time_switch, lst_show_switch
+        switch_total = lst_switch.summary_total
+        for i in switch_total.keys():
+            ip = switch_total[i]["IP"]
+            PE_sum = switch_total[i]["PE_Sum"]
+            PE_total = switch_total[i]["PE_Total"]
+            PE_sum.insert(0,ip)
+            PE_sum.append(PE_total)
+            PE_sum.insert(0,i)
+            switch_show.append(PE_sum)
+            switch_show.sort(key=operator.itemgetter(0))
+        return time_switch,switch_show
 
 
 def get_HAAP_show_db():
@@ -349,18 +366,20 @@ def get_HAAP_show_db():
             show_HAAP.append(info_status)
     return time_HAAP, show_HAAP
 
-# def get_HAAP_other_db(lst_haap_Alias):
-#     """
-#     @note: 获取数据库具体up_sec
-#     """
-#     lst_HAAP = db.HAAP_last_info().info
-#     if lst_HAAP:
-#         s = lst_HAAP[[lst_haap_Alias]]
-#         
-#         
-#         
-#         up_sec = lst_HAAP[lst_haap_Alias]["up_sec"]
-#     return {1:[],1:[]}
-# 2 ： AH
-# 3 ： shij
+
+def get_HAAP_other_db():
+    """
+    @note: 获取数据库具体up_sec
+    ['192.168.1.1',0,27838,0,0]
+    """
+    lst_HAAP = db.HAAP_last_info().info
+    lst_other = {}
+    if lst_HAAP:
+        for i in lst_HAAP.keys():
+            list_status = lst_HAAP[i]["status"]
+            list_status.insert(2, lst_HAAP[i]['up_sec'])
+            list_status_judge = [list_status[a] for a in [0, 1,2, 5, 6]]
+            lst_other[i] = list_status_judge
+    return lst_other
+
 

@@ -222,11 +222,11 @@ info:{
 
 def origin(haap_alias, objEngine):
     dicOrigin = {haap_alias: {'ip': objEngine._host}}
-    dicOrigin[haap_alias].update(objEnginel.dictInfo)
+    dicOrigin[haap_alias].update(objEngine.dictInfo)
     return dicOrigin
 
 def info(haap_alias, objEngine):
-    lstStatus = objEngine.status_warning()
+    lstStatus = objEngine.over_all_and_warning()
     intUpTimeSec = objEngine.uptime_second()
 
     dicInfo = {haap_alias: {'status': lstStatus[:-1],
@@ -236,13 +236,15 @@ def info(haap_alias, objEngine):
                     
 
 def data_for_db():
-    dicInfo = odd()
-    dicOrigin = odd()
-    for i in range(len(lst_haap_Alias)):
-        objEngine = Status(lst_haap_IP[i], telnet_port, passwd, FTP_port)
-        dicInfo.update(info(haap_alias[i], objEngine))
-        dicOrigin.update(origin(haap_alias[i], objEngine))
+    dicInfo = {}
+    dicOrigin = {}
+    for i in range(len(list_engines_alias)):
+        objEngine = Status(list_engines_IP[i], telnet_port, passwd, FTP_port)
+        dicInfo.update(info(list_engines_alias[i], objEngine))
+        dicOrigin.update(origin(list_engines_alias[i], objEngine))
     return dicInfo, dicOrigin
+
+
 
 
 class Action():
@@ -680,13 +682,13 @@ class Status(Action):
             lstStatus.append(0)
         return lstStatus
 
-    def status_for_judging(lstStatus,uptime_second):
-        lstAllStatus=lstStatus
-        lstStatus = [lstAllStatus[i] for i in [0,1,2,4,5]]
-        lstStatus[2]=uptime_second
-        return lstStatus
+    # def status_for_judging(lstStatus,uptime_second):
+    #     lstAllStatus=lstStatus
+    #     lstStatus = [lstAllStatus[i] for i in [0,1,2,4,5]]
+    #     lstStatus[2]=uptime_second
+    #     return lstStatus
 
 
 if __name__ == '__main__':
-    pass
+    print(data_for_db())
 
