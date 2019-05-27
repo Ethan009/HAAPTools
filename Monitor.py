@@ -12,6 +12,7 @@ import datetime
 import DB as db
 import GetConfig as gc
 import types
+from Carbon import AH
 try:
     import configparser as cp
 except Exception:
@@ -56,11 +57,10 @@ def show_engine_status_DB():
     return engine[0], engine[1]
 
 
-
-def haap_status_for_judging(lstStatus,uptime_second):
-    lstAllStatus=lstStatus
-    lstStatus = [lstAllStatus[i] for i in [0,1,2,4,5]]
-    lstStatus[2]=uptime_second
+def haap_status_for_judging(lstStatus, uptime_second):
+    lstAllStatus = lstStatus
+    lstStatus = [lstAllStatus[i] for i in [0, 1, 2, 4, 5]]
+    lstStatus[2] = uptime_second
     return lstStatus
 
 # lstStatus, uptime_second = status_for_judging_realtime()
@@ -113,7 +113,7 @@ def start_web(mode):
 #             tlu_sansw = s.time_now_folder()
 # =======
             StatusHAAP = haap.list_status_for_realtime_show()
-            #StatusSANSW = show_switch_status()
+            # StatusSANSW = show_switch_status()
             tlu_haap = s.time_now_to_show()
             tlu_sansw = s.time_now_to_show()
         elif mode == 'db':
@@ -183,7 +183,7 @@ def list_to_dic(lstAllStatus):
 
 def judge_all_haap():
     SRT = haap.real_time_status()
-    #IP,AHStatus,uptime_sec,cluster_status,mirror_status
+    # IP,AHStatus,uptime_sec,cluster_status,mirror_status
     SDB = db.get_HAAP_status()
     SRT_show = haap.real_time_status_show()
     for i in range(len(list_haap_alias)):
@@ -321,7 +321,8 @@ def get_switch_total_db(list_switch_alias):
         db_total = list_switch[list_switch_alias]["PE_Total"]
         return db_total
 
-    
+
+# zaixiu  
 def get_switch_show_db():
     """
     @note: 获取数据库SANSW要展示的内容（时间，status）
@@ -330,7 +331,7 @@ def get_switch_show_db():
     if lst_switch:
         time_switch = lst_switch.time
         lst_show_switch = [[i["IP"]] + i["PE_Sum"]for i in lst_switch.summary_total.values()]
-        return time_switch,lst_show_switch
+        return time_switch, lst_show_switch
 
 
 def get_HAAP_show_db():
@@ -341,18 +342,25 @@ def get_HAAP_show_db():
     show_HAAP = []
     if lst_HAAP:
         time_HAAP = lst_HAAP.time
-        for i in lst_HAAP.info.values():
-            show_HAAP.append(i["status"])
-            
-    return time_HAAP,show_HAAP
+        info = lst_HAAP.info
+        for i in info.keys():
+            info_status = info[i]["status"]
+            info_status.insert(0, i)
+            show_HAAP.append(info_status)
+    return time_HAAP, show_HAAP
 
+# def get_HAAP_other_db(lst_haap_Alias):
+#     """
+#     @note: 获取数据库具体up_sec
+#     """
+#     lst_HAAP = db.HAAP_last_info().info
+#     if lst_HAAP:
+#         s = lst_HAAP[[lst_haap_Alias]]
+#         
+#         
+#         
+#         up_sec = lst_HAAP[lst_haap_Alias]["up_sec"]
+#     return {1:[],1:[]}
+# 2 ： AH
+# 3 ： shij
 
-def get_HAAP_other_db(lst_haap_Alias):
-    """
-    @note: 获取数据库具体up_sec
-    """
-    lst_HAAP = db.HAAP_last_info().info
-    if lst_HAAP:
-        
-        up_sec = lst_HAAP[lst_haap_Alias]["up_sec"]
-    return up_sec
