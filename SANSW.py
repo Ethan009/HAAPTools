@@ -261,7 +261,7 @@ class Status(Action):
             lstPortErrLines = self.strPorterrshow.split('\n')
             for intPortNum in self._allSWPort:
                 lstErrInfo = _getErrorAsList(intPortNum, lstPortErrLines)
-                oddPortError[intPortNum] = lstErrInfo
+                oddPortError[str(intPortNum)] = lstErrInfo
             self._dicPartPortError = oddPortError
 
         if self.strPorterrshow:
@@ -408,7 +408,7 @@ class InfoForDB(object):
         # super(InfoForDB, self).__init__()
         self._ip = strIP
         self._alias = strAlias
-        self._objSANSW = Status(strIP, ssh_port, user, passwd, list_sw_ports)
+        self._objSANSW = Status(strIP, ssh_port, user, passwd, list_sw_ports[0])
 
     def get_dicOrigin(self):
         return {str(self._alias): {'IP': self._ip,
@@ -417,7 +417,7 @@ class InfoForDB(object):
 
     def get_dicPEFormated(self):
         return {str(self._alias): {'IP': self._ip,
-            'PTES_Formatd': self._objSANSW._dicPartPortError}}
+            'PTES_Formatd': dict(self._objSANSW._dicPartPortError)}}
 
     def get_summary_total(self):
         sum_and_total = self._objSANSW.sum_and_total()
