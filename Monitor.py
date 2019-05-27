@@ -63,14 +63,14 @@ def haap_status_for_judging(lstStatus,uptime_second):
     lstStatus[2]=uptime_second
     return lstStatus
 
-lstStatus, uptime_second = status_for_judging_realtime()
-haap_status_for_judging(lstStatus, uptime_second)
-
-a = db.get_haap_last()
-info_engine1 = a.info['engnie1']
-lst = info_engine1['status']
-up_sec = info_engine1['up_sec']
-haap_status_for_judging(lst,up_sec)
+# lstStatus, uptime_second = status_for_judging_realtime()
+# haap_status_for_judging(lstStatus, uptime_second)
+# 
+# a = db.get_haap_last()
+# info_engine1 = a.info['engnie1']
+# lst = info_engine1['status']
+# up_sec = info_engine1['up_sec']
+# haap_status_for_judging(lst,up_sec)
 
 
 def start_mnt_4Thread():
@@ -324,22 +324,35 @@ def get_switch_total_db(list_switch_alias):
     
 def get_switch_show_db():
     """
-    @note: 获取数据库SANSW要展示的内容
+    @note: 获取数据库SANSW要展示的内容（时间，status）
     """
-    lst_switch = db.switch_last_info().summary_total
-    if list_switch:
-        lst_show_switch = [[i["IP"]] + i["PE_Sum"]for i in list_switch.values()]
-        return lst_show_switch
+    lst_switch = db.switch_last_info()
+    if lst_switch:
+        time_switch = lst_switch.time
+        lst_show_switch = [[i["IP"]] + i["PE_Sum"]for i in lst_switch.summary_total.values()]
+        return time_switch,lst_show_switch
 
 
 def get_HAAP_show_db():
     """
-    @note: HAAP网页展示数据
+    @note: HAAP网页展示数据(时间，status)
     """
-    lst_HAAP = db.HAAP_last_info().info
+    lst_HAAP = db.HAAP_last_info()
     show_HAAP = []
     if lst_HAAP:
-        for i in lst_HAAP.values():
+        time_HAAP = lst_HAAP.time
+        for i in lst_HAAP.info.values():
             show_HAAP.append(i["status"])
-    return show_HAAP
-    
+            
+    return time_HAAP,show_HAAP
+
+
+def get_HAAP_other_db(lst_haap_Alias):
+    """
+    @note: 获取数据库具体up_sec
+    """
+    lst_HAAP = db.HAAP_last_info().info
+    if lst_HAAP:
+        
+        up_sec = lst_HAAP[lst_haap_Alias]["up_sec"]
+    return up_sec

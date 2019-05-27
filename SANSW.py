@@ -466,7 +466,10 @@ def get_info_for_DB():
         objSANSW = InfoForDB(list_sw_alias[i], list_sw_ip[i])
         origin.update(objSANSW.get_dicOrigin())
         sum_and_total.update(objSANSW.get_summary_total())
+        print("12323:",sum_and_total)
         PEFormated.update(objSANSW.get_dicPEFormated())
+        print("12323:",PEFormated)
+        
     return origin,sum_and_total,PEFormated
 
 
@@ -475,10 +478,11 @@ def get_info_for_DB():
 if __name__ == '__main__':
 #     print(get_dic_all_sw()[1])
 #     print(get_dic_all_sw()[0])
-    db.switch_insert(datetime.datetime.now(),get_dic_all_sw()[0],
-                     get_dic_all_sw()[1],get_dic_all_sw()[2])
+#     db.switch_insert(datetime.datetime.now(),get_dic_all_sw()[0],
+#                      get_dic_all_sw()[1],get_dic_all_sw()[2])
     
 
+    print(get_info_for_DB())
     print("ok")
 # {'switch1': {'IP': '10.203.1.212', 'PE': {1: ['0', '0', '0', '0', '0', '0', '1'], 2: ['1.1m', '131.2k', '0', '0', '10', '18', '19'], 3: ['168', '158', '0', '0', '9', '10', '11'], 4: ['2.6k', '6.4k', '0', '0', '10', '11', '12'], 5: ['187', '177', '0', '0', '9', '10', '11'], 6: ['0', '0', '0', '0', '0', '0', '1']}}, 
 # 'switch0': {'IP': '10.203.1.211', 'PE': {1: ['0', '0', '0', '0', '0', '0', '1'], 2: ['802', '922', '0', '0', '10', '11', '12'], 3: ['175.1k', '1.1m', '3', '11', '9', '10', '11'], 4: ['505.4k', '84.1k', '0', '0', '10', '11', '12'], 5: ['118.6k', '522.5k', '0', '1', '9', '10', '11'], 6: ['0', '0', '0', '0', '0', '0', '1']}}}

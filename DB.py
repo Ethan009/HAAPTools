@@ -36,24 +36,6 @@ def HAAP_last_info():
     """
     return HAAP().query_last_record()
 
-# def get_list_HAAP():
-#     """
-#     @note: HAAP-网页展示的数据
-#     """
-#     list_status = HAAP().query_last_record()
-#     if list_status:
-#         time = list_status.time
-#         status_to_show = list_status.status_to_show.values()
-#         return time,status_to_show
-#  
-# def get_HAAP_status():
-#     """
-#     @note:HAAP模块需调用的数据
-#     """
-#     all_status = HAAP().query_last_record()
-#     if all_status:
-#         return all_status.status_for_judging.values()
-
 # SANSW
 def switch_insert(n, origin, dicPEFormated, summary_total):
     """
@@ -65,7 +47,7 @@ def switch_last_info():
     """
     @note: SANSW最后一次所有的数据
     """
-    return SANSW().query_first_records()
+    return SANSW().query_last_records()
 
  
 # Warning 
@@ -181,14 +163,14 @@ class SANSW(object):
         collSANSW.objects(date__gte=time_start,
                           date__lt=time_end).order_by('-date')
 
-    def query_first_records(self):
+    def query_last_records(self):
         return collSANSW.objects().order_by('-time').first()
    
 
 class Warning(object):
     
-    def insert(self, time_now, lstip, lstdj, lstSTS, confirm = 0):
-        t = collWarning(time=time_now, ip=lstip, level=lstdj,
+    def insert(self, time_now, lstip, lstdj, device,lstSTS, confirm = 0):
+        t = collWarning(time=time_now, ip=lstip, level=lstdj,device =device,
                         warn_message=lstSTS, confirm_status=confirm)
         t.save()
     
@@ -196,7 +178,7 @@ class Warning(object):
         collWARN.objects(date__gte=time_start,
                         date__lt=time_end).order_by('-date')
 
-    def query_first_records(self, intN):
+    def query_last_records(self):
         return collWARN.objects().order_by('-time').first()
 
     def update(self, intN):
@@ -211,6 +193,5 @@ class Warning(object):
 
 
 if __name__ == '__main__':
-    print(get_switch_total("SW01"))
     pass
 
