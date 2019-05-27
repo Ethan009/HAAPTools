@@ -1,14 +1,19 @@
 # coding: utf-8
 from __future__ import print_function
-from ClassConnect import *
-from collections import OrderedDict as odd
-import re
-import Source as s
-import os
-import time
-import GetConfig as gc
+
 import array
+from collections import OrderedDict as odd
+import datetime
 from functools import total_ordering
+import os
+import re
+import time
+
+from ClassConnect import *
+import DB as db
+import GetConfig as gc
+import Source as s
+
 objSwitchConfig = gc.SwitchConfig()
 
 # <<<Get Config Field>>>
@@ -99,20 +104,25 @@ def periodically_check(ip):
 #         lst_summary_total.append(objSANSWInfo.get_summary_total())
 #     return lst_dicOrigin, lst_dicPEFormated, lst_summary_total
 
+    def get_dicOrigin(self):
+        return {'porterrshow': self._objSANSW.strPorterrshow,
+            'switchshow': self._objSANSW.strSwitchshow}
 
+    def get_summary_total(self):
+        return self._objSANSW.sum_total_and_warning()
 
-# def dict_for_DB2():
-#     for i in range(len(lst_sansw_Alias)):
-#         lst_dicOrigin = []
-#         lst_dicPEFormated = []
-#         lst_summary_total = []
-#         objSW = Status(lst_sansw_IP[i],ssh_port, user, passwd, list_sw_ports)
-#         dicOrigin = {'porterrshow': objSW.strPorterrshow,
-#             'switchshow': objSW.strSwitchshow}
-#         lst_origin.append(dicOrigin)
-#         lst_dicPEFormated.append(objSW.dicPE)
-#         lst_summary_total.append(objSW.sum_total_and_warning())
-#         return lst_dicOrigin, lst_dicPEFormated, lst_summary_total
+def dict_for_DB2():
+    for i in range(len(list_sw_alias)):
+        lst_dicOrigin = []
+        lst_dicPEFormated = []
+        lst_summary_total = []
+        objSW = Status(list_sw_alias[i],ssh_port, user, passwd, list_sw_ports)
+        dicOrigin = {'porterrshow': objSW.strPorterrshow,
+            'switchshow': objSW.strSwitchshow}
+        lst_dicOrigin.append(dicOrigin)
+        lst_dicPEFormated.append(objSW.dicPE)
+        lst_summary_total.append(objSW.sum_total_and_warning())
+        return lst_dicOrigin, lst_dicPEFormated, lst_summary_total
 
 
 # def get_origin_dict():
@@ -261,7 +271,7 @@ class Status(Action):
             lstPortErrLines = self.strPorterrshow.split('\n')
             for intPortNum in self._allSWPort:
                 lstErrInfo = _getErrorAsList(intPortNum, lstPortErrLines)
-                oddPortError[intPortNum] = lstErrInfo
+                oddPortError[str(intPortNum)] = lstErrInfo
             self._dicPartPortError = oddPortError
 
         if self.strPorterrshow:
@@ -363,43 +373,44 @@ class Status(Action):
                 print('Please Correct the Port Number...')
 
 
-def get_Portershow(sw_status):
-    DicPE = {}
-    sw_PE = sw_status._dicPartPortError
-    for port in sw_PE:
-        DicPE[port] = sw_PE[port]
-    return DicPE
+# def get_Portershow(sw_status):
+#     DicPE = {}
+#     sw_PE = sw_status._dicPartPortError
+#     for port in sw_PE:
+#         DicPE[port] = sw_PE[port]
+#     return DicPE
 
 
-def get_sw_origin(sw_status,sw_ID):
-    return {sw_ID: {'IP': sw_status._host,
-                    'strSwitchshow': sw_status.strPorterrshow,
-                    'porterrshow': sw_status.strSwitchshow}}
+# def get_sw_origin(sw_status,sw_ID):
+#     return {sw_ID: {'IP': sw_status._host,
+#                     'strSwitchshow': sw_status.strPorterrshow,
+#                     'porterrshow': sw_status.strSwitchshow}}
 
 
-def get_sw_summary(sw_status,sw_ID):
-    sum_and_total = sw_status.sum_and_total()
-    return {sw_ID: {'IP': sw_status._host,
-                    'PE_Sum': sum_and_total[0],
-                    'PE_Total': sum_and_total[1]}}
+# def get_sw_summary(sw_status,sw_ID):
+#     sum_and_total = sw_status.sum_and_total()
+#     return {sw_ID: {'IP': sw_status._host,
+#                     'PE_Sum': sum_and_total[0],
+#                     'PE_Total': sum_and_total[1]}}
 
 
-def get_sw_status(sw_status,sw_ID):
-    return{sw_ID: {'IP': sw_status._host,
-                   'PE': get_Portershow(sw_status)}}
+# def get_sw_status(sw_status,sw_ID):
+#     return{sw_ID: {'IP': sw_status._host,
+#                    'PE': get_Portershow(sw_status)}}
 
 
 
-def get_dic_all_sw():
-    all_sw_origin = {}
-    all_sw_summary = {}
-    all_sw_status = {}
-    for i in range(len(list_sw_IP)):
-        objSANSWStatus = Status(list_sw_IP[i],ssh_port,user,passwd,list_sw_ports[0])
-        all_sw_origin.update(get_sw_origin(objSANSWStatus, sw_ID[i]))
-        all_sw_summary.update(get_sw_summary(objSANSWStatus, sw_ID[i]))
-        all_sw_status.update(get_sw_status(objSANSWStatus, sw_ID[i]))
-    return [all_sw_origin,all_sw_summary,all_sw_status]
+# def get_dic_all_sw():
+#     all_sw_origin = {}
+#     all_sw_summary = {}
+#     all_sw_status = {}
+#     for i in range(len(list_sw_IP)):
+#         objSANSWStatus = Status(list_sw_IP[i],ssh_port,user,passwd,list_sw_ports[0])
+#         all_sw_origin.update(get_sw_origin(objSANSWStatus, sw_ID[i]))
+#         all_sw_summary.update(get_sw_summary(objSANSWStatus, sw_ID[i]))
+#         all_sw_status.update(get_sw_status(objSANSWStatus, sw_ID[i]))
+#     return [all_sw_origin,all_sw_summary,all_sw_status]
+
 
 
 class InfoForDB(object):
@@ -439,12 +450,24 @@ def get_info_for_DB():
         origin.update(objSANSW.get_dicOrigin())
         sum_and_total.update(objSANSW.get_summary_total())
         PEFormated.update(objSANSW.get_dicPEFormated())
-    return [origin,sum_and_total,PEFormated]
-
-
+    return origin,sum_and_total,PEFormated
 
 
 if __name__ == '__main__':
+#     print(get_dic_all_sw()[1])
+#     print(get_dic_all_sw()[0])
+#     db.switch_insert(datetime.datetime.now(),get_dic_all_sw()[0],
+#                      get_dic_all_sw()[1],get_dic_all_sw()[2])
+    
+
+    print(get_info_for_DB())
+    print("ok")
+# {'switch1': {'IP': '10.203.1.212', 'PE': {1: ['0', '0', '0', '0', '0', '0', '1'], 2: ['1.1m', '131.2k', '0', '0', '10', '18', '19'], 3: ['168', '158', '0', '0', '9', '10', '11'], 4: ['2.6k', '6.4k', '0', '0', '10', '11', '12'], 5: ['187', '177', '0', '0', '9', '10', '11'], 6: ['0', '0', '0', '0', '0', '0', '1']}}, 
+# 'switch0': {'IP': '10.203.1.211', 'PE': {1: ['0', '0', '0', '0', '0', '0', '1'], 2: ['802', '922', '0', '0', '10', '11', '12'], 3: ['175.1k', '1.1m', '3', '11', '9', '10', '11'], 4: ['505.4k', '84.1k', '0', '0', '10', '11', '12'], 5: ['118.6k', '522.5k', '0', '1', '9', '10', '11'], 6: ['0', '0', '0', '0', '0', '0', '1']}}}
+
+
+
+
 
     swcfg = gc.SwitchConfig()
     list_sw_IP = swcfg.list_switch_IP()

@@ -11,6 +11,7 @@ import SendEmail as SE
 import datetime
 import DB as db
 import GetConfig as gc
+import types
 try:
     import configparser as cp
 except Exception:
@@ -27,7 +28,6 @@ swcfg = gc.SwitchConfig()
 tuplThresholdTotal = swcfg.threshold_total()
 lst_sansw_IP = swcfg.list_switch_IP()
 lst_sansw_Alias = swcfg.list_switch_alias()
-
 
 haapcfg = gc.EngineConfig()
 oddEngines = haapcfg._odd_engines()
@@ -55,25 +55,12 @@ def show_engine_status_DB():
     return engine[0], engine[1]
 
 
-def show_switch_status_DB():
-    Switch = db.get_list_switch()
-    lstSWSum = [[i["IP"]] + i["PE_Sum"]for i in Switch[1].values()]
-    return Switch[0], lstSWSum
 
 def haap_status_for_judging(lstStatus,uptime_second):
     lstAllStatus=lstStatus
     lstStatus = [lstAllStatus[i] for i in [0,1,2,4,5]]
     lstStatus[2]=uptime_second
     return lstStatus
-
-#lstStatus, uptime_second = status_for_judging_realtime()
-#haap_status_for_judging(lstStatus, uptime_second)
-
-a = db.get_haap_last()
-info_engine1 = a.info['engnie1']
-lst = info_engine1['status']
-up_sec = info_engine1['up_sec']
-haap_status_for_judging(lst,up_sec)
 
 
 def start_mnt_4Thread():
@@ -193,7 +180,6 @@ def judge_all_haap():
     db.haap_insert(s.time_now_to_show(),
                    Info_from_engine, Origin_from_engine)
 
-
 # check status interval
 
 
@@ -291,10 +277,6 @@ def warning_message_sansw(intWarninglevel):
         strLevel = 'Alarm'
     return 'Total Error Count Increase Reach Level %s' % strLevel
 
-def get_total(dic_all_sw, sw_Alias):
-    all_sw_summary = dic_all_sw[1]
-    sw_summary = all_sw_summary[sw_Alias]
-    return sw_summary['PE_Total']
 
 def judge_PE_total(total_sw, total_DB, sansw_IP):
     strTimeNow = s.time_now_to_show()
@@ -308,6 +290,7 @@ def judge_PE_total(total_sw, total_DB, sansw_IP):
             # 这部分发送应该是有一个特定的格式吧。。。
             SE.Timely_send(strTimeNow, sansw_IP, intWarninglevel, msg)
 
+
 def get_sw_warning():
     info_for_DB = sw.get_info_for_DB()
     for i in range(len(lst_sansw_Alias)):
@@ -315,6 +298,61 @@ def get_sw_warning():
         sansw_total = get_total(info_for_DB, lst_sansw_Alias[i])
         judge_PE_total(total_DB, sansw_total, lst_sansw_IP[i])
     db.switch_insert(s.time_now_to_show(),
+<<<<<<< HEAD
                      info_for_DB[0], info_for_DB[1], info_for_DB[2])
+
+
+=======
+                     dic_all_sw[0], dic_all_sw[1], dic_all_sw[2])
+    
+# 最新方法
+
+
+def get_switch_total_db(list_switch_alias):
+    """
+    @note: 获取数据库的Total
+    """
+    list_switch = db.switch_last_info().summary_total
+    if list_switch:
+        db_total = list_switch[list_switch_alias]["PE_Total"]
+        return db_total
+
+    
+def get_switch_show_db():
+    """
+    @note: 获取数据库SANSW要展示的内容（时间，status）
+    """
+    lst_switch = db.switch_last_info()
+    if lst_switch:
+        time_switch = lst_switch.time
+        lst_show_switch = [[i["IP"]] + i["PE_Sum"]for i in lst_switch.summary_total.values()]
+        return time_switch,lst_show_switch
+
+
+def get_HAAP_show_db():
+    """
+    @note: HAAP网页展示数据(时间，status)
+    """
+    lst_HAAP = db.HAAP_last_info()
+    show_HAAP = []
+    if lst_HAAP:
+        time_HAAP = lst_HAAP.time
+        for i in lst_HAAP.info.values():
+            show_HAAP.append(i["status"])
+            
+    return time_HAAP,show_HAAP
+
+
+def get_HAAP_other_db(lst_haap_Alias):
+    """
+    @note: 获取数据库具体up_sec
+    ['192.168.1.1',0,27838,0,0]
+    """
+    lst_HAAP = db.HAAP_last_info().info
+    if lst_HAAP:
+        
+        up_sec = lst_HAAP[lst_haap_Alias]["up_sec"]
+    return up_sec
+
 
 
