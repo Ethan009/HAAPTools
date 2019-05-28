@@ -23,11 +23,11 @@ intDBPort = cfgDB.port()
 connect(strDBName, host=strDBHost, port=intDBPort)
 
 # HAAP
-def haap_insert(n, engine_status, lst_status):
+def haap_insert(origin, info):
     """
     @note: monitoHAAP数据插入
     """
-    HAAP().insert(n, engine_status, lst_status)
+    HAAP().insert(origin, info)
     
 def haap_last_record():
     """
@@ -76,11 +76,11 @@ def haap_web_show_for_engineX(engineX):
 
 
 # SANSW
-def switch_insert(n, origin, dicPEFormated, summary_total):
+def switch_insert(origin, dicPEFormated, sum_total):
     """
     @note: SANSW数据插入
     """
-    SANSW().insert(n, origin, dicPEFormated, summary_total)
+    SANSW().insert(origin, dicPEFormated, sum_total)
     
 def switch_last_info():
     """
@@ -97,11 +97,11 @@ def sansw_total_list_or_dict():
 
  
 # Warning 
-def insert_warning(n, ip, level, warn_message, confirm_status):
+def insert_warning(ip, level, warn_message, confirm):
     """
     @note: warning数据插入
     """
-    Warning().insert(n, ip, level, warn_message, confirm_status)
+    Warning().insert(ip, level, warn_message, confirm)
 
 
 def update_warning():
@@ -115,13 +115,12 @@ def get_unconfirm_warning():
     """
     @note: warning网页部分展示
     """
-    unconfirm_warnning = Warning().get_all_unconfirm_warning()
-    if unconfirm_warnning:
-        lstAllUCW = []
-        for record in unconfirm_warnning:
-            lstAllUCW.append([record.time, record.level, record.device, \
-                record.ip, record.warn_message])
-    return lstAllUCW
+    lstAllUCW = []
+    for warning in Warning().get_all_unconfirm_warning():
+        lstAllUCW.append([record.time, record.level, record.device, \
+            record.ip, record.warn_message])
+    if lstAllUCW:
+        return lstAllUCW
 
             
 class collHAAP(Document):
@@ -135,7 +134,7 @@ class collSANSW(Document):
     time = DateTimeField(default=datetime.datetime.now())
     origin = DictField()
     ptes = DictField()
-    sum_toatl = DictField()
+    sum_total = DictField()
 
 
 class collWarning(Document):
@@ -157,8 +156,8 @@ confirm:1
 
 class HAAP(object):
 
-    def insert(self, engine_status, lst_status):
-        t = collHAAP(origin=engine_status, info=lst_status)
+    def insert(self, origin, info):
+        t = collHAAP(origin=origin, info=info)
         t.save()
 
     def query_range(self, time_start, time_end):
@@ -173,7 +172,7 @@ class SANSW(object):
 
 # ptes = port error show info formatted
     def insert(self, origin, ptes, sum_total):
-        t = collSANSW(origin=origin, ptes=ptes, sum_toatl=sum_total)
+        t = collSANSW(origin=origin, ptes=ptes, sum_total=sum_total)
         t.save()
 
     def query_range(self, time_start, time_end):
@@ -188,7 +187,7 @@ class Warning(object):
     
     def insert(self, time_now, lstip, lstdj, device,lstSTS, confirm = 0):
         t = collWarning(time=time_now, ip=lstip, level=lstdj,device =device,
-                        warn_message=lstSTS, confirm_status=confirm)
+                        warn_message=lstSTS, confirm=confirm)
         t.save()
     
     def query_range(self, time_start, time_end):
@@ -202,11 +201,11 @@ class Warning(object):
         return collWARN.objects().order_by('-time').first()
     
     def get_all_unconfirm_warning(self):
-        warning_status = collWarning.objects(confirm_status=0)
+        warning_status = collWarning.objects(confirm=0)
         return warning_status
     
     def update_Warning(self):
-        return collWarning.objects(confirm_status=0).update(confirm_status=1)
+        return collWarning.objects(confirm=0).update(confirm=1)
 
 
 if __name__ == '__main__':

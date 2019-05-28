@@ -242,7 +242,7 @@ def data_for_db():
         objEngine = Status(list_engines_IP[i], telnet_port, passwd, FTP_port)
         dicInfo.update(info(list_engines_alias[i], objEngine))
         dicOrigin.update(origin(list_engines_alias[i], objEngine))
-    return dicInfo, dicOrigin
+    return dicOrigin, dicInfo
 
 
 #[['1.1.1.1',0,'8d 7h 20s',0,0,0],['1.1.1.1',0,8623,0,0,0]]
@@ -577,7 +577,7 @@ class Status(Action):
             print("Engine '%s' is at AH Status(AH Code %d)"
                   % (self._host, self.AHStatus))
             return
-        lstCommand = ['vpd', 'engine', 'mirror', 'abts', 'qfull']
+        lstCommand = ['vpd', 'engine', 'mirror']
         dictInfo = {}
         if self._TN_Connect_Status:
             for command in lstCommand:
