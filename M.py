@@ -5,6 +5,7 @@ import sys
 import SANSW as sw
 import HAAP as haap
 import Source as s
+import Monitor as m
 
 try:
     import configparser as cp
@@ -335,8 +336,8 @@ def main():
 
     elif sys.argv[1] == 'mnt':
         num_argv = len(sys.argv)
-        if num_argv == 2 or num_argv > 3:
-            print(strSWSHelp)
+        if num_argv == 2 or num_argv > 4:
+            print(strMNTHelp)
         elif sys.argv[2] == 'rt':
             m.monitor_rt_1_thread()
         elif sys.argv[2] == 'db':

@@ -18,7 +18,7 @@ objSwitchConfig = gc.SwitchConfig()
 
 # <<<Get Config Field>>>
 swcfg = gc.SwitchConfig()
-list_sw_ip = swcfg.list_switch_IP()
+list_sw_IP = swcfg.list_switch_IP()
 list_sw_alias = swcfg.list_switch_alias()
 ssh_port = swcfg.SSH_port()
 user = swcfg.username()
@@ -40,7 +40,7 @@ def clear_one_port(ip, sw_port):
     Action(ip, ssh_port, user, passwd, []).clear_one_port(sw_port)
 
 # def print_porterror_all():
-#     for ip in list_sw_ip:
+#     for ip in list_sw_IP:
 #         Action(ip, ssh_port, user, passwd, []).print_porterrshow()
 
 # def print_porterror(ip):
@@ -99,7 +99,7 @@ def get_info_for_DB():
     sum_and_total = {}
     PEFormated = {}
     for i in range(len(list_sw_alias)):
-        objSANSW = InfoForDB(list_sw_alias[i], list_sw_ip[i], list_sw_ports[i])
+        objSANSW = InfoForDB(list_sw_alias[i], list_sw_IP[i], list_sw_ports[i])
         origin.update(objSANSW.get_dicOrigin())
         sum_and_total.update(objSANSW.get_summary_total())
         PEFormated.update(objSANSW.get_dicPEFormated())
