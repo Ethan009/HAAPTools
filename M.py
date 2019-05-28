@@ -44,21 +44,21 @@ strHelp = '''
 
 
 strPTESHelp = '''
-    SAN Switch Clear Port Error Counter('statsclear' or '')
+    Show port error of defined pors as table formatted
     ptes <SW_IP> | all   
         SW_IP  - for defined SAN Switch
         all    - for All SAN Switchs defined in Conf.ini
 '''
 
 strPTCLHelp = '''
-    SAN Switch Port Error Show('porterrshow')
+    Clear Port Error Counter('statsclear' or '')
     ptcl <SW_IP Port> | all
         SW_IP Port  - for defined Port of defined SAN Switch
         all         - for All SAN Switchs defined in Conf.ini
 '''
 
 strSWSHelp = '''
-    Print SAN Switch Info('switchshow')
+    Print SAN Switch Connect Info('switchshow')
     sws <SW_IP> | all
         SW_IP  - for defined SAN Switch
         all    - for All SAN Switchs defined in Conf.ini
@@ -69,7 +69,7 @@ strFWHelp = '''
     fw <HAAP_IP> <FW_File>
 '''
 
-strBKHelp = '''
+strBCHelp = '''
     Backup Config for HA-AP Engine(s), Save in "{}" Folder
     bc <HAAP_IP> | all
         HAAP_IP  - for Given HA-AP Engine
@@ -85,13 +85,18 @@ strGTHelp = '''
             [Trace_Level]  - Option, Given or Defined
 '''.format(strTraceFolder)
 
+# strATHelp = '''
+#     Analyse Trace of HA-AP Engine(s), Save in "{}" Folder
+#     at <HAAP_IP> [Trace_Level] | all [Trace_Level]
+#         HAAP_IP        - for defined HA-AP Engine
+#         all            - for All HA-AP Engines Defined in Conf.ini
+#             [Trace_Level]  - Option, Given or Defined        
+# '''.format(strTraceFolder)
+
 strATHelp = '''
-    Analyse Trace of HA-AP Engine(s), Save in "{}" Folder
-    at <HAAP_IP> [Trace_Level] | all [Trace_Level]
-        HAAP_IP        - for defined HA-AP Engine
-        all            - for All HA-AP Engines Defined in Conf.ini
-            [Trace_Level]  - Option, Given or Defined        
-'''.format(strTraceFolder)
+    Analyse Given Trace of HA-AP Engine(s) in Folder <Trace_Folder>
+    at <Trace_Folder>
+'''
 
 strECHelp = '''
     Execute Commands listed in <Command_File> on Given Engine
@@ -113,7 +118,7 @@ strSTHelp = '''
 strSTMHelp = '''
     stm <HAAP_IP> | all
         HAAP_IP  - for Given HA-AP Engine
-        all      - for All HA-AP Engines defined in Conf.ini        
+        all      - for All HA-AP Engines defined in Conf.ini
 '''
 
 strPCHelp = '''
@@ -121,13 +126,14 @@ strPCHelp = '''
     pc <sw [SW_IP]|haap [HAAP_IP]> | all
         sw SW_IP      - for Given HA-AP Engine
         haap HAAP_IP  - for Given HA-AP Engine
-        all           - for All HA-AP Engines and SAN Switches        
+        all           - for All HA-AP Engines and SAN Switches
 '''
 
 strMNTHelp = '''
-    mnt real | db
-        real  - for Get Status Real Time
-        db   - for Get Status from DB(Need MongoDB)        
+    Show Status Through Web Page
+    mnt rt | db
+        rt  - Get Status Real Time
+        db  - Get Status from DB(Need MongoDB)
 '''
 
 # <<<Help String Field>>>
@@ -181,12 +187,12 @@ def main():
     elif sys.argv[1] == 'bc':
         num_argv = len(sys.argv)
         if num_argv == 2 and num_argv > 3:
-            print(strSWSHelp)
+            print(strBCHelp)
         elif sys.argv[2] == 'all':
             haap.backup_config_all()
         else:
             if s.is_IP(sys.argv[2]):
-                haap.backup_config(sys.argv[1])
+                haap.backup_config(sys.argv[2])
             else:
                 print('Please Provide Correct Engine IP...')
 
@@ -196,7 +202,7 @@ def main():
         if num_argv > 3:
             trace_level = sys.argv[3]
         if num_argv == 2 or num_argv > 4:
-            print(strPTCLHelp)
+            print(strGTLHelp)
         elif sys.argv[2] == 'all':
             if num_argv > 3:
                 if s.is_trace_level(trace_level):
@@ -216,30 +222,40 @@ def main():
         else:
             print('Please Provide Correct Engine IP...')
 
+    # elif sys.argv[1] == 'at':
+    #     num_argv = len(sys.argv)
+    #     if num_argv > 3:
+    #         trace_level = sys.argv[3]
+    #     if num_argv == 2 or num_argv > 4:
+    #         print(strPTCLHelp)
+    #     elif sys.argv[2] == 'all':
+    #         if num_argv > 3:
+    #             if s.is_trace_level(trace_level):
+    #                 haap.analyse_trace_all(trace_level)
+    #             else:
+    #                 print('Trace Level Must Be "1" or "2" or "3"')
+    #         else:
+    #             haap.analyse_trace_all(0)
+    #     elif s.is_IP(sys.argv[2]):
+    #         if num_argv > 3:
+    #             if s.is_trace_level(trace_level):
+    #                 haap.analyse_trace(sys.argv[2], trace_level)
+    #             else:
+    #                 print('Trace Level Must Be "1" or "2" or "3"')
+    #         else:
+    #             haap.analyse_trace(sys.argv[2], 0)
+    #     else:
+    #         print('Please Provide Correct Engine IP...')
+
     elif sys.argv[1] == 'at':
         num_argv = len(sys.argv)
-        if num_argv > 3:
-            trace_level = sys.argv[3]
-        if num_argv == 2 or num_argv > 4:
-            print(strPTCLHelp)
-        elif sys.argv[2] == 'all':
-            if num_argv > 3:
-                if s.is_trace_level(trace_level):
-                    haap.analyse_trace_all(trace_level)
-                else:
-                    print('Trace Level Must Be "1" or "2" or "3"')
-            else:
-                haap.analyse_trace_all(0)
-        elif s.is_IP(sys.argv[2]):
-            if num_argv > 3:
-                if s.is_trace_level(trace_level):
-                    haap.analyse_trace(sys.argv[2], trace_level)
-                else:
-                    print('Trace Level Must Be "1" or "2" or "3"')
-            else:
-                haap.analyse_trace(sys.argv[2], 0)
+        if num_argv == 2 or num_argv > 3:
+            print(strATHelp)
         else:
-            print('Please Provide Correct Engine IP...')
+            if s.is_file(sys.argv[2]):
+                s.TraceAnalyse(sys.argv[2])
+            else:
+                print('Please Provide Correct Trace Folder')
 
     elif sys.argv[1] == 'ec':
         if len(sys.argv) != 4:
@@ -257,7 +273,7 @@ def main():
     elif sys.argv[1] == 'sts':
         num_argv = len(sys.argv)
         if num_argv == 2 or num_argv > 3:
-            print(strSWSHelp)
+            print(strSTSHelp)
         elif sys.argv[2] == 'all':
             haap.show_stauts_all()
         else:
@@ -269,7 +285,7 @@ def main():
     elif sys.argv[1] == 'st':
         num_argv = len(sys.argv)
         if num_argv == 2 or num_argv > 3:
-            print(strSWSHelp)
+            print(strSTHelp)
         elif sys.argv[2] == 'all':
             haap.set_time_all()
         else:
@@ -281,7 +297,7 @@ def main():
     elif sys.argv[1] == 'stm':
         num_argv = len(sys.argv)
         if num_argv == 2 or num_argv > 3:
-            print(strSWSHelp)
+            print(strSTMSHelp)
         elif sys.argv[2] == 'all':
             haap.show_time_all()
         else:
@@ -318,7 +334,15 @@ def main():
                 strPTCLHelp
 
     elif sys.argv[1] == 'mnt':
-        mnt.start()
+        num_argv = len(sys.argv)
+        if num_argv == 2 or num_argv > 3:
+            print(strSWSHelp)
+        elif sys.argv[2] == 'rt':
+            haap.monitor_rt_1_thread()
+        elif sys.argv[2] == 'db':
+            haap.monitor_db_4_thread()
+        else:
+            print('RealTime(rt) or DataBase(db)')
 
     else:
         print(strHelp)

@@ -245,6 +245,8 @@ def data_for_db():
     return dicInfo, dicOrigin
 
 
+#[['1.1.1.1',0,'8d 7h 20s',0,0,0],['1.1.1.1',0,8623,0,0,0]]
+
 
 
 class Action():
@@ -682,11 +684,11 @@ class Status(Action):
             lstStatus.append(0)
         return lstStatus
 
-    # def status_for_judging(lstStatus,uptime_second):
-    #     lstAllStatus=lstStatus
-    #     lstStatus = [lstAllStatus[i] for i in [0,1,2,4,5]]
-    #     lstStatus[2]=uptime_second
-    #     return lstStatus
+    def status_for_judging(lstStatus,uptime_second):
+        lstAllStatus=lstStatus
+        lstStatus = [lstAllStatus[i] for i in [0,1,2,4,5]]
+        lstStatus[2]=uptime_second
+        return lstStatus
 
 
 if __name__ == '__main__':

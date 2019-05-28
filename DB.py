@@ -35,6 +35,46 @@ def HAAP_last_info():
     """
     return HAAP().query_last_record()
 
+### 你这里是X也没有写啊！！！真是坑
+def haap_judge_list():
+    '''
+[['1.1.1.1',0,8623,0,0],['1.1.1.1',0,8623,0,0]]
+    '''
+    dic_last = HAAP().query_last_record()
+
+    list_info = engine_info[haap_Alias]
+    list_status = list_info['status']
+    list_status_judge = [list_status[i] for i in [0, 1, 4, 5]]
+    list_status_judge.insert(2, list_status['up_sec'])
+    return list_status_judge
+    
+    pass
+
+def haap_judge_list_for_engineX(engineX):
+    '''
+['1.1.1.1',0,8623,0,0]
+    '''
+    # 找出engineX的index值，然后从judge_list()结果返回也可以
+    
+    pass
+
+def haap_web_show_list():
+    '''
+[['1.1.1.1',0,'8d 7h 20s',0,0,0],['1.1.1.1',0,8623,0,0,0]]
+    '''
+    dic_last = HAAP().query_last_record()
+
+    pass
+
+def haap_web_show_for_engineX(engineX):
+    '''
+['1.1.1.1',0,'8d 7h 20s',0,0,0]
+    '''
+    #XXXXXXXX
+    
+    pass
+
+
 # SANSW
 def switch_insert(n, origin, dicPEFormated, summary_total):
     """
@@ -47,6 +87,13 @@ def switch_last_info():
     @note: SANSW最后一次所有的数据
     """
     return SANSW().query_last_records()
+
+def sansw_web_show_list():
+    pass
+
+def sansw_total_list_or_dict():
+    pass
+
 
  
 # Warning 
@@ -139,8 +186,8 @@ confirm:1
 
 class HAAP(object):
 
-    def insert(self, time_now, engine_status, lst_status):
-        t = collHAAP(time=time_now, origin=engine_status, info=lst_status)
+    def insert(self, engine_status, lst_status):
+        t = collHAAP(origin=engine_status, info=lst_status)
         t.save()
 
     def query_range(self, time_start, time_end):
@@ -153,6 +200,7 @@ class HAAP(object):
 
 class SANSW(object):
 
+### 瞎写！！！
     def insert(self, time_now, origin, Switch_Status, Summary):
         t = collSANSW(time=time_now, origin=origin,
                        dicPEFormated=Switch_Status,summary_total=Summary)

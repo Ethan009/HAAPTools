@@ -164,8 +164,7 @@ def judge_db_confirm(interval_warning_check):
 #         dictAllStatus[engine_alies] = lstStatus
 #     return dictAllStatus
 
-def engineList_judge(engine_info, haap_Alias):
-    list_info = engine_info[haap_Alias]
+def engineList_judge(list_info):
     list_status = list_info['status']
     list_status_judge = [list_status[i] for i in [0, 1, 4, 5]]
     list_status_judge.insert(2, list_status['up_sec'])
@@ -175,7 +174,8 @@ def judge_all_haap():
     Info_from_engine, Origin_from_engine = haap.data_for_db()
     Info_from_DB = db.get_HAAP_status()
     for i in range(len(lst_haap_Alias)):
-        list_judge = engineList_judge(Info_from_engine,lst_haap_Alias[i])
+        list_info = Info_from_engine[lst_haap_Alias[i]]
+        list_judge = engineList_judge(list_info)
         haap_judge(list_judge, Info_from_DB)
     db.haap_insert(s.time_now_to_show(),
                    Info_from_engine, Origin_from_engine)
@@ -275,11 +275,11 @@ def thrd_web_rt():
 
 
 def warning_message_sansw(intWarninglevel):
-    if intWarninglevel == 3:
+    if intWarninglevel == 1:
         strLevel = 'Notify'
     if intWarninglevel == 2:
         strLevel = 'Warning'
-    if intWarninglevel == 1:
+    if intWarninglevel == 3:
         strLevel = 'Alarm'
     return 'Total Error Count Increase Reach Level %s' % strLevel
 
@@ -292,12 +292,13 @@ def judge_PE_total(total_sw, total_DB, sansw_IP):
         if intWarninglevel:
             msg = warning_message_sansw(intWarninglevel)
             db.insert_warning(strTimeNow, sansw_IP, intWarninglevel,
-                              'san_switch', warning_message_sansw(intWarninglevel))
+                              'san_switch', msg)
             # 这部分发送应该是有一个特定的格式吧。。。
-            SE.Timely_send(strTimeNow, sansw_IP, intWarninglevel, msg)
+            SE.Timely_send([strTimeNow, sansw_IP, intWarninglevel,
+                              'san_switch', msg])
 
 
-def get_sw_warning():
+def sansw_check():
     info_for_DB = sw.get_info_for_DB()
     for i in range(len(lst_sansw_Alias)):
         total_DB = db.get_Switch_Total(lst_sansw_Alias[i])
@@ -307,7 +308,6 @@ def get_sw_warning():
                      info_for_DB[0], info_for_DB[1], info_for_DB[2])
 
 
-    
 # 最新方法
 
 

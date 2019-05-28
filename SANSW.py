@@ -93,49 +93,18 @@ def periodically_check(ip):
     Action(ip, ssh_port, user, passwd, []).periodic_check(
         lstPCCommand, strPCFolder, PCFile_name)
 
-# def dict_for_DB():
-#     for i in range(len(lst_sansw_Alias)):
-#         lst_dicOrigin = []
-#         lst_dicPEFormated = []
-#         lst_summary_total = []
-#         objSANSWInfo = InfoForDB(lst_sansw_Alias[i], lst_sansw_IP[i])
-#         lst_origin.append(objSANSWInfo.get_dicOrigin())
-#         lst_dicPEFormated.append(objSANSWInfo.get_dicPEFormated())
-#         lst_summary_total.append(objSANSWInfo.get_summary_total())
-#     return lst_dicOrigin, lst_dicPEFormated, lst_summary_total
-
-    def get_dicOrigin(self):
-        return {'porterrshow': self._objSANSW.strPorterrshow,
-            'switchshow': self._objSANSW.strSwitchshow}
-
-    def get_summary_total(self):
-        return self._objSANSW.sum_total_and_warning()
-
-def dict_for_DB2():
+### prepare All info need store in database
+### initilize class InfoForDB()
+def get_info_for_DB():
+    origin = {}
+    sum_and_total = {}
+    PEFormated = {}
     for i in range(len(list_sw_alias)):
-        lst_dicOrigin = []
-        lst_dicPEFormated = []
-        lst_summary_total = []
-        objSW = Status(list_sw_alias[i],ssh_port, user, passwd, list_sw_ports)
-        dicOrigin = {'porterrshow': objSW.strPorterrshow,
-            'switchshow': objSW.strSwitchshow}
-        lst_dicOrigin.append(dicOrigin)
-        lst_dicPEFormated.append(objSW.dicPE)
-        lst_summary_total.append(objSW.sum_total_and_warning())
-        return lst_dicOrigin, lst_dicPEFormated, lst_summary_total
-
-
-# def get_origin_dict():
-#     dic_sansw_origin = odd()
-#     for i in range(len(lst_sansw_Alias)):
-#         objSANSW = Status(lst_sansw_IP[i],ssh_port, user, passwd, [])
-#         dic_sansw_origin[lst_sansw_Alias[i]] = {
-#         'porterrshow': objSANSW.strPorterrshow
-#         'switchshow': objSANSW.strSwitchshow
-#         }
-#     return dic_sansw_origin
-
-
+        objSANSW = InfoForDB(list_sw_alias[i], list_sw_ip[i], list_sw_ports[i])
+        origin.update(objSANSW.get_dicOrigin())
+        sum_and_total.update(objSANSW.get_summary_total())
+        PEFormated.update(objSANSW.get_dicPEFormated())
+    return origin,sum_and_total,PEFormated
 
 class Action():
 
@@ -374,46 +343,6 @@ class Status(Action):
                 print('Please Correct the Port Number...')
 
 
-# def get_Portershow(sw_status):
-#     DicPE = {}
-#     sw_PE = sw_status._dicPartPortError
-#     for port in sw_PE:
-#         DicPE[port] = sw_PE[port]
-#     return DicPE
-
-
-# def get_sw_origin(sw_status,sw_ID):
-#     return {sw_ID: {'IP': sw_status._host,
-#                     'strSwitchshow': sw_status.strPorterrshow,
-#                     'porterrshow': sw_status.strSwitchshow}}
-
-
-# def get_sw_summary(sw_status,sw_ID):
-#     sum_and_total = sw_status.sum_and_total()
-#     return {sw_ID: {'IP': sw_status._host,
-#                     'PE_Sum': sum_and_total[0],
-#                     'PE_Total': sum_and_total[1]}}
-
-
-# def get_sw_status(sw_status,sw_ID):
-#     return{sw_ID: {'IP': sw_status._host,
-#                    'PE': get_Portershow(sw_status)}}
-
-
-
-# def get_dic_all_sw():
-#     all_sw_origin = {}
-#     all_sw_summary = {}
-#     all_sw_status = {}
-#     for i in range(len(list_sw_IP)):
-#         objSANSWStatus = Status(list_sw_IP[i],ssh_port,user,passwd,list_sw_ports[0])
-#         all_sw_origin.update(get_sw_origin(objSANSWStatus, sw_ID[i]))
-#         all_sw_summary.update(get_sw_summary(objSANSWStatus, sw_ID[i]))
-#         all_sw_status.update(get_sw_status(objSANSWStatus, sw_ID[i]))
-#     return [all_sw_origin,all_sw_summary,all_sw_status]
-
-
-
 class InfoForDB(object):
     """docstring for InfoForDB"""
     def __init__(self, strAlias, strIP, list_sw_ports):
@@ -442,16 +371,6 @@ class InfoForDB(object):
                         'PE_Sum': None,
                         'PE_Total': None}}
 
-def get_info_for_DB():
-    origin = {}
-    sum_and_total = {}
-    PEFormated = {}
-    for i in range(len(list_sw_alias)):
-        objSANSW = InfoForDB(list_sw_alias[i], list_sw_ip[i], list_sw_ports[i])
-        origin.update(objSANSW.get_dicOrigin())
-        sum_and_total.update(objSANSW.get_summary_total())
-        PEFormated.update(objSANSW.get_dicPEFormated())
-    return origin,sum_and_total,PEFormated
 
 
 
