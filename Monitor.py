@@ -217,19 +217,17 @@ def check_all_haap():
 
 def check_all_sansw():
     dicAll = sw.get_info_for_DB()
-    try:
-        for sw_alias in lst_sansw_alias:
-            int_total_DB = get_switch_total_db(sw_alias)
+    for sw_alias in lst_sansw_alias:
+        int_total_DB = get_switch_total_db(sw_alias)
 
-            dic_sum_total = dicAll[1]
-            dic_sum_total = dic_sum_total[sw_alias]
-            int_total_RT = dic_sum_total['PE_Total']
+        dic_sum_total = dicAll[1]
+        dic_sum_total = dic_sum_total[sw_alias]
+        int_total_RT = dic_sum_total['PE_Total']
 
-            strIP = dic_sum_total['IP']
+        strIP = dic_sum_total['IP']
 
-            sansw_judge(int_total_RT, int_total_DB, strIP, sw_alias)
-    finally:
-        db.switch_insert(dicAll[0], dicAll[1], dicAll[2])
+        sansw_judge(int_total_RT, int_total_DB, strIP, sw_alias)
+    db.switch_insert(dicAll[0], dicAll[1], dicAll[2])
 
 
 def get_sansw_total(dicAll, sansw_alias):
@@ -342,14 +340,13 @@ def haap_info_to_show():
     """
     dicALL = db.haap_last_record()
     lstHAAPToShow = []
-    if dicALL:
-        strTime = dicALL.time.strftime('%Y-%m-%d %H:%M:%S')
-        info = dicALL.info
-        for engine_alias in info.keys():
-            info_status = info[engine_alias]['status']
-            info_status.insert(0, engine_alias)
-            lstHAAPToShow.append(info_status)
-            lstHAAPToShow.append(info[engine_alias]['level'])
+    strTime = dicALL.time.strftime('%Y-%m-%d %H:%M:%S')
+    info = dicALL.info
+    for engine_alias in info.keys():
+        info_status = info[engine_alias]['status']
+        info_status.insert(0, engine_alias)
+        lstHAAPToShow.append(info_status)
+        lstHAAPToShow.append(info[engine_alias]['level'])
     return strTime, lstHAAPToShow
 
 def sansw_info_to_show():
@@ -360,7 +357,7 @@ def sansw_info_to_show():
     lst_sansw_to_show = []
     if lst_switch:
         strTime = lst_switch.time.strftime('%Y-%m-%d %H:%M:%S')
-        switch_total = lst_switch.summary_total
+        switch_total = lst_switch.sum_total
         for sansw_alias in switch_total.keys():
             ip = switch_total[sansw_alias]["IP"]
             PE_sum = switch_total[sansw_alias]["PE_Sum"]
@@ -369,8 +366,8 @@ def sansw_info_to_show():
             PE_sum.insert(0,ip)
             PE_sum.append(PE_total)
             PE_sum.insert(0,sansw_alias)
+            PE_sum.append(warning_level)
             lst_sansw_to_show.append(PE_sum)
-            lst_sansw_to_show.append(warning_level)
             lst_sansw_to_show.sort(key=operator.itemgetter(0))
         return strTime, lst_sansw_to_show
 
@@ -397,3 +394,8 @@ def get_switch_total_db(list_switch_alias):
     if list_switch:
         db_total = list_switch[list_switch_alias]["PE_Total"]
         return db_total
+
+if __name__ == '__main__':
+
+    print(haap_info_to_show())
+    pass
