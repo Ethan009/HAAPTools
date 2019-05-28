@@ -90,7 +90,7 @@ def execute_multi_commands(ip, command_file):
     Action(ip, telnet_port, passwd, FTP_port).auto_commands(command_file)
 
 tupDesc = ('Engine', 'AH', 'Uptime', 'Master', 'Cluster', 'Mirror')
-tupWidth = (18, 5, 12, 8, 9, 8)
+tupWidth = (18, 5, 15, 8, 9, 8)
 
 def _print_description():
     for i in range(len(tupDesc)):
@@ -551,11 +551,11 @@ class Uptime(object):
             m = uptime_list[2]
             s = uptime_list[3]
             if d:
-                return '%d D %d H %d M' % (d, h, m)
+                return '%dd %dh %dm' % (d, h, m)
             elif h:
-                return '%d H %d M %d S' % (h, m, s)
+                return '%dh %dm %ds' % (h, m, s)
             elif m:
-                return '%d M %d S' % (m, s)
+                return '%dm %ds' % (m, s)
             else:
                 return '%d Seconds' % s
 

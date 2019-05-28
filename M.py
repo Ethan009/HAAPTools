@@ -187,7 +187,7 @@ def main():
 
     elif sys.argv[1] == 'bc':
         num_argv = len(sys.argv)
-        if num_argv == 2 and num_argv > 3:
+        if num_argv == 2 or num_argv > 3:
             print(strBCHelp)
         elif sys.argv[2] == 'all':
             haap.backup_config_all()
