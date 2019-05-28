@@ -38,9 +38,9 @@ lst_haap_Alias = oddEngines.keys()
 
 # <<<email massage>>>
 
-str_engine_mirror = 'Engine mirror not ok'
-str_engine_status = 'Engine offline'
-str_engine_AH = 'Engine AH'
+
+
+
 
 # <<web show-from name>>
 lstDescHAAP = ('EngineIP', 'AH Status', 'Uptime',
@@ -175,8 +175,9 @@ def judge_all_haap():
     Info_from_engine, Origin_from_engine = haap.data_for_db()
     Info_from_DB = db.get_HAAP_status()
     for i in range(len(lst_haap_Alias)):
-        list_judge = engineList_judge(Info_from_engine,lst_haap_Alias[i])
-        haap_judge(list_judge, Info_from_DB)
+        listDB_judge = Info_from_DB[lst_haap_Alias[i]]
+        listEngine_judge = engineList_judge(Info_from_engine,lst_haap_Alias[i])
+        haap_judge(listEngine_judge, listDB_judge, lst_haap_Alias[i]).All_judge()
     db.haap_insert(s.time_now_to_show(),
                    Info_from_engine, Origin_from_engine)
 
@@ -186,21 +187,22 @@ def judge_all_haap():
 class haap_judge(object):
     """docstring for haap_judge"""
 
-    def __init__(self, statusRT, statusDB):
+    def __init__(self, statusRT, statusDB, haap_Alias):
+        self.alias = haap_Alias
         self.host = statusRT[0]
         self.statusRT = statusRT
         self.statusDB = statusDB
         self.strTimeNow = s.time_now_to_show()
         self.lstWarningToSend = []
-        #self.All_judge()
 
     def judge_AH(self, AHstatus_rt, AHstatus_db):
+        str_engine_AH = 'Engine AH'
         if AHstatus_rt:
             if AHstatus_rt != AHstatus_db:
                 db.insert_warning(self.strTimeNow, self.host,
-                                  level, 'engine', str_engine_AH)
-                self.lstWarningToSend.apend(self.strTimeNow, self.host,
-                               AH_errlevel, str_engine_AH)
+                                  2, 'engine', str_engine_AH)
+                self.lstWarningToSend.apend([self.strTimeNow, self.host,
+                               self.alias, str_engine_AH])
                 return
         return True
 
@@ -210,24 +212,26 @@ class haap_judge(object):
             restart_time = uptime_second_db - uptime_second_rt
             db.insert_warning(self.strTimeNow, self.host, 2,
                               'engine',  str_engine_restart%(restart_time))
-            self.lstWarningToSend.apend(self.strTimeNow, self.host,
-                           reboot_errlevel, str_engine_restart)
+            self.lstWarningToSend.apend([self.strTimeNow, self.host,
+                           self.alias, str_engine_restart])
 
     def judge_Status(self, Status_rt, Status_db):
+        str_engine_status = 'Engine offline'
         if Status_rt:
             if Status_rt != Status_db:
                 db.insert_warning(self.strTimeNow, self.host,
                                   2, 'engine', str_engine_status)
-                self.lstWarningToSend.apend(self.strTimeNow, self.host,
-                               status_errlevel, str_engine_status)
+                self.lstWarningToSend.apend([self.strTimeNow, self.host,
+                               self.alias, str_engine_status])
 
     def judge_Mirror(self, MirrorStatus_rt, MirrorStatus_db):
+        str_engine_mirror = 'Engine mirror not ok'
         if MirrorStatus_rt:
             if MirrorStatus_rt != MirrorStatus_db:
                 db.insert_warning(self.strTimeNow, self.host,
                                   2, 'engine', str_engine_mirror)
-                self.lstWarningToSend.apend(self.strTimeNow, self.host,
-                               mirror_errlevel, str_engine_mirror)
+                self.lstWarningToSend.apend([self.strTimeNow, self.host,
+                               self.alias, str_engine_mirror])
 
     # 如果数据库没有信息，当引擎发生问题的时候，是否直接发送警报
     def All_judge(self):
@@ -238,7 +242,8 @@ class haap_judge(object):
                     self.judge_Status(self.statusRT[3], self.statusDB[3])
                     self.judge_Mirror(self.statusRT[4], self.statusDB[4])
         finally:
-            SE.xxx(self.lstWarningToSend)
+            if self.lstWarningToSend:
+                SE.send_warnmail(self.lstWarningToSend)
 
 # 执行查询数据库，并在发现用户未确认信息后，发送警报邮件
 
@@ -284,7 +289,7 @@ def warning_message_sansw(intWarninglevel):
     return 'Total Error Count Increase Reach Level %s' % strLevel
 
 
-def judge_PE_total(total_sw, total_DB, sansw_IP):
+def judge_PE_total(total_sw, total_DB, sansw_IP, sansw_Alias):
     strTimeNow = s.time_now_to_show()
     if total_DB:
         intErrorIncrease = total_sw - total_DB
@@ -292,17 +297,17 @@ def judge_PE_total(total_sw, total_DB, sansw_IP):
         if intWarninglevel:
             msg = warning_message_sansw(intWarninglevel)
             db.insert_warning(strTimeNow, sansw_IP, intWarninglevel,
-                              'san_switch', warning_message_sansw(intWarninglevel))
-            # 这部分发送应该是有一个特定的格式吧。。。
-            SE.Timely_send(strTimeNow, sansw_IP, intWarninglevel, msg)
-
+                              'switch', warning_message_sansw(intWarninglevel))
+            SE.send_warnmail([[strTimeNow, sansw_IP, sansw_Alias, msg]])
 
 def get_sw_warning():
     info_for_DB = sw.get_info_for_DB()
     for i in range(len(lst_sansw_Alias)):
-        total_DB = db.get_Switch_Total(lst_sansw_Alias[i])
-        sansw_total = get_total(info_for_DB, lst_sansw_Alias[i])
-        judge_PE_total(total_DB, sansw_total, lst_sansw_IP[i])
+        total_DB = get_switch_total_db(lst_sansw_Alias[i])
+        all_summary = info_for_DB[1]
+        sansw_summary = all_summary[lst_sansw_Alias[i]]
+        total_sansw = sansw_summary['PE_Total']
+        judge_PE_total(total_DB, total_sansw, lst_sansw_IP[i], lst_sansw_Alias[i])
     db.switch_insert(s.time_now_to_show(),
                      info_for_DB[0], info_for_DB[1], info_for_DB[2])
 

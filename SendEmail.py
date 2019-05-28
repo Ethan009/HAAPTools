@@ -37,10 +37,10 @@ def send_warnmail(warninfo_email):
     shuju = ""
     for e in warninfo_email:
         lie = """<tr>
-                    <td>""" + str(e['time']) + """</td>
-                    <td>""" + str(e['IP']) + """</td>
-                    <td>""" + str(e['level']) + """</td>
-                    <td>""" + str(e['message']) + """</td>
+                    <td>""" + str(e[0]) + """</td>
+                    <td>""" + str(e[1]) + """</td>
+                    <td>""" + str(e[2]) + """</td>
+                    <td>""" + str(e[3]) + """</td>
                 </tr>"""
         shuju = shuju + lie
     html = """\
@@ -59,7 +59,7 @@ def send_warnmail(warninfo_email):
           <tr>
             <th>Time</th>
             <th>IP</th>
-            <th>Level</th>
+            <th>Device</th>
             <th>Message</th>
           </tr>
           """ + shuju + """
@@ -105,4 +105,4 @@ def Timely_send(time_now,IP,errlevel,error_massage):
 
     except smtplib.SMTPException:
         print "Error: NOT SEND Email"
-
+send_warnmail([['time', '1.1.1.1', 'engine1', 'AH'], ['time', '1.1.1.1', 'engine2', 'AH']])

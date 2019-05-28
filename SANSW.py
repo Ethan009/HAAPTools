@@ -420,7 +420,7 @@ class InfoForDB(object):
         # super(InfoForDB, self).__init__()
         self._ip = strIP
         self._alias = strAlias
-        self._objSANSW = Status(strIP, ssh_port, user, passwd, list_sw_ports[0])
+        self._objSANSW = Status(strIP, ssh_port, user, passwd, list_sw_ports)
 
     def get_dicOrigin(self):
         return {str(self._alias): {'IP': self._ip,
@@ -429,7 +429,7 @@ class InfoForDB(object):
 
     def get_dicPEFormated(self):
         return {str(self._alias): {'IP': self._ip,
-            'PTES_Formatd': dict(self._objSANSW._dicPartPortError)}}
+            'PTES_Formatd': self._objSANSW._dicPartPortError}}
 
     def get_summary_total(self):
         sum_and_total = self._objSANSW.sum_and_total()
