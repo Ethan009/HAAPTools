@@ -29,8 +29,7 @@ tuplThresholdTotal = swcfg.threshold_total()
 setting = gc.Setting()
 lstPCCommand = setting.PCEngineCommand()
 strPCFolder = setting.folder_PeriodicCheck()
-sw_ID=swcfg.list_switch_alias()
-level_sw=swcfg.threshold_total()
+
 # <<<Get Config Field>>>
 
 def clear_all():

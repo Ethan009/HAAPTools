@@ -31,7 +31,7 @@ lst_sansw_alias = swcfg.list_switch_alias()
 haapcfg = gc.EngineConfig()
 oddEngines = haapcfg._odd_engines()
 lst_haap_IP = oddEngines.values()
-lst_haap_Alias = oddEngines.keys()
+lst_haap_alias = oddEngines.keys()
 # <<<Get Config Field>>>
 
 
@@ -168,9 +168,9 @@ def warning_interval_check(intInterval):
 
 # def check_haap():
 #     dicDB = db.haap_info_for_judge()
-#     for i in range(len(lst_haap_Alias)):
+#     for i in range(len(lst_haap_alias)):
 #         lstRT = haap.info_for_judge(lst_haap_IP[i])
-#         lstDB = dicDB[lst_haap_Alias[i]]
+#         lstDB = dicDB[lst_haap_alias[i]]
 #         haap_judge(lstRT, lstDB)
 
 
@@ -181,9 +181,9 @@ def warning_interval_check(intInterval):
 #     dicDB = db.last_record()
 #     objHAAP = haap.XXX()
 #     info_for_DB = objHAAP.info_for_DB()
-#     for i in range(len(lst_haap_Alias)):
+#     for i in range(len(lst_haap_alias)):
 #         lstRT = objHAAP.xxFun(lst_haap_IP[i])
-#         lstDB = dicDB[lst_haap_Alias[i]]
+#         lstDB = dicDB[lst_haap_alias[i]]
 #         haap_judge(lstRT, lstDB)
 
 #     info = info_for_DB[0]
