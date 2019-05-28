@@ -381,8 +381,9 @@ def haap_info_for_judge(lstInfo):
         list_haap_alias = lstInfo.keys()
         for haap in list_haap_alias:
             list_status = lstInfo[haap]["status"]
-            list_status_judge = [list_status[i] for i in [0, 1,2,4, 5]]
-            list_status[2]= lstInfo[haap]['up_sec']
+            new_list_status_judge = list_status[:]
+            list_status_judge = [list_status_judge[i] for i in [0, 1,2,4, 5]]
+            list_status_judge[2]= lstInfo[haap]['up_sec']
             dicInfo[haap] = list_status_judge
         return dicInfo
 #增加一个if判断。不能直接拿sum_total值
@@ -399,6 +400,4 @@ def get_switch_total_db(list_switch_alias):
 if __name__ == '__main__':
 #     print(haap_info_to_show())
 #     print(check_all_haap())
-    print(check_all_haap())
-    
     pass
