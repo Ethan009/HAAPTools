@@ -11,9 +11,6 @@ import SendEmail as SE
 import datetime
 import DB as db
 import GetConfig as gc
-import operator
-import types
-from Carbon import AH
 try:
     import configparser as cp
 except Exception:
@@ -29,46 +26,39 @@ interval_warning_check = setting.interval_warning_check()
 swcfg = gc.SwitchConfig()
 tuplThresholdTotal = swcfg.threshold_total()
 lst_sansw_IP = swcfg.list_switch_IP()
-lst_sansw_Alias = swcfg.list_switch_alias()
+lst_sansw_alias = swcfg.list_switch_alias()
 
 haapcfg = gc.EngineConfig()
 oddEngines = haapcfg._odd_engines()
 lst_haap_IP = oddEngines.values()
 lst_haap_Alias = oddEngines.keys()
-
 # <<<Get Config Field>>>
 
-# <<<email massage>>>
 
-str_engine_mirror = 'Engine mirror not ok'
-str_engine_status = 'Engine offline'
-str_engine_AH = 'Engine AH'
-
-# <<web show-from name>>
-lstDescHAAP = ('EngineIP', 'AH Status', 'Uptime',
+# <<web show table title>>
+lstDescHAAP = ('Engine', 'IP', 'AH Status', 'Uptime',
                'Master', 'Cluster', 'Mirror')
-lstDescSANSW = ('SwitchIP', 'Encout', 'DiscC3',
+lstDescSANSW = ('Switch', 'IP', 'Encout', 'DiscC3',
                 'LinkFail', 'LossSigle', 'LossSync')
-lstWarning = ('Time', 'Level', 'Message')
+lstWarning = ('Time', 'Level', 'Device', 'IP', 'Message')
 
 
-def show_engine_status_DB():
-    engine = db.get_list_haap()
-    return engine[0], engine[1]
+def monitor_rt_1_thread():
+    t1 = Thread(target=start_web, args=('rt',))
+    t1.setDaemon(True)
+    t1.start()
+    try:
+        while t1.isAlive():
+            pass
+    except KeyboardInterrupt:
+        stopping_web(3)
 
 
-def haap_status_for_judging(lstStatus, uptime_second):
-    lstAllStatus = lstStatus
-    lstStatus = [lstAllStatus[i] for i in [0, 1, 2, 4, 5]]
-    lstStatus[2] = uptime_second
-    return lstStatus
-
-
-def start_mnt_4Thread():
+def monitor_db_4_thread():
     t1 = Thread(target=start_web, args=('db', interval_web_refresh))
     t2 = Thread(target=judge_haap_all_status, args=(interval_haap_update,))
     t3 = Thread(target=judge_SANSW_all_status, args=(interval_sansw_update,))
-    t4 = Thread(target=send_unconfirm_waring, args=(interval_warning_check,))
+    t4 = Thread(target=judge_db_confirm, args=(interval_warning_check,))
     t1.setDaemon(True)
     t2.setDaemon(True)
     t3.setDaemon(True)
@@ -91,104 +81,157 @@ def start_mnt_4Thread():
 
 
 def start_web(mode):
+    '''
+tlu = Time Last Update
+    '''
     app = Flask(__name__, template_folder='./web/templates',
                 static_folder='./web/static', static_url_path='')
 
     @app.route("/", methods=['GET', 'POST'])
     def home():
+
+        # Transfer lstDescHAAP, lstDescSANSW, lstStatusHAAP, \
+        # lstStatusSANSW, interval_refresh, haap_status, \
+        # sansw_status, warning_status
+
         if mode == 'rt':
-            StatusHAAP = haap.list_status_for_realtime_show()
-            # StatusSANSW = show_switch_status()
+            StatusHAAP = haap.real_time_status()
+            StatusSANSW = haap.real_time_status()
             tlu_haap = s.time_now_to_show()
             tlu_sansw = s.time_now_to_show()
+            status_warning = 0
+
         elif mode == 'db':
-            tlu_haap = show_engine_status_DB()[0]
-            tlu_sansw = show_switch_status_DB()[0]
-            StatusHAAP = show_engine_status_DB()[1]
-            StatusSANSW = show_switch_status_DB()[1]
-        # 预警提示弹出为0，不弹出为1
-        if request.method == 'GET' and get_warning_unchecked_format():
-            error = 1
-        else:
-            db.update_warning()
-            error = 0
-        context = {
-            'TitleHAAP': lstDescHAAP,
-            'Titleswitch': lstDescSANSW,
-            'StatusHAAP': StatusHAAP,
-            'StatusSANSW': StatusSANSW,
-            'tlu_haap': tlu_haap,
-            'tlu_sansw': tlu_sansw,
-            'error': error
-        }
-        return render_template("monitor.html", **context)
+            haap = haap_info_to_show()
+            sansw = sansw_info_to_show()
+            status_warning = db.get_unconfirm_warning()
+            StatusHAAP = haap[1]
+            StatusSANSW = sansw[1]
+            tlu_haap = haap[0]
+            tlu_sansw = sansw[0]
+            status_warning = status_warning
+
+        return render_template("monitor.html",
+                               Title_HAAP=lstDescHAAP,
+                               Title_SANSW=lstDescSANSW,
+                               warning_level_haap=StatusHAAP[-1],
+                               warning_level_sansw=StatusSANSW[-1],
+                               last_update_haap=tlu_haap,
+                               last_update_sansw=tlu_sansw,
+                               status_haap=StatusHAAP[:-1],
+                               status_sansw=StatusSANSW[:-1],
+                               status_warning=status_warning)
 
     @app.route("/warning/")
     def warning():
         context = {
-            'error_message': get_warning_unchecked_format()
+            'error_message': db.get_unconfirm_warning()
         }
         return render_template("warning.html", **context)
 
     app.run(debug=False, use_reloader=False, host='127.0.0.1', port=5000)
 
 
-def judge_haap_all_status(interval_haap_update):
-    t = s.Timing()
-    t.add_interval(judge_all_haap, interval_haap_update)
+def stopping_web(intSec):
+    try:
+        print('\nStopping Web Server ', end='')
+        for i in range(intSec):
+            time.sleep(1)
+            print('.', end='')
+        time.sleep(1)
+        print('\n\nWeb Server Stopped.')
+    except KeyboardInterrupt:
+        print('\n\nWeb Server Stopped.')
 
+
+def haap_interval_check(intInterval):
+    t = s.Timing()
+    t.add_interval(check_all_haap(), intInterval)
     t.stt()
 
-
-def judge_SANSW_all_status(interval_sansw_update):
+def sansw_interval_check(intInterval):
     t = s.Timing()
-    t.add_interval(get_sw_warning, interval_sansw_update)
+    t.add_interval(check_all_sansw(), intInterval)
     t.stt()
 
-
-def judge_db_confirm(interval_warning_check):
+def warning_interval_check(intInterval):
     t = s.Timing()
-    t.add_interval(judge_user_confirm, interval_warning_check)
+    t.add_interval(warning_interval_check(), intInterval)
     t.stt()
 
+###########################
 
-# def IP_to_alies(engine_IP):
-#     for alies in list_haap_alias:
-#         if list_haap_IP_alies[alies] == engine_IP:
-#             return alies
-#
-#
-# def list_to_dic(lstAllStatus):
-#     dictAllStatus = {}
-#     for lstStatus in lstAllStatus:
-#         engine_alies = IP_to_alies(lstStatus[0])
-#         dictAllStatus[engine_alies] = lstStatus
-#     return dictAllStatus
+# 根据需要重新写haap 和 sansw的方法，需要一个调用后直接可以输出judge需要的那个列表的方法。
+# 同样，DB中也要写相应的方法
 
-def engineList_judge(list_info):
-    list_status = list_info['status']
-    list_status_judge = [list_status[i] for i in [0, 1, 4, 5]]
-    list_status_judge.insert(2, list_status['up_sec'])
-    return list_status_judge
+###########################
 
-def judge_all_haap():
+# def check_haap():
+#     dicDB = db.haap_info_for_judge()
+#     for i in range(len(lst_haap_Alias)):
+#         lstRT = haap.info_for_judge(lst_haap_IP[i])
+#         lstDB = dicDB[lst_haap_Alias[i]]
+#         haap_judge(lstRT, lstDB)
 
-#     SRT = haap.real_time_status()
-#     # IP,AHStatus,uptime_sec,cluster_status,mirror_status
-#     SDB = db.get_HAAP_status()
-#     SRT_show = haap.real_time_status_show()
-#     for i in range(len(list_haap_alias)):
-#         haap_judge(SRT[i], SDB[i])
-#     db.haap_insert(s.time_now_to_show(), list_to_dic(
-#         SRT_show), list_to_dic(SRT))
+
+# def check_haap():
+#     def change_dic_to_list():
+#         pass
+    
+#     dicDB = db.last_record()
+#     objHAAP = haap.XXX()
+#     info_for_DB = objHAAP.info_for_DB()
+#     for i in range(len(lst_haap_Alias)):
+#         lstRT = objHAAP.xxFun(lst_haap_IP[i])
+#         lstDB = dicDB[lst_haap_Alias[i]]
+#         haap_judge(lstRT, lstDB)
+
+#     info = info_for_DB[0]
+#     origin = info_for_DB[1]
+
+#     db.haap_insert(info,origin)
+
+
+
+# 现阶段先这样，每个引擎判断后发送邮件一次，下一阶段考虑两个引擎都判断完之后再发送邮件
+def check_all_haap():
     Info_from_engine, Origin_from_engine = haap.data_for_db()
-    Info_from_DB = db.get_HAAP_status()
-    for i in range(len(lst_haap_Alias)):
-        list_info = Info_from_engine[lst_haap_Alias[i]]
-        list_judge = engineList_judge(list_info)
-        haap_judge(list_judge, Info_from_DB)
-    db.haap_insert(s.time_now_to_show(),
-                   Info_from_engine, Origin_from_engine)
+    Info_from_DB = db.haap_last_record()
+    if Info_from_DB:
+        for haap in lst_haap_alias:
+            lstRT = haap_info_for_judge(Info_from_engine)[haap]
+            lstDB = haap_info_for_judge(Info_from_DB.info)[haap]
+            haap_judge(lstRT, lstDB)
+    db.haap_insert(Info_from_engine, Origin_from_engine)
+
+def check_all_sansw():
+    dicAll = sw.get_info_for_DB()
+    try:
+        for sw_alias in lst_sansw_alias:
+            int_total_DB = get_switch_total_db(sw_alias)
+
+            dic_sum_total = dicAll[1]
+            dic_sum_total = dic_sum_total[sw_alias]
+            int_total_RT = dic_sum_total['PE_Total']
+
+            strIP = dic_sum_total['IP']
+
+            sansw_judge(int_total_RT, int_total_DB, strIP, sw_alias)
+    finally:
+        db.switch_insert(info_for_DB[0], info_for_DB[1], info_for_DB[2])
+
+
+def get_sansw_total(dicAll, sansw_alias):
+
+    return
+
+def warning_interval_check():
+    unconfirm_warning = db.get_unconfirm_warning()
+    if unconfirm_warning:
+        lstXXX = change_to_list(unconfirm_warning)
+        SE.send_warnmail(lstXXX)
+    else:
+        print('No Unconfirm Warning Found...')
 
 # check status interval
 
@@ -248,78 +291,92 @@ class haap_judge(object):
                     self.judge_Status(self.statusRT[3], self.statusDB[3])
                     self.judge_Mirror(self.statusRT[4], self.statusDB[4])
         finally:
-            SE.xxx(self.lstWarningToSend)
+            SE.send_warnmail(self.lstWarningToSend)
 
-# 执行查询数据库，并在发现用户未确认信息后，发送警报邮件
-
-
-def send_unconfirm_waring():
-    unconfirm_warning = db.get_unconfirm_warning()
-    if unconfirm_warning:
-        SE.send_warnmail(unconfirm_warning)
-    else:
-        print('No Unconfirm Warning Found...')
+### engine_info[haap_Alias]这两个参数这么用的话，那么直接传入engine_info[haap_Alias]不是更好？
+def get_engine_status_list_for_judg(engine_info, haap_Alias):
+    list_info = engine_info[haap_Alias]
+    list_status = list_info['status']
+    list_status_judge = [list_status[i] for i in [0, 1, 4, 5]]
+    list_status_judge.insert(2, list_status['up_sec'])
+    return list_status_judge
 
 
-def stopping_web(intSec):
-    try:
-        print('\nStopping Web Server ', end='')
-        for i in range(intSec):
-            time.sleep(1)
-            print('.', end='')
-        time.sleep(1)
-        print('\n\nWeb Server Stopped.')
-    except KeyboardInterrupt:
-        print('\n\nWeb Server Stopped.')
-
-
-def thrd_web_rt():
-    t1 = Thread(target=start_web, args=('rt',))
-    t1.setDaemon(True)
-    t1.start()
-    try:
-        while t1.isAlive():
-            pass
-    except KeyboardInterrupt:
-        stopping_web(3)
-
-
-def warning_message_sansw(intWarninglevel):
-    if intWarninglevel == 1:
-        strLevel = 'Notify'
-    if intWarninglevel == 2:
-        strLevel = 'Warning'
-    if intWarninglevel == 3:
-        strLevel = 'Alarm'
-    return 'Total Error Count Increase Reach Level %s' % strLevel
-
-
-def judge_PE_total(total_sw, total_DB, sansw_IP):
+def sansw_judge(total_RT, total_DB, sansw_IP, sansw_Alias):
     strTimeNow = s.time_now_to_show()
     if total_DB:
-        intErrorIncrease = total_sw - total_DB
+        intErrorIncrease = total_RT - total_DB
         intWarninglevel = s.is_Warning(intErrorIncrease, tuplThresholdTotal)
         if intWarninglevel:
             msg = warning_message_sansw(intWarninglevel)
             db.insert_warning(strTimeNow, sansw_IP, intWarninglevel,
-                              'san_switch', msg)
-            # 这部分发送应该是有一个特定的格式吧。。。
-            SE.Timely_send([strTimeNow, sansw_IP, intWarninglevel,
-                              'san_switch', msg])
+                              'switch', msg)
+            SE.send_warnmail([[strTimeNow, sansw_IP, intWarninglevel, \
+                sansw_Alias, msg]])
 
 
-def sansw_check():
-    info_for_DB = sw.get_info_for_DB()
-    for i in range(len(lst_sansw_Alias)):
-        total_DB = db.get_Switch_Total(lst_sansw_Alias[i])
-        sansw_total = get_total(info_for_DB, lst_sansw_Alias[i])
-        judge_PE_total(total_DB, sansw_total, lst_sansw_IP[i])
-    db.switch_insert(s.time_now_to_show(),
-                     info_for_DB[0], info_for_DB[1], info_for_DB[2])
+def warning_message_sansw(intWarninglevel):
+    # if intWarninglevel == 0:
+    #     strLevel = 'Notify'
+    if intWarninglevel == 1:
+        strLevel = 'Warning'
+    elif intWarninglevel == 2:
+        strLevel = 'Alarm'
+    return 'Total Error Count Increase Reach Level %s' % strLevel
 
 
-# 最新方法
+def haap_info_to_show():
+    """
+    @note: HAAP网页展示数据(时间，status)
+    """
+    lst_HAAP = db.HAAP_last_info()
+    lstHAAPToShow = []
+    if lst_HAAP:
+        strTime = lst_HAAP.time.strftime('%Y-%m-%d %H:%M:%S')
+        info = lst_HAAP.info
+        for i in info.keys():
+            info_status = info[i]["status"]
+            info_status.insert(0, i)
+            lstHAAPToShow.append(info_status)
+            lstHAAPToShow.append(info[i]['level'])
+    return strTime, lstHAAPToShow
 
+def sansw_info_to_show():
+    """
+    @note: 获取数据库SANSW要展示的内容（时间，status）
+    """
+    lst_switch = db.switch_last_info()
+    lst_sansw_to_show = []
+    if lst_switch:
+        strTime = lst_switch.time.strftime('%Y-%m-%d %H:%M:%S')
+        switch_total = lst_switch.summary_total
+        for sansw_alias in switch_total.keys():
+            ip = switch_total[sansw_alias]["IP"]
+            PE_sum = switch_total[sansw_alias]["PE_Sum"]
+            PE_total = switch_total[sansw_alias]["PE_Total"]
+            warning_level = s.is_Warning(PE_total, tuplThresholdTotal)
+            PE_sum.insert(0,ip)
+            PE_sum.append(PE_total)
+            PE_sum.insert(0,sansw_alias)
+            lst_sansw_to_show.append(PE_sum)
+            lst_sansw_to_show.append(warning_level)
+            lst_sansw_to_show.sort(key=operator.itemgetter(0))
+        return strTime, lst_sansw_to_show
+
+def haap_info_for_judge(lstInfo):
+    """
+    @note: 获取数据库具体up_sec
+    ['192.168.1.1',0,27838,0,0]
+    """
+    dicInfo = {}
+    if lstInfo:
+        list_haap_alias = lstInfo.keys()
+        for haap in list_haap_alias:
+            list_status = lstInfo[haap]["status"]
+            list_status.insert(2, lstInfo[haap]['up_sec'])
+            list_status_judge = [list_status[i] for i in [0, 1,2, 5, 6]]
+            dicInfo[haap] = list_status_judge
+    return dicInfo
 
 def get_switch_total_db(list_switch_alias):
     """
@@ -329,57 +386,3 @@ def get_switch_total_db(list_switch_alias):
     if list_switch:
         db_total = list_switch[list_switch_alias]["PE_Total"]
         return db_total
-
-def get_switch_show_db():
-    """
-    @note: 获取数据库SANSW要展示的内容（时间，status）
-    """
-    lst_switch = db.switch_last_info()
-    switch_show = []
-    if lst_switch:
-        time_switch = lst_switch.time
-        switch_total = lst_switch.summary_total
-        for i in switch_total.keys():
-            ip = switch_total[i]["IP"]
-            PE_sum = switch_total[i]["PE_Sum"]
-            PE_total = switch_total[i]["PE_Total"]
-            PE_sum.insert(0,ip)
-            PE_sum.append(PE_total)
-            PE_sum.insert(0,i)
-            switch_show.append(PE_sum)
-            switch_show.sort(key=operator.itemgetter(0))
-        return time_switch,switch_show
-
-
-def get_HAAP_show_db():
-    """
-    @note: HAAP网页展示数据(时间，status)
-    """
-    lst_HAAP = db.HAAP_last_info()
-    show_HAAP = []
-    if lst_HAAP:
-        time_HAAP = lst_HAAP.time
-        info = lst_HAAP.info
-        for i in info.keys():
-            info_status = info[i]["status"]
-            info_status.insert(0, i)
-            show_HAAP.append(info_status)
-    return time_HAAP, show_HAAP
-
-
-def get_HAAP_other_db():
-    """
-    @note: 获取数据库具体up_sec
-    ['192.168.1.1',0,27838,0,0]
-    """
-    lst_HAAP = db.HAAP_last_info().info
-    lst_other = {}
-    if lst_HAAP:
-        for i in lst_HAAP.keys():
-            list_status = lst_HAAP[i]["status"]
-            list_status.insert(2, lst_HAAP[i]['up_sec'])
-            list_status_judge = [list_status[a] for a in [0, 1,2, 5, 6]]
-            lst_other[i] = list_status_judge
-    return lst_other
-
-

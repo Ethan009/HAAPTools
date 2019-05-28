@@ -5,6 +5,7 @@ import sys
 import SANSW as sw
 import HAAP as haap
 import Source as s
+import Main as m
 
 try:
     import configparser as cp
@@ -338,9 +339,9 @@ def main():
         if num_argv == 2 or num_argv > 3:
             print(strSWSHelp)
         elif sys.argv[2] == 'rt':
-            haap.monitor_rt_1_thread()
+            m.monitor_rt_1_thread()
         elif sys.argv[2] == 'db':
-            haap.monitor_db_4_thread()
+            m.monitor_db_4_thread()
         else:
             print('RealTime(rt) or DataBase(db)')
 

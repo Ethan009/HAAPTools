@@ -29,7 +29,7 @@ def haap_insert(n, engine_status, lst_status):
     """
     HAAP().insert(n, engine_status, lst_status)
     
-def HAAP_last_info():
+def haap_last_record():
     """
     @note: HAAP最后一次所有的数据
     """
@@ -119,7 +119,8 @@ def get_unconfirm_warning():
     if unconfirm_warnning:
         lstAllUCW = []
         for record in unconfirm_warnning:
-            lstAllUCW.append([record.time, record.ip, record.level, record.warn_message])
+            lstAllUCW.append([record.time, record.level, record.device, \
+                record.ip, record.warn_message])
     return lstAllUCW
 
             
@@ -127,44 +128,14 @@ class collHAAP(Document):
     time = DateTimeField(default=datetime.datetime.now())
     origin = DictField()
     info = DictField()
-    '''
-origin:{'engine1':{'ip': '1.1.1.1', 'vpd': 'xxxx','engine': 'yyyy', 'mirror': 'yyyy'},
-'engine2':{'ip': '1.1.1.1','vpd': 'xxxx','engine': 'yyyy', 'mirror': 'yyyy'}
-}
-info:{
-    'engine1':{'status':['1.1.1.1',0,'2d','M',0,0],'up_sec':7283,'level':0},
-    'engine2':{'status':['1.1.1.1',0,'2d','M',0,0],'up_sec':7283,'level':0}
-}
-    '''
 
 
 class collSANSW(Document):
+    # ptes = port error show info formatted 
     time = DateTimeField(default=datetime.datetime.now())
     origin = DictField()
-    dicPEFormated = DictField()
-    summary_total = DictField()
-    '''
-origin:[{'ip':'x.x.x.x', 'porterrshow': 'xxxx','switchshow': 'yyyy'},
-        {'ip':'x.x.x.x', 'porterrshow': 'xxxx','switchshow': 'yyyy'}]
-dicPEFormated:[{'2': ['x', 'x', 'x', 'x', 'x', 'x', 'x'],
-                '3': ['x', 'x', 'x', 'x', 'x', 'x', 'x']},
-               {'2': ['x', 'x', 'x', 'x', 'x', 'x', 'x'],
-                '3': ['x', 'x', 'x', 'x', 'x', 'x', 'x']}]
-summary_total:[[6,7,5,4,2,8,27],
-               [6,7,5,4,2,8,27]]
-
-or
-
-origin:{'sw1':{'ip':'x.x.x.x', 'porterrshow': 'xxxx','switchshow': 'yyyy'},
-        'sw2':{'ip':'x.x.x.x', 'porterrshow': 'xxxx','switchshow': 'yyyy'}}
-dicPEFormated:{'sw1':{'2': ['x', 'x', 'x', 'x', 'x', 'x', 'x'],
-                '3': ['x', 'x', 'x', 'x', 'x', 'x', 'x']},
-               'sw2':{'2': ['x', 'x', 'x', 'x', 'x', 'x', 'x'],
-                '3': ['x', 'x', 'x', 'x', 'x', 'x', 'x']}}
-summary_total:{'sw1':[6,7,5,4,2,8,27],
-               'sw2':[6,7,5,4,2,8,27]}
-    '''
-
+    ptes = DictField()
+    sum_toatl = DictField()
 
 
 class collWarning(Document):
@@ -200,10 +171,9 @@ class HAAP(object):
 
 class SANSW(object):
 
-### 瞎写！！！
-    def insert(self, time_now, origin, Switch_Status, Summary):
-        t = collSANSW(time=time_now, origin=origin,
-                       dicPEFormated=Switch_Status,summary_total=Summary)
+# ptes = port error show info formatted
+    def insert(self, origin, ptes, sum_total):
+        t = collSANSW(origin=origin, ptes=ptes, sum_toatl=sum_total)
         t.save()
 
     def query_range(self, time_start, time_end):

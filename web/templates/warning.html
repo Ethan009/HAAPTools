@@ -18,16 +18,17 @@
                         <tr class="warning">
                             <th>Time</th>
                             <th>Level</th>
+                            <th>Device</th>
+                            <th>IP</th>
                             <th>Message</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for e in error_message %}
+                        {% for error in error_list %}
                         <tr>
-                            <td>{{ e['time'] }}</td>
-                            <td>{{ e['IP'] }}</td>
-                            <td>{{ e['level'] }}</td>
-                            <td>{{ e['message'] }}</td>
+                            {% for item in error %}
+                            <th>item</th>
+                            {% endfor %}
                         </tr>
                         {% endfor %}
                     </tbody>

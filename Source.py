@@ -60,12 +60,12 @@ def is_Warning(intValue, data):
         if intValue > data:
             return True
     else:
-        if intValue >= data[2]:
-            return 3
-        elif intValue >= data[1]:
+        if intValue >= data[1]:
             return 2
         elif intValue >= data[0]:
             return 1
+        else:
+            return 0
         # return judge_level(intValue, data)
 
 def is_trace_level(num):

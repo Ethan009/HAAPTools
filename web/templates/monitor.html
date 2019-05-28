@@ -83,7 +83,7 @@
                 </div>
             </nav>
 
-            {% if error == 1 %}
+            {% if status_warning %}
             <div class="alert alert-warning">
                 <a href="{{ url_for('warning') }}" target="" class="close" data-dismiss="alert">
                     Check the details
@@ -124,22 +124,22 @@
                                 </tr>
                             </thead>
                             <tbody>
-                            {% for statushaap in StatusHAAP %}
-                                {% if statushaap[6]==0 %}
+                            {% for engine in StatusHAAP %}
+                                {% if status_haap==0 %}
                                     <tr class="success">
-                                        {% for status in statushaap %}
+                                        {% for status in engine %}
                                             <td>{{ status }}</td>
                                         {% endfor %}
                                     </tr>
-                                {% elif StatusHAAP[6]==2 %}
+                                {% elif status_haap==1 %}
                                     <tr class="warning">
-                                        {% for status in statushaap %}
+                                        {% for status in engine %}
                                             <td>{{ status }}</td>
                                         {% endfor %}
                                     </tr>
-                                {% else %}
+                                {% elif status_haap==2 %}
                                     <tr class="danger">
-                                        {% for status in statushaap %}
+                                        {% for status in engine %}
                                             <td>{{ status }}</td>
                                         {% endfor %}
                                     </tr>
@@ -185,22 +185,22 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for statussansw in StatusSANSW %}
-                                    {% if statussansw[xxx] == 0 %}
+                                {% for sw in StatusSANSW %}
+                                    {% if status_sansw == 0 %}
                                         <tr class="success">
-                                            {% for status in statussansw %}
+                                            {% for status in sw %}
                                                 <td>{{ status }}</td>
                                             {% endfor %}
                                         </tr>
-                                    {% elif warns[i[0]]==2 %}
+                                    {% elif status_sansw==1 %}
                                         <tr class="warning">
-                                            {% for status in statussansw %}
+                                            {% for status in sw %}
                                                 <td>{{ status }}</td>
                                             {% endfor %}
                                         </tr>
-                                    {% else %}
+                                    {% elif status_sansw==2 %}
                                         <tr class="danger">
-                                            {% for status in statussansw %}
+                                            {% for status in sw %}
                                                 <td>{{ status }}</td>
                                             {% endfor %}
                                         </tr>
