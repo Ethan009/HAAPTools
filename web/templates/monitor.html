@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<meta http-equiv="refresh" content="{{interval_refresh}}" >
+<meta http-equiv="refresh" content="2" >
 <html>
 <head lang="en">
     <meta charset="UTF-8">
@@ -83,7 +83,7 @@
                 </div>
             </nav>
 
-            {% if status_warning %}
+            {% if status_haap %}
             <div class="alert alert-warning">
                 <a href="{{ url_for('warning') }}" target="" class="close" data-dismiss="alert">
                     Check the details
@@ -114,33 +114,33 @@
 
             <div class="row clearfix">
                 <div class="col-md-12 column">
-                    {% if Status %}
+                    {% if status_haap %}
                         <table class="table">
                             <thead>
                                 <tr>
-                                    {% for tielehaap in TitleHAAP %}
+                                    {% for tielehaap in Title_HAAP %}
                                     <th>{{tielehaap}}</th>
                                     {% endfor %}
                                 </tr>
                             </thead>
                             <tbody>
-                            {% for engine in StatusHAAP %}
-                                {% if status_haap==0 %}
+                            {% for engine in status_haap %}
+                                {% if engine[-1]==0 %}
                                     <tr class="success">
-                                        {% for status in engine %}
+                                        {% for status in engine[:-1] %}
                                             <td>{{ status }}</td>
                                         {% endfor %}
                                     </tr>
-                                {% elif status_haap==1 %}
+                                {% elif engine[-1]==1 %}
                                     <tr class="warning">
-                                        {% for status in engine %}
+                                        {% for status in engine[:-1] %}
                                             <td>{{ status }}</td>
                                         {% endfor %}
                                     </tr>
-                                {% elif status_haap==2 %}
+                                {% elif engine[-1]==2 %}
                                     <tr class="danger">
-                                        {% for status in engine %}
-                                            <td>{{ status }}</td>
+                                        {% for status in engine[:-1] %}
+                                            <td>{{ status}}</td>
                                         {% endfor %}
                                     </tr>
                                 {% endif %}
@@ -175,32 +175,32 @@
 
             <div class="row clearfix">
                 <div class="col-md-12 column">
-                    {% if Status_switch %}
+                    {% if status_sansw %}
                         <table class="table">
                             <thead>
                                 <tr>
-                                    {% for titlesansw in TitleSANSW %}
+                                    {% for titlesansw in Title_SANSW %}
                                         <th>{{ titlesansw }}</th>
                                     {% endfor %}
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for sw in StatusSANSW %}
-                                    {% if status_sansw == 0 %}
+                                {% for sw in status_sansw %}
+                                    {% if sw[-1] == 0 %}
                                         <tr class="success">
-                                            {% for status in sw %}
+                                            {% for status in sw[:-1] %}
                                                 <td>{{ status }}</td>
                                             {% endfor %}
                                         </tr>
-                                    {% elif status_sansw==1 %}
+                                    {% elif sw[-1]==1 %}
                                         <tr class="warning">
-                                            {% for status in sw %}
-                                                <td>{{ status }}</td>
+                                            {% for status in sw[:-1] %}
+                                                <td>{{ status}}</td>
                                             {% endfor %}
                                         </tr>
-                                    {% elif status_sansw==2 %}
+                                    {% elif sw[-1]==2 %}
                                         <tr class="danger">
-                                            {% for status in sw %}
+                                            {% for status in sw[:-1] %}
                                                 <td>{{ status }}</td>
                                             {% endfor %}
                                         </tr>

@@ -692,5 +692,6 @@ class Status(Action):
 
 
 if __name__ == '__main__':
-    print(data_for_db())
+#     print(data_for_db()[1])
+    pass
 

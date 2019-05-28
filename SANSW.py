@@ -374,23 +374,24 @@ class InfoForDB(object):
 
 
 if __name__ == '__main__':
-    import pprint
+    pass
+#     import pprint
 #     print(get_dic_all_sw()[1])
 #     print(get_dic_all_sw()[0])
 #     db.switch_insert(datetime.datetime.now(),get_dic_all_sw()[0],
 #                      get_dic_all_sw()[1],get_dic_all_sw()[2])
-    pprint.pprint(get_info_for_DB())
-    print("ok")
+#     pprint.pprint(get_info_for_DB())
+#     print("ok")
 # {'switch1': {'IP': '10.203.1.212', 'PE': {1: ['0', '0', '0', '0', '0', '0', '1'], 2: ['1.1m', '131.2k', '0', '0', '10', '18', '19'], 3: ['168', '158', '0', '0', '9', '10', '11'], 4: ['2.6k', '6.4k', '0', '0', '10', '11', '12'], 5: ['187', '177', '0', '0', '9', '10', '11'], 6: ['0', '0', '0', '0', '0', '0', '1']}}, 
 # 'switch0': {'IP': '10.203.1.211', 'PE': {1: ['0', '0', '0', '0', '0', '0', '1'], 2: ['802', '922', '0', '0', '10', '11', '12'], 3: ['175.1k', '1.1m', '3', '11', '9', '10', '11'], 4: ['505.4k', '84.1k', '0', '0', '10', '11', '12'], 5: ['118.6k', '522.5k', '0', '1', '9', '10', '11'], 6: ['0', '0', '0', '0', '0', '0', '1']}}}
-
-
-
-
-
-    swcfg = gc.SwitchConfig()
-    list_sw_IP = swcfg.list_switch_IP()
-    list_sw_alias = swcfg.list_switch_alias()
+# 
+# 
+# 
+# 
+# 
+#     swcfg = gc.SwitchConfig()
+#     list_sw_IP = swcfg.list_switch_IP()
+#     list_sw_alias = swcfg.list_switch_alias()
 
     # xx = InfoForDB(list_sw_alias[0], list_sw_IP[1])
     #print(get_info_for_DB())

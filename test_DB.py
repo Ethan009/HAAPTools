@@ -243,7 +243,7 @@ if __name__ == '__main__':
 #     print(mn.get_switch_total_db("switch1"))
 #     print(mn.get_switch_show_db())
 #     print(mn.get_HAAP_show_db())
-    print(mn.get_HAAP_other_db())
+#     print(mn.get_HAAP_other_db())
     print("ok")
     pass
     

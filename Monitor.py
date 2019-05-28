@@ -10,6 +10,7 @@ import time
 import SendEmail as SE
 import datetime
 import DB as db
+import operator
 import GetConfig as gc
 try:
     import configparser as cp
@@ -39,7 +40,7 @@ lst_haap_alias = oddEngines.keys()
 lstDescHAAP = ('Engine', 'IP', 'AH Status', 'Uptime',
                'Master', 'Cluster', 'Mirror')
 lstDescSANSW = ('Switch', 'IP', 'Encout', 'DiscC3',
-                'LinkFail', 'LossSigle', 'LossSync')
+                'LinkFail', 'LossSigle', 'LossSync','Total')
 lstWarning = ('Time', 'Level', 'Device', 'IP', 'Message')
 
 
@@ -108,6 +109,7 @@ tlu = Time Last Update
             if haap:
                 tlu_haap = haap[0]
                 StatusHAAP = haap[1]
+                print(StatusHAAP[:-1])
             else:
                 tlu_haap = s.time_now_to_show()
                 StatusHAAP = [0]
@@ -115,6 +117,7 @@ tlu = Time Last Update
             if sansw:
                 tlu_sansw = sansw[0]
                 StatusSANSW = sansw[1]
+                print(StatusSANSW[:-1])
             else:
                 tlu_sansw = s.time_now_to_show()
                 StatusSANSW = [0]
@@ -129,8 +132,8 @@ tlu = Time Last Update
                                warning_level_sansw=StatusSANSW[-1],
                                tlu_haap=tlu_haap,
                                tlu_sansw=tlu_sansw,
-                               status_haap=StatusHAAP[:-1],
-                               status_sansw=StatusSANSW[:-1],
+                               status_haap=StatusHAAP,
+                               status_sansw=StatusSANSW,
                                status_warning=status_warning)
 
     @app.route("/warning/")
@@ -206,33 +209,29 @@ def warning_interval_check(intInterval):
 
 # 现阶段先这样，每个引擎判断后发送邮件一次，下一阶段考虑两个引擎都判断完之后再发送邮件
 def check_all_haap():
-    Info_from_engine, Origin_from_engine = haap.data_for_db()
+    Origin_from_engine,Info_from_engine  = haap.data_for_db()
     Info_from_DB = db.haap_last_record()
     if Info_from_DB:
         for engine in lst_haap_alias:
             lstRT = haap_info_for_judge(Info_from_engine)[engine]
+            print("12222",lstRT)
             lstDB = haap_info_for_judge(Info_from_DB.info)[engine]
+            print("222222",lstDB)
             haap_judge(lstRT, lstDB)
-    db.haap_insert(Info_from_engine, Origin_from_engine)
+    db.haap_insert(Origin_from_engine,Info_from_engine)
 
 def check_all_sansw():
     dicAll = sw.get_info_for_DB()
-    for sw_alias in lst_sansw_alias:
-        int_total_DB = get_switch_total_db(sw_alias)
-
-        dic_sum_total = dicAll[1]
-        dic_sum_total = dic_sum_total[sw_alias]
-        int_total_RT = dic_sum_total['PE_Total']
-
-        strIP = dic_sum_total['IP']
-
-        sansw_judge(int_total_RT, int_total_DB, strIP, sw_alias)
+    if dicAll:
+        for sw_alias in lst_sansw_alias:
+            int_total_DB = get_switch_total_db(sw_alias)
+            dic_sum_total = dicAll[1]
+            dic_sum_total = dic_sum_total[sw_alias]
+            int_total_RT = dic_sum_total['PE_Total']
+            strIP = dic_sum_total['IP']
+            sansw_judge(int_total_RT, int_total_DB, strIP, sw_alias)
     db.switch_insert(dicAll[0], dicAll[1], dicAll[2])
 
-
-def get_sansw_total(dicAll, sansw_alias):
-
-    return
 
 def warning_check():
     unconfirm_warning = db.get_unconfirm_warning()
@@ -340,15 +339,16 @@ def haap_info_to_show():
     """
     dicALL = db.haap_last_record()
     lstHAAPToShow = []
-    strTime = dicALL.time.strftime('%Y-%m-%d %H:%M:%S')
-    info = dicALL.info
-    for engine_alias in info.keys():
-        info_status = info[engine_alias]['status']
-        info_status.insert(0, engine_alias)
-        lstHAAPToShow.append(info_status)
-        lstHAAPToShow.append(info[engine_alias]['level'])
-    return strTime, lstHAAPToShow
-
+    if dicALL:
+        strTime = dicALL.time.strftime('%Y-%m-%d %H:%M:%S')
+        info = dicALL.info
+        for engine_alias in info.keys():
+            info_status = info[engine_alias]['status']
+            info_status.insert(0, engine_alias)
+            info_status.append(info[engine_alias]['level'])
+            lstHAAPToShow.append(info_status)
+        return strTime, lstHAAPToShow
+###355行是拿ptes的值。ptes
 def sansw_info_to_show():
     """
     @note: 获取数据库SANSW要展示的内容（时间，status）
@@ -357,7 +357,7 @@ def sansw_info_to_show():
     lst_sansw_to_show = []
     if lst_switch:
         strTime = lst_switch.time.strftime('%Y-%m-%d %H:%M:%S')
-        switch_total = lst_switch.sum_total
+        switch_total = lst_switch.ptes
         for sansw_alias in switch_total.keys():
             ip = switch_total[sansw_alias]["IP"]
             PE_sum = switch_total[sansw_alias]["PE_Sum"]
@@ -381,21 +381,24 @@ def haap_info_for_judge(lstInfo):
         list_haap_alias = lstInfo.keys()
         for haap in list_haap_alias:
             list_status = lstInfo[haap]["status"]
-            list_status.insert(2, lstInfo[haap]['up_sec'])
-            list_status_judge = [list_status[i] for i in [0, 1,2, 5, 6]]
+            list_status_judge = [list_status[i] for i in [0, 1,2,4, 5]]
+            list_status[2]= lstInfo[haap]['up_sec']
             dicInfo[haap] = list_status_judge
-    return dicInfo
-
+        return dicInfo
+#增加一个if判断。不能直接拿sum_total值
 def get_switch_total_db(list_switch_alias):
     """
     @note: 获取数据库的Total
     """
-    list_switch = db.switch_last_info().sum_total
+    list_switch = db.switch_last_info()
     if list_switch:
+        list_switch =list_switch.sum_total
         db_total = list_switch[list_switch_alias]["PE_Total"]
         return db_total
 
 if __name__ == '__main__':
-
-    print(haap_info_to_show())
+#     print(haap_info_to_show())
+#     print(check_all_haap())
+    print(check_all_haap())
+    
     pass
