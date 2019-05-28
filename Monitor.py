@@ -11,7 +11,9 @@ import SendEmail as SE
 import datetime
 import DB as db
 import GetConfig as gc
+import operator
 import types
+from Carbon import AH
 try:
     import configparser as cp
 except Exception:
@@ -55,11 +57,10 @@ def show_engine_status_DB():
     return engine[0], engine[1]
 
 
-
-def haap_status_for_judging(lstStatus,uptime_second):
-    lstAllStatus=lstStatus
-    lstStatus = [lstAllStatus[i] for i in [0,1,2,4,5]]
-    lstStatus[2]=uptime_second
+def haap_status_for_judging(lstStatus, uptime_second):
+    lstAllStatus = lstStatus
+    lstStatus = [lstAllStatus[i] for i in [0, 1, 2, 4, 5]]
+    lstStatus[2] = uptime_second
     return lstStatus
 
 
@@ -97,7 +98,7 @@ def start_web(mode):
     def home():
         if mode == 'rt':
             StatusHAAP = haap.list_status_for_realtime_show()
-            #StatusSANSW = show_switch_status()
+            # StatusSANSW = show_switch_status()
             tlu_haap = s.time_now_to_show()
             tlu_sansw = s.time_now_to_show()
         elif mode == 'db':
@@ -171,6 +172,15 @@ def engineList_judge(list_info):
     return list_status_judge
 
 def judge_all_haap():
+
+#     SRT = haap.real_time_status()
+#     # IP,AHStatus,uptime_sec,cluster_status,mirror_status
+#     SDB = db.get_HAAP_status()
+#     SRT_show = haap.real_time_status_show()
+#     for i in range(len(list_haap_alias)):
+#         haap_judge(SRT[i], SDB[i])
+#     db.haap_insert(s.time_now_to_show(), list_to_dic(
+#         SRT_show), list_to_dic(SRT))
     Info_from_engine, Origin_from_engine = haap.data_for_db()
     Info_from_DB = db.get_HAAP_status()
     for i in range(len(lst_haap_Alias)):
@@ -320,16 +330,25 @@ def get_switch_total_db(list_switch_alias):
         db_total = list_switch[list_switch_alias]["PE_Total"]
         return db_total
 
-    
 def get_switch_show_db():
     """
     @note: 获取数据库SANSW要展示的内容（时间，status）
     """
     lst_switch = db.switch_last_info()
+    switch_show = []
     if lst_switch:
         time_switch = lst_switch.time
-        lst_show_switch = [[i["IP"]] + i["PE_Sum"]for i in lst_switch.summary_total.values()]
-        return time_switch,lst_show_switch
+        switch_total = lst_switch.summary_total
+        for i in switch_total.keys():
+            ip = switch_total[i]["IP"]
+            PE_sum = switch_total[i]["PE_Sum"]
+            PE_total = switch_total[i]["PE_Total"]
+            PE_sum.insert(0,ip)
+            PE_sum.append(PE_total)
+            PE_sum.insert(0,i)
+            switch_show.append(PE_sum)
+            switch_show.sort(key=operator.itemgetter(0))
+        return time_switch,switch_show
 
 
 def get_HAAP_show_db():
@@ -340,22 +359,27 @@ def get_HAAP_show_db():
     show_HAAP = []
     if lst_HAAP:
         time_HAAP = lst_HAAP.time
-        for i in lst_HAAP.info.values():
-            show_HAAP.append(i["status"])
-            
-    return time_HAAP,show_HAAP
+        info = lst_HAAP.info
+        for i in info.keys():
+            info_status = info[i]["status"]
+            info_status.insert(0, i)
+            show_HAAP.append(info_status)
+    return time_HAAP, show_HAAP
 
 
-def get_HAAP_other_db(lst_haap_Alias):
+def get_HAAP_other_db():
     """
     @note: 获取数据库具体up_sec
     ['192.168.1.1',0,27838,0,0]
     """
     lst_HAAP = db.HAAP_last_info().info
+    lst_other = {}
     if lst_HAAP:
-        
-        up_sec = lst_HAAP[lst_haap_Alias]["up_sec"]
-    return up_sec
-
+        for i in lst_HAAP.keys():
+            list_status = lst_HAAP[i]["status"]
+            list_status.insert(2, lst_HAAP[i]['up_sec'])
+            list_status_judge = [list_status[a] for a in [0, 1,2, 5, 6]]
+            lst_other[i] = list_status_judge
+    return lst_other
 
 
