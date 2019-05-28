@@ -109,7 +109,7 @@ tlu = Time Last Update
             if haap:
                 tlu_haap = haap[0]
                 StatusHAAP = haap[1]
-                print(StatusHAAP[:-1])
+                #print(StatusHAAP[:-1])
             else:
                 tlu_haap = s.time_now_to_show()
                 StatusHAAP = [0]
@@ -117,13 +117,12 @@ tlu = Time Last Update
             if sansw:
                 tlu_sansw = sansw[0]
                 StatusSANSW = sansw[1]
-                print(StatusSANSW[:-1])
+                #print(StatusSANSW[:-1])
             else:
                 tlu_sansw = s.time_now_to_show()
                 StatusSANSW = [0]
             
-            
-            status_warning = status_warning
+            #status_warning = status_warning
 
         return render_template("monitor.html",
                                Title_HAAP=lstDescHAAP,
