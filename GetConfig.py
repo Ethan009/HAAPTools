@@ -105,19 +105,13 @@ class SwitchConfig(object):
 
     def threshold_total(self):
         lstThreshold = []
-        level1 = self.cfg.getint('Threshold', 'SWTotal_increase_Notify')
+        # level1 = self.cfg.getint('Threshold', 'SWTotal_increase_Notify')
         level2 = self.cfg.getint('Threshold', 'SWTotal_increase_Warning')
-        level3 = self.cfg.getint('Threshold', 'SWTotal_increase_Notify')
-        lstThreshold.append(level1)
+        level3 = self.cfg.getint('Threshold', 'SWTotal_increase_Alarm')
+        # lstThreshold.append(level1)
         lstThreshold.append(level2)
         lstThreshold.append(level3)
         return tuple(lstThreshold)
-
-    def SWTotal_level2(self):
-        return self.cfg.getint('Threshold', 'SWTotal_level2')
-
-    def SWTotal_level3(self):
-        return self.cfg.getint('Threshold', 'SWTotal_level3')
 
 
 class EmailConfig(object):

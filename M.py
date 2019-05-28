@@ -5,7 +5,6 @@ import sys
 import SANSW as sw
 import HAAP as haap
 import Source as s
-import Main as m
 
 try:
     import configparser as cp
