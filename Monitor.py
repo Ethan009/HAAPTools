@@ -206,14 +206,14 @@ def warning_interval_check(intInterval):
 
 # 现阶段先这样，每个引擎判断后发送邮件一次，下一阶段考虑两个引擎都判断完之后再发送邮件
 def check_all_haap():
-    Info_from_engine, Origin_from_engine = haap.data_for_db()
+    Origin_from_engine, Info_from_engine = haap.data_for_db()
     Info_from_DB = db.haap_last_record()
     if Info_from_DB:
         for engine in lst_haap_alias:
             lstRT = haap_info_for_judge(Info_from_engine)[engine]
             lstDB = haap_info_for_judge(Info_from_DB.info)[engine]
-            haap_judge(lstRT, lstDB)
-    db.haap_insert(Info_from_engine, Origin_from_engine)
+            haap_judge(lstRT, lstDB, engine)
+    db.haap_insert(Origin_from_engine, Info_from_engine)
 
 def check_all_sansw():
     dicAll = sw.get_info_for_DB()
@@ -248,21 +248,22 @@ def warning_check():
 class haap_judge(object):
     """docstring for haap_judge"""
 
-    def __init__(self, statusRT, statusDB):
+    def __init__(self, statusRT, statusDB, haap_Alias):
+        self.alias = haap_Alias
         self.host = statusRT[0]
         self.statusRT = statusRT
         self.statusDB = statusDB
         self.strTimeNow = s.time_now_to_show()
         self.lstWarningToSend = []
-        #self.All_judge()
 
     def judge_AH(self, AHstatus_rt, AHstatus_db):
+        str_engine_AH = 'Engine AH'
         if AHstatus_rt:
             if AHstatus_rt != AHstatus_db:
                 db.insert_warning(self.strTimeNow, self.host,
-                                  level, 'engine', str_engine_AH)
-                self.lstWarningToSend.apend(self.strTimeNow, self.host,
-                               AH_errlevel, str_engine_AH)
+                                  2, 'engine', str_engine_AH)
+                self.lstWarningToSend.apend([self.strTimeNow, self.host,
+                               self.alias, str_engine_AH])
                 return
         return True
 
@@ -272,24 +273,26 @@ class haap_judge(object):
             restart_time = uptime_second_db - uptime_second_rt
             db.insert_warning(self.strTimeNow, self.host, 2,
                               'engine',  str_engine_restart%(restart_time))
-            self.lstWarningToSend.apend(self.strTimeNow, self.host,
-                           reboot_errlevel, str_engine_restart)
+            self.lstWarningToSend.apend([self.strTimeNow, self.host,
+                           self.alias, str_engine_restart])
 
     def judge_Status(self, Status_rt, Status_db):
+        str_engine_status = 'Engine offline'
         if Status_rt:
             if Status_rt != Status_db:
                 db.insert_warning(self.strTimeNow, self.host,
                                   2, 'engine', str_engine_status)
-                self.lstWarningToSend.apend(self.strTimeNow, self.host,
-                               status_errlevel, str_engine_status)
+                self.lstWarningToSend.apend([self.strTimeNow, self.host,
+                               self.alias, str_engine_status])
 
     def judge_Mirror(self, MirrorStatus_rt, MirrorStatus_db):
+        str_engine_mirror = 'Engine mirror not ok'
         if MirrorStatus_rt:
             if MirrorStatus_rt != MirrorStatus_db:
                 db.insert_warning(self.strTimeNow, self.host,
                                   2, 'engine', str_engine_mirror)
-                self.lstWarningToSend.apend(self.strTimeNow, self.host,
-                               mirror_errlevel, str_engine_mirror)
+                self.lstWarningToSend.apend([self.strTimeNow, self.host,
+                               self.alias, str_engine_mirror])
 
     # 如果数据库没有信息，当引擎发生问题的时候，是否直接发送警报
     def All_judge(self):
@@ -300,7 +303,8 @@ class haap_judge(object):
                     self.judge_Status(self.statusRT[3], self.statusDB[3])
                     self.judge_Mirror(self.statusRT[4], self.statusDB[4])
         finally:
-            SE.send_warnmail(self.lstWarningToSend)
+            if self.lstWarningToSend:
+                SE.send_warnmail(self.lstWarningToSend)
 
 ### engine_info[haap_Alias]这两个参数这么用的话，那么直接传入engine_info[haap_Alias]不是更好？
 def get_engine_status_list_for_judg(engine_info, haap_Alias):
@@ -357,7 +361,7 @@ def sansw_info_to_show():
     lst_sansw_to_show = []
     if lst_switch:
         strTime = lst_switch.time.strftime('%Y-%m-%d %H:%M:%S')
-        switch_total = lst_switch.sum_total
+        switch_total = lst_switch.ptes
         for sansw_alias in switch_total.keys():
             ip = switch_total[sansw_alias]["IP"]
             PE_sum = switch_total[sansw_alias]["PE_Sum"]
@@ -390,8 +394,9 @@ def get_switch_total_db(list_switch_alias):
     """
     @note: 获取数据库的Total
     """
-    list_switch = db.switch_last_info().sum_total
+    list_switch = db.switch_last_info()
     if list_switch:
+        list_switch = list_switch.sum_total
         db_total = list_switch[list_switch_alias]["PE_Total"]
         return db_total
 
