@@ -24,13 +24,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for error in error_list %}
-                        <tr>
-                            {% for item in error %}
-                            <th>item</th>
-                            {% endfor %}
+                      {% for me in error_message %}
+                                <tr class="success">
+                             {% for status in me %}
+                                  <td>{{ status }}</td>
+                         {% endfor %}
                         </tr>
-                        {% endfor %}
+                         {% endfor %}
                     </tbody>
                 </table>
                 <!--确认按钮-->

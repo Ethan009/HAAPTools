@@ -87,10 +87,19 @@ tlu = Time Last Update
     '''
     app = Flask(__name__, template_folder='./web/templates',
                 static_folder='./web/static', static_url_path='')
+    
+
 
     @app.route("/", methods=['GET', 'POST'])
     def home():
-
+        error_message = db.get_unconfirm_warning()          
+        print("error_message:",error_message)
+        if request.method == 'GET' and error_message:
+            error = 1
+        else:
+            db.update_warning()
+            error = 0
+        
         # Transfer lstDescHAAP, lstDescSANSW, lstStatusHAAP, \
         # lstStatusSANSW, interval_refresh, haap_status, \
         # sansw_status, warning_status
@@ -140,10 +149,9 @@ tlu = Time Last Update
 
     @app.route("/warning/")
     def warning():
-        context = {
-            'error_message': db.get_unconfirm_warning()
-        }
-        return render_template("warning.html", **context)
+        error_message = db.get_unconfirm_warning()          
+        return render_template("warning.html", error_message = error_message,
+                               )
 
     app.run(debug=False, use_reloader=False, host='127.0.0.1', port=5000)
 
@@ -263,38 +271,37 @@ class haap_judge(object):
         if AHstatus_rt:
             if AHstatus_rt != AHstatus_db:
                 db.insert_warning(self.strTimeNow, self.host,
-                                  2, 'engine', str_engine_AH)
+                                  2, 'engine', str_engine_AH,0)
                 self.lstWarningToSend.append([self.strTimeNow, self.host,
-                               self.alias, str_engine_AH])
+                               self.alias, 2, str_engine_AH])
                 return
         return True
 
     def judge_reboot(self, uptime_second_rt, uptime_second_db):
         str_engine_restart = 'Engine Reboot %d secends ago'
         if uptime_second_rt <= uptime_second_db:
-            restart_time = uptime_second_db - uptime_second_rt
             db.insert_warning(self.strTimeNow, self.host, 2,
-                              'engine',  str_engine_restart%(restart_time))
+                              'engine',  str_engine_restart%(uptime_second_rt),0)
             self.lstWarningToSend.append([self.strTimeNow, self.host,
-                           self.alias, str_engine_restart])
+                           self.alias, 2, str_engine_restart%(uptime_second_rt)])
 
     def judge_Status(self, Status_rt, Status_db):
         str_engine_status = 'Engine offline'
         if Status_rt:
             if Status_rt != Status_db:
                 db.insert_warning(self.strTimeNow, self.host,
-                                  2, 'engine', str_engine_status)
+                                  2, 'engine', str_engine_status,0)
                 self.lstWarningToSend.append([self.strTimeNow, self.host,
-                               self.alias, str_engine_status])
+                               self.alias, 2, str_engine_status])
 
     def judge_Mirror(self, MirrorStatus_rt, MirrorStatus_db):
         str_engine_mirror = 'Engine mirror not ok'
         if MirrorStatus_rt:
             if MirrorStatus_rt != MirrorStatus_db:
                 db.insert_warning(self.strTimeNow, self.host,
-                                  2, 'engine', str_engine_mirror)
+                                  2, 'engine', str_engine_mirror,0)
                 self.lstWarningToSend.append([self.strTimeNow, self.host,
-                               self.alias, str_engine_mirror])
+                               self.alias, 2, str_engine_mirror])
 
     # 如果数据库没有信息，当引擎发生问题的时候，是否直接发送警报
     def all_judge(self):
@@ -326,8 +333,8 @@ def sansw_judge(total_RT, total_DB, sansw_IP, sansw_Alias):
             msg = warning_message_sansw(intWarninglevel)
             db.insert_warning(strTimeNow, sansw_IP, intWarninglevel,
                               'switch', msg)
-            SE.send_warnmail([[strTimeNow, sansw_IP, intWarninglevel, \
-                sansw_Alias, msg]])
+            SE.send_warnmail([[strTimeNow, sansw_IP,
+                               sansw_Alias, intWarninglevel, msg]])
 
 
 def warning_message_sansw(intWarninglevel):

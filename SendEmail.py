@@ -41,6 +41,7 @@ def send_warnmail(warninfo_email):
                     <td>""" + str(e[1]) + """</td>
                     <td>""" + str(e[2]) + """</td>
                     <td>""" + str(e[3]) + """</td>
+                    <td>""" + str(e[4]) + """</td>
                 </tr>"""
         shuju = shuju + lie
     html = """\
@@ -60,6 +61,7 @@ def send_warnmail(warninfo_email):
             <th>Time</th>
             <th>IP</th>
             <th>Device</th>
+            <th>Level</th>
             <th>Message</th>
           </tr>
           """ + shuju + """

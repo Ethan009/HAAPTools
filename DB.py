@@ -102,11 +102,12 @@ def sansw_total_list_or_dict():
 
  
 # Warning 
-def insert_warning(ip, level, warn_message, confirm):
+def insert_warning(time,ip, level, device,warn_message, confirm):
     """
     @note: warning数据插入
     """
-    Warning().insert(ip, level, warn_message, confirm)
+    Warning().insert(time ,ip, level, device,
+                        warn_message, confirm)
 
 
 def update_warning():
@@ -122,8 +123,8 @@ def get_unconfirm_warning():
     """
     lstAllUCW = []
     for warning in Warning().get_all_unconfirm_warning():
-        lstAllUCW.append([record.time, record.level, record.device, \
-            record.ip, record.warn_message])
+        lstAllUCW.append([warning.time, warning.level, warning.device,
+            warning.ip, warning.warn_message])
     if lstAllUCW:
         return lstAllUCW
 
@@ -147,7 +148,7 @@ class collWarning(Document):
     level = IntField()
     device = StringField()
     ip = StringField()
-    msg = StringField()
+    warn_message = StringField()
     confirm = IntField()
     '''
 time:'2019-05-20 15:20'
@@ -190,20 +191,20 @@ class SANSW(object):
 
 class Warning(object):
     
-    def insert(self, time_now, lstip, lstdj, device, lstSTS, confirm=0):
+    def insert(self, time_now, lstip, lstdj, device, lstSTS, confirm):
         t = collWarning(time=time_now, ip=lstip, level=lstdj, device=device,
                         warn_message=lstSTS, confirm=confirm)
         t.save()
     
     def query_range(self, time_start, time_end):
-        collWARN.objects(date__gte=time_start,
+        collWarning.objects(date__gte=time_start,
                         date__lt=time_end).order_by('-date')
 
     def query_last_records(self):
-        return collWARN.objects().order_by('-time').first()
+        return collWarning.objects().order_by('-time').first()
 
     def update(self, intN):
-        return collWARN.objects().order_by('-time').first()
+        return collWarning.objects().order_by('-time').first()
     
     def get_all_unconfirm_warning(self):
         warning_status = collWarning.objects(confirm=0)
@@ -214,5 +215,6 @@ class Warning(object):
 
 
 if __name__ == '__main__':
+#     print(get_unconfirm_warning())
     pass
 

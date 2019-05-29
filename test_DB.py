@@ -244,6 +244,7 @@ if __name__ == '__main__':
 #     print(mn.get_switch_show_db())
 #     print(mn.get_HAAP_show_db())
 #     print(mn.get_HAAP_other_db())
+#     db.insert_warning(s.time_now_to_show(),'222.2.2.2',2,'engine',"wewewewe",0)
     print("ok")
     pass
     
