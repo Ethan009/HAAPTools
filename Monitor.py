@@ -209,7 +209,7 @@ def warning_interval_check(intInterval):
 # 现阶段先这样，每个引擎判断后发送邮件一次，下一阶段考虑两个引擎都判断完之后再发送邮件
 def check_all_haap():
     Origin_from_engine, Info_from_engine = haap.data_for_db()
-    Info_from_DB = db.haap_last_record()
+    Info_from_DB = db.HAAP().query_last_record()
     if Info_from_DB:
         for engine in lst_haap_alias:
             lstRT = haap_info_for_judge(Info_from_engine)[engine]
@@ -260,7 +260,7 @@ class haap_judge(object):
             if AHstatus_rt != AHstatus_db:
                 db.insert_warning(self.strTimeNow, self.host,
                                   2, 'engine', str_engine_AH)
-                self.lstWarningToSend.apend([self.strTimeNow, self.host,
+                self.lstWarningToSend.append([self.strTimeNow, self.host,
                                self.alias, str_engine_AH])
                 return
         return True
@@ -271,7 +271,7 @@ class haap_judge(object):
             restart_time = uptime_second_db - uptime_second_rt
             db.insert_warning(self.strTimeNow, self.host, 2,
                               'engine',  str_engine_restart%(restart_time))
-            self.lstWarningToSend.apend([self.strTimeNow, self.host,
+            self.lstWarningToSend.append([self.strTimeNow, self.host,
                            self.alias, str_engine_restart])
 
     def judge_Status(self, Status_rt, Status_db):
@@ -280,7 +280,7 @@ class haap_judge(object):
             if Status_rt != Status_db:
                 db.insert_warning(self.strTimeNow, self.host,
                                   2, 'engine', str_engine_status)
-                self.lstWarningToSend.apend([self.strTimeNow, self.host,
+                self.lstWarningToSend.append([self.strTimeNow, self.host,
                                self.alias, str_engine_status])
 
     def judge_Mirror(self, MirrorStatus_rt, MirrorStatus_db):
@@ -289,7 +289,7 @@ class haap_judge(object):
             if MirrorStatus_rt != MirrorStatus_db:
                 db.insert_warning(self.strTimeNow, self.host,
                                   2, 'engine', str_engine_mirror)
-                self.lstWarningToSend.apend([self.strTimeNow, self.host,
+                self.lstWarningToSend.append([self.strTimeNow, self.host,
                                self.alias, str_engine_mirror])
 
     # 如果数据库没有信息，当引擎发生问题的时候，是否直接发送警报
@@ -340,7 +340,7 @@ def haap_info_to_show():
     """
     @note: HAAP网页展示数据(时间，status)
     """
-    dicALL = db.haap_last_record()
+    dicALL = db.HAAP().query_last_record()
     lstHAAPToShow = []
     if dicALL:
         strTime = dicALL.time.strftime('%Y-%m-%d %H:%M:%S')
@@ -356,7 +356,7 @@ def sansw_info_to_show():
     """
     @note: 获取数据库SANSW要展示的内容（时间，status）
     """
-    lst_switch = db.switch_last_info()
+    lst_switch = db.SANSW().query_last_records()
     lst_sansw_to_show = []
     if lst_switch:
         strTime = lst_switch.time.strftime('%Y-%m-%d %H:%M:%S')
@@ -394,7 +394,7 @@ def get_switch_total_db(list_switch_alias):
     """
     @note: 获取数据库的Total
     """
-    list_switch = db.switch_last_info()
+    list_switch = db.SANSW().query_last_records()
     if list_switch:
         list_switch = list_switch.sum_total
         db_total = list_switch[list_switch_alias]["PE_Total"]

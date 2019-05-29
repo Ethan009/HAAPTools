@@ -30,11 +30,11 @@ def haap_insert(origin, info):
     HAAP().insert(origin, info)
 
     
-def haap_last_record():
-    """
-    @note: HAAP最后一次所有的数据
-    """
-    return HAAP().query_last_record()
+# def haap_last_record():
+#     """
+#     @note: HAAP最后一次所有的数据
+#     """
+#     return HAAP().query_last_record()
 
 
 # ## 你这里是X也没有写啊！！！真是坑
@@ -88,11 +88,11 @@ def switch_insert(origin, sum_total, dicPEFormated):
     SANSW().insert(origin,  sum_total, dicPEFormated)
 
     
-def switch_last_info():
-    """
-    @note: SANSW最后一次所有的数据
-    """
-    return SANSW().query_last_records()
+# def switch_last_info():
+#     """
+#     @note: SANSW最后一次所有的数据
+#     """
+#     return SANSW().query_last_records()
 
 
 def sansw_web_show_list():
