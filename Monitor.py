@@ -103,13 +103,16 @@ tlu = Time Last Update
             status_warning = 0
 
         elif mode == 'db':
+            print("111111111111111111111111")
             haap = haap_info_to_show()
             sansw = sansw_info_to_show()
             status_warning = db.get_unconfirm_warning()
             if haap:
+                print("haap:",haap)
                 tlu_haap = haap[0]
                 StatusHAAP = haap[1]
                 #print(StatusHAAP[:-1])
+                
             else:
                 tlu_haap = s.time_now_to_show()
                 StatusHAAP = [0]
@@ -209,14 +212,14 @@ def warning_interval_check(intInterval):
 # 现阶段先这样，每个引擎判断后发送邮件一次，下一阶段考虑两个引擎都判断完之后再发送邮件
 def check_all_haap():
     Origin_from_engine, Info_from_engine = haap.data_for_db()
-    Info_from_DB = db.HAAP().query_last_record()
+    Info_from_DB = db.haap_last_record()
     if Info_from_DB:
         for engine in lst_haap_alias:
             lstRT = haap_info_for_judge(Info_from_engine)[engine]
             print("12222",lstRT)
             lstDB = haap_info_for_judge(Info_from_DB.info)[engine]
             haap_judge(lstRT, lstDB, engine)
-    db.haap_insert(Origin_from_engine, Info_from_engine)
+    db.haap_insert(datetime.datetime.now(),Origin_from_engine, Info_from_engine)
 
 def check_all_sansw():
     dicAll = sw.get_info_for_DB()
@@ -228,8 +231,7 @@ def check_all_sansw():
             int_total_RT = dic_sum_total['PE_Total']
             strIP = dic_sum_total['IP']
             sansw_judge(int_total_RT, int_total_DB, strIP, sw_alias)
-    print("ok")
-    db.switch_insert(dicAll[0], dicAll[1], dicAll[2])
+    db.switch_insert(datetime.datetime.now(),dicAll[0], dicAll[1], dicAll[2])
 
 
 def warning_check():
@@ -350,13 +352,14 @@ def haap_info_to_show():
             info_status.insert(0, engine_alias)
             info_status.append(info[engine_alias]['level'])
             lstHAAPToShow.append(info_status)
+        print("lstHAAPToShow:",lstHAAPToShow)
         return strTime, lstHAAPToShow
 ###355行是拿ptes的值。ptes
 def sansw_info_to_show():
     """
     @note: 获取数据库SANSW要展示的内容（时间，status）
     """
-    lst_switch = db.SANSW().query_last_records()
+    lst_switch = db.switch_last_info()
     lst_sansw_to_show = []
     if lst_switch:
         strTime = lst_switch.time.strftime('%Y-%m-%d %H:%M:%S')
@@ -394,13 +397,13 @@ def get_switch_total_db(list_switch_alias):
     """
     @note: 获取数据库的Total
     """
-    list_switch = db.SANSW().query_last_records()
+    list_switch = db.switch_last_info()
     if list_switch:
         list_switch = list_switch.sum_total
         db_total = list_switch[list_switch_alias]["PE_Total"]
         return db_total
 
 if __name__ == '__main__':
-#     print(haap_info_to_show())
+    print(haap_info_to_show())
 #     print(check_all_haap())
     pass
