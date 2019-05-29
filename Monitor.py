@@ -228,6 +228,7 @@ def check_all_sansw():
             int_total_RT = dic_sum_total['PE_Total']
             strIP = dic_sum_total['IP']
             sansw_judge(int_total_RT, int_total_DB, strIP, sw_alias)
+    print("ok")
     db.switch_insert(dicAll[0], dicAll[1], dicAll[2])
 
 
@@ -359,7 +360,7 @@ def sansw_info_to_show():
     lst_sansw_to_show = []
     if lst_switch:
         strTime = lst_switch.time.strftime('%Y-%m-%d %H:%M:%S')
-        switch_total = lst_switch.ptes
+        switch_total = lst_switch.sum_total
         for sansw_alias in switch_total.keys():
             ip = switch_total[sansw_alias]["IP"]
             PE_sum = switch_total[sansw_alias]["PE_Sum"]
@@ -384,7 +385,7 @@ def haap_info_for_judge(lstInfo):
         for haap in list_haap_alias:
             list_status = lstInfo[haap]["status"]
             new_list_status_judge = list_status[:]
-            list_status_judge = [list_status_judge[i] for i in [0, 1,2,4, 5]]
+            list_status_judge = [new_list_status_judge[i] for i in [0, 1,2,4, 5]]
             list_status_judge[2]= lstInfo[haap]['up_sec']
             dicInfo[haap] = list_status_judge
         return dicInfo

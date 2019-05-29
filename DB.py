@@ -10,17 +10,17 @@ import HAAP as haap
 import SANSW as sw
 import Source as s
 
-
 # read config and connet to the datebase
 cfgDB = gc.DBConfig()
 strDBName = cfgDB.name()
-#print("strDBName:", strDBName)
+# print("strDBName:", strDBName)
 strDBHost = cfgDB.host()
-#print("strDBName:", strDBHost)
+# print("strDBName:", strDBHost)
 intDBPort = cfgDB.port()
-#print("strDBName:", intDBPort)
+# print("strDBName:", intDBPort)
 
 connect(strDBName, host=strDBHost, port=intDBPort)
+
 
 # HAAP
 def haap_insert(origin, info):
@@ -28,6 +28,7 @@ def haap_insert(origin, info):
     @note: monitoHAAP数据插入
     """
     HAAP().insert(origin, info)
+
     
 def haap_last_record():
     """
@@ -35,7 +36,8 @@ def haap_last_record():
     """
     return HAAP().query_last_record()
 
-### 你这里是X也没有写啊！！！真是坑
+
+# ## 你这里是X也没有写啊！！！真是坑
 def haap_judge_list():
     '''
 [['1.1.1.1',0,8623,0,0],['1.1.1.1',0,8623,0,0]]
@@ -50,6 +52,7 @@ def haap_judge_list():
     
     pass
 
+
 def haap_judge_list_for_engineX(engineX):
     '''
 ['1.1.1.1',0,8623,0,0]
@@ -57,6 +60,7 @@ def haap_judge_list_for_engineX(engineX):
     # 找出engineX的index值，然后从judge_list()结果返回也可以
     
     pass
+
 
 def haap_web_show_list():
     '''
@@ -66,21 +70,23 @@ def haap_web_show_list():
 
     pass
 
+
 def haap_web_show_for_engineX(engineX):
     '''
 ['1.1.1.1',0,'8d 7h 20s',0,0,0]
     '''
-    #XXXXXXXX
+    # XXXXXXXX
     
     pass
 
 
 # SANSW
-def switch_insert(origin, dicPEFormated, sum_total):
+def switch_insert(origin, sum_total, dicPEFormated):
     """
     @note: SANSW数据插入
     """
-    SANSW().insert(origin, dicPEFormated, sum_total)
+    SANSW().insert(origin,  sum_total, dicPEFormated)
+
     
 def switch_last_info():
     """
@@ -88,12 +94,13 @@ def switch_last_info():
     """
     return SANSW().query_last_records()
 
+
 def sansw_web_show_list():
     pass
 
+
 def sansw_total_list_or_dict():
     pass
-
 
  
 # Warning 
@@ -171,8 +178,8 @@ class HAAP(object):
 class SANSW(object):
 
 # ptes = port error show info formatted
-    def insert(self, origin, ptes, sum_total):
-        t = collSANSW(origin=origin, ptes=ptes, sum_total=sum_total)
+    def insert(self, origin,  sum_total,ptes):
+        t = collSANSW(origin=origin, sum_total=sum_total,ptes=ptes,)
         t.save()
 
     def query_range(self, time_start, time_end):
@@ -185,8 +192,8 @@ class SANSW(object):
 
 class Warning(object):
     
-    def insert(self, time_now, lstip, lstdj, device,lstSTS, confirm = 0):
-        t = collWarning(time=time_now, ip=lstip, level=lstdj,device =device,
+    def insert(self, time_now, lstip, lstdj, device, lstSTS, confirm=0):
+        t = collWarning(time=time_now, ip=lstip, level=lstdj, device=device,
                         warn_message=lstSTS, confirm=confirm)
         t.save()
     
