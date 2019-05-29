@@ -8,6 +8,9 @@ import re
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
+import logging
+logging.basicConfig()
+
 try:
     import configparser as cp
 except Exception:

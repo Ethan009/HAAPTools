@@ -197,6 +197,19 @@ def main():
             else:
                 print('Please Provide Correct Engine IP...')
 
+    elif sys.argv[1] == 'fw':
+        if len(sys.argv) != 4:
+            print(strFWHelp)
+        else:
+            ip = sys.argv[2]
+            fw_file = sys.argv[3]
+            if not s.is_IP(ip):
+                print('Please Provide Correct Engine IP...')
+            if not s.is_file(fw_file):
+                print('File Not Exists. Please Provide Correct File...')
+            haap.change_firmware(ip, fw_file)
+
+
     # get engines' trace files under TraceFolder based on Trace levels
     elif sys.argv[1] == 'gt':
         num_argv = len(sys.argv)

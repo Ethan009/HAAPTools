@@ -103,7 +103,7 @@ def get_info_for_DB():
         origin.update(objSANSW.get_dicOrigin())
         sum_and_total.update(objSANSW.get_summary_total())
         PEFormated.update(objSANSW.get_dicPEFormated())
-    return origin,sum_and_total,PEFormated
+    return origin,PEFormated,sum_and_total
 
 class Action():
 

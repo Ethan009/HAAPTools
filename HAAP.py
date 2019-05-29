@@ -122,6 +122,8 @@ def show_stauts(ip):
     lstStatus = Status(ip, telnet_port, passwd, FTP_port).over_all()
     _print_status_in_line(lstStatus)
 
+def change_firmware(ip, fw_file):
+    Action(ip, telnet_port, passwd, FTP_port).change_firmware(fw_file)
 
 def set_time_all():
     for ip in list_engines_IP:

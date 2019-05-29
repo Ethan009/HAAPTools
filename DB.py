@@ -86,7 +86,7 @@ def switch_last_info():
     """
     @note: SANSW最后一次所有的数据
     """
-    return SANSW().query_last_records()
+    return SANSW().query_last_record()
 
 def sansw_web_show_list():
     pass
@@ -179,7 +179,7 @@ class SANSW(object):
         collSANSW.objects(date__gte=time_start,
                           date__lt=time_end).order_by('-date')
 
-    def query_last_records(self):
+    def query_last_record(self):
         return collSANSW.objects().order_by('-time').first()
    
 

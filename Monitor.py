@@ -160,7 +160,9 @@ def stopping_web(intSec):
 def haap_interval_check(intInterval):
     t = s.Timing()
     t.add_interval(check_all_haap, intInterval)
+    print('haap add ok')
     t.stt()
+    print('haap start ok')
 
 def sansw_interval_check(intInterval):
     t = s.Timing()
@@ -209,21 +211,25 @@ def warning_interval_check(intInterval):
 # 现阶段先这样，每个引擎判断后发送邮件一次，下一阶段考虑两个引擎都判断完之后再发送邮件
 def check_all_haap():
     Origin_from_engine, Info_from_engine = haap.data_for_db()
-    Info_from_DB = db.haap_last_record()
+    print('get from RT ok @ %s' % datetime.datetime.now())
+    print(Info_from_engine)
+    Info_from_DB = db.HAAP().query_last_record()
+    print('get from db ok @ %s' % datetime.datetime.now())
+    print(Info_from_DB.info)
     if Info_from_DB:
         for engine in lst_haap_alias:
             lstRT = haap_info_for_judge(Info_from_engine)[engine]
-            print("12222",lstRT)
             lstDB = haap_info_for_judge(Info_from_DB.info)[engine]
             haap_judge(lstRT, lstDB, engine)
     db.haap_insert(Origin_from_engine, Info_from_engine)
+    print('insert to DB ok @ %s' % datetime.datetime.now())
 
 def check_all_sansw():
     dicAll = sw.get_info_for_DB()
     if dicAll:
         for sw_alias in lst_sansw_alias:
             int_total_DB = get_switch_total_db(sw_alias)
-            dic_sum_total = dicAll[1]
+            dic_sum_total = dicAll[2]
             dic_sum_total = dic_sum_total[sw_alias]
             int_total_RT = dic_sum_total['PE_Total']
             strIP = dic_sum_total['IP']
@@ -339,7 +345,7 @@ def haap_info_to_show():
     """
     @note: HAAP网页展示数据(时间，status)
     """
-    dicALL = db.haap_last_record()
+    dicALL = db.HAAP().query_last_record()
     lstHAAPToShow = []
     if dicALL:
         strTime = dicALL.time.strftime('%Y-%m-%d %H:%M:%S')
@@ -355,15 +361,15 @@ def sansw_info_to_show():
     """
     @note: 获取数据库SANSW要展示的内容（时间，status）
     """
-    lst_switch = db.switch_last_info()
+    dicALL = db.SANSW().query_last_record()
     lst_sansw_to_show = []
-    if lst_switch:
-        strTime = lst_switch.time.strftime('%Y-%m-%d %H:%M:%S')
-        switch_total = lst_switch.ptes
-        for sansw_alias in switch_total.keys():
-            ip = switch_total[sansw_alias]["IP"]
-            PE_sum = switch_total[sansw_alias]["PE_Sum"]
-            PE_total = switch_total[sansw_alias]["PE_Total"]
+    if dicALL:
+        strTime = dicALL.time.strftime('%Y-%m-%d %H:%M:%S')
+        sum_total = dicALL.sum_total
+        for sansw_alias in sum_total.keys():
+            ip = sum_total[sansw_alias]["IP"]
+            PE_sum = sum_total[sansw_alias]["PE_Sum"]
+            PE_total = sum_total[sansw_alias]["PE_Total"]
             warning_level = s.is_Warning(PE_total, tuplThresholdTotal)
             PE_sum.insert(0,ip)
             PE_sum.append(PE_total)
@@ -378,25 +384,37 @@ def haap_info_for_judge(lstInfo):
     @note: 获取数据库具体up_sec
     ['192.168.1.1',0,27838,0,0]
     """
+    # dicInfo = {}
+    # if lstInfo:
+    #     list_haap_alias = lstInfo.keys()
+    #     for haap in list_haap_alias:
+    #         list_status = lstInfo[haap]["status"]
+    #         new_list_status_judge = list_status[:]
+    #         list_status_judge = [list_status_judge[i] for i in [0, 1,2,4, 5]]
+    #         list_status_judge[2]= lstInfo[haap]['up_sec']
+    #         dicInfo[haap] = list_status_judge
+    #     return dicInfo
+
     dicInfo = {}
     if lstInfo:
         list_haap_alias = lstInfo.keys()
         for haap in list_haap_alias:
             list_status = lstInfo[haap]["status"]
-            new_list_status_judge = list_status[:]
-            list_status_judge = [list_status_judge[i] for i in [0, 1,2,4, 5]]
+            #new_list_status_judge = list_status[:]
+            list_status_judge = [list_status[i] for i in [0, 1,2,4, 5]]
             list_status_judge[2]= lstInfo[haap]['up_sec']
             dicInfo[haap] = list_status_judge
         return dicInfo
+
 #增加一个if判断。不能直接拿sum_total值
-def get_switch_total_db(list_switch_alias):
+def get_switch_total_db(sansw_alias):
     """
     @note: 获取数据库的Total
     """
-    list_switch = db.switch_last_info()
-    if list_switch:
-        list_switch = list_switch.sum_total
-        db_total = list_switch[list_switch_alias]["PE_Total"]
+    dicALL = db.SANSW().query_last_record()
+    if dicALL:
+        dic_sum_total = dicALL.sum_total
+        db_total = dic_sum_total[sansw_alias]["PE_Total"]
         return db_total
 
 if __name__ == '__main__':
