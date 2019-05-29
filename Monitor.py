@@ -103,7 +103,7 @@ tlu = Time Last Update
             status_warning = 0
 
         elif mode == 'db':
-            print("111111111111111111111111")
+#             print("111111111111111111111111")
             haap = haap_info_to_show()
             sansw = sansw_info_to_show()
             status_warning = db.get_unconfirm_warning()
@@ -218,7 +218,8 @@ def check_all_haap():
             lstRT = haap_info_for_judge(Info_from_engine)[engine]
             print("12222",lstRT)
             lstDB = haap_info_for_judge(Info_from_DB.info)[engine]
-            haap_judge(lstRT, lstDB, engine)
+            haap_judge(lstRT, lstDB, engine).all_judge()
+            
     db.haap_insert(datetime.datetime.now(),Origin_from_engine, Info_from_engine)
 
 def check_all_sansw():
@@ -255,6 +256,7 @@ class haap_judge(object):
         self.statusDB = statusDB
         self.strTimeNow = s.time_now_to_show()
         self.lstWarningToSend = []
+        print("3232323232332")
 
     def judge_AH(self, AHstatus_rt, AHstatus_db):
         str_engine_AH = 'Engine AH'
@@ -295,7 +297,7 @@ class haap_judge(object):
                                self.alias, str_engine_mirror])
 
     # 如果数据库没有信息，当引擎发生问题的时候，是否直接发送警报
-    def All_judge(self):
+    def all_judge(self):
         try:
             if self.statusDB:
                 if self.judge_AH(self.statusRT[1], self.statusDB[1]):
@@ -404,6 +406,6 @@ def get_switch_total_db(list_switch_alias):
         return db_total
 
 if __name__ == '__main__':
-    print(haap_info_to_show())
+#     print(haap_info_to_show())
 #     print(check_all_haap())
     pass
