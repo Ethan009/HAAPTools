@@ -15,6 +15,9 @@ except Exception:
 
 import GetConfig as gc
 
+import logging
+logging.basicConfig()
+
 # <<<Get Config Field>>>
 setting = gc.Setting()
 error_level = setting.message_level()
