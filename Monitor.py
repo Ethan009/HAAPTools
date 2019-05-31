@@ -56,15 +56,15 @@ def monitor_rt_1_thread():
 
 
 def monitor_db_4_thread():
-    #t1 = Thread(target=start_web, args=('db',))
+    t1 = Thread(target=start_web, args=('db',))
     t2 = Thread(target=haap_interval_check, args=(interval_haap_update,))
     t3 = Thread(target=sansw_interval_check, args=(interval_sansw_update,))
     t4 = Thread(target=warning_interval_check, args=(interval_warning_check,))
-    #t1.setDaemon(True)
+    t1.setDaemon(True)
     t2.setDaemon(True)
     t3.setDaemon(True)
     t4.setDaemon(True)
-    #t1.start()
+    t1.start()
     t2.start()
     t3.start()
     t4.start()
@@ -219,33 +219,17 @@ def warning_interval_check(intInterval):
 # 现阶段先这样，每个引擎判断后发送邮件一次，下一阶段考虑两个引擎都判断完之后再发送邮件
 def check_all_haap():
     Origin_from_engine, Info_from_engine = haap.data_for_db()
-#     try:
-#         Info_from_DB = db.haap_last_record()
-#         if Info_from_DB:
-#             for engine in lst_haap_alias:
-#                 lstRT = haap_info_for_judge(Info_from_engine)[engine]
-#                 lstDB = haap_info_for_judge(Info_from_DB.info)[engine]
-#                 haap_judge(lstRT, lstDB, engine).all_judge()
-#     finally:
-#         db.haap_insert(datetime.datetime.now(),Origin_from_engine, Info_from_engine)
-    print('get info from db...')
     try:
         Info_from_DB = db.haap_last_record()
-        print('get info from db...completely...')
-        #print(Info_from_DB)
         if Info_from_DB:
             print('start for...')
             for engine in lst_haap_alias:
                 print(Info_from_engine)
                 lstRT = haap_info_for_judge(Info_from_engine)[engine]
-                #print(lstRT)
                 print(Info_from_DB.info)
                 lstDB = haap_info_for_judge(Info_from_DB.info)[engine]
-                #print(lstDB)
-                print('starting haap_dudge...')
                 haap_judge(lstRT, lstDB, engine).all_judge()  
                 return
-                print('end haap_judge...!!!') 
     finally:
         db.haap_insert(datetime.datetime.now(),Origin_from_engine, Info_from_engine)
     
@@ -267,8 +251,10 @@ def check_all_sansw():
 def warning_check():
     unconfirm_warning = db.get_unconfirm_warning()
     if unconfirm_warning:
-        lstWarning = change_to_list(unconfirm_warning)
-        SE.send_warnmail(lstWarning)
+        print("unconfirm_warning:",unconfirm_warning)
+#         lstWarning = change_to_list(unconfirm_warning)
+#         print("unconfirm_warning:",unconfirm_warning)
+        SE.send_warnmail(unconfirm_warning)
     else:
         print('No Unconfirm Warning Found...')
 
@@ -443,5 +429,8 @@ def get_switch_total_db(list_switch_alias):
 if __name__ == '__main__':
 #     print(haap_info_to_show())
 #     print(check_all_haap())
-#     print(sansw_info_to_show())
+    db.insert_warning("22:000", "1.1.1.1", 2,
+                              'switch',  "errrr",1)
+    warning_check()
+    print("ok")
     pass
