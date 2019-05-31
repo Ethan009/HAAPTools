@@ -28,55 +28,13 @@ def haap_insert(time, origin, info):
     @note: monitoHAAP数据插入
     """
     HAAP().insert(time, origin, info)
+    #HAAP().insert(time, origin, info)
     
 def haap_last_record():
     """
     @note: HAAP最后一次所有的数据
     """
     return HAAP().query_last_record()
-
-
-# ## 你这里是X也没有写啊！！！真是坑
-def haap_judge_list():
-    '''
-[['1.1.1.1',0,8623,0,0],['1.1.1.1',0,8623,0,0]]
-    '''
-    dic_last = HAAP().query_last_record()
-
-    list_info = engine_info[haap_Alias]
-    list_status = list_info['status']
-    list_status_judge = [list_status[i] for i in [0, 1, 4, 5]]
-    list_status_judge.insert(2, list_status['up_sec'])
-    return list_status_judge
-    
-    pass
-
-
-def haap_judge_list_for_engineX(engineX):
-    '''
-['1.1.1.1',0,8623,0,0]
-    '''
-    # 找出engineX的index值，然后从judge_list()结果返回也可以
-    
-    pass
-
-
-def haap_web_show_list():
-    '''
-[['1.1.1.1',0,'8d 7h 20s',0,0,0],['1.1.1.1',0,8623,0,0,0]]
-    '''
-    dic_last = HAAP().query_last_record()
-
-    pass
-
-
-def haap_web_show_for_engineX(engineX):
-    '''
-['1.1.1.1',0,'8d 7h 20s',0,0,0]
-    '''
-    # XXXXXXXX
-    
-    pass
 
 
 # SANSW

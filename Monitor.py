@@ -92,9 +92,8 @@ tlu = Time Last Update
 
     @app.route("/", methods=['GET', 'POST'])
     def home():
-        error_message = db.get_unconfirm_warning()          
-        print("error_message:",error_message)
-        if request.method == 'GET' and error_message:
+        lstWarningList = db.get_unconfirm_warning()
+        if request.method == 'GET' and lstWarningList:
             error = 1
         else:
             db.update_warning()
@@ -148,8 +147,8 @@ tlu = Time Last Update
 
     @app.route("/warning/")
     def warning():
-        error_message = db.get_unconfirm_warning()          
-        return render_template("warning.html", error_message = error_message,
+        lstWarningList = db.get_unconfirm_warning()          
+        return render_template("warning.html", lstWarningList = lstWarningList,
                                )
 
     app.run(debug=False, use_reloader=False, host='127.0.0.1', port=5000)
@@ -236,30 +235,28 @@ def check_all_haap():
     
 
 def check_all_sansw():
-    dicAll = sw.get_info_for_DB()
-    if dicAll:
-        for sw_alias in lst_sansw_alias:
-            int_total_DB = get_switch_total_db(sw_alias)
-            dic_sum_total = dicAll[1]
-            dic_sum_total = dic_sum_total[sw_alias]
-            int_total_RT = dic_sum_total['PE_Total']
-            strIP = dic_sum_total['IP']
-            sansw_judge(int_total_RT, int_total_DB, strIP, sw_alias)
-    db.switch_insert(datetime.datetime.now(),dicAll[0], dicAll[1], dicAll[2])
+    try:
+        dicAll = sw.get_info_for_DB()
+        if dicAll:
+            for sw_alias in lst_sansw_alias:
+                int_total_DB = get_switch_total_db(sw_alias)
+                dic_sum_total = dicAll[1]
+                dic_sum_total = dic_sum_total[sw_alias]
+                int_total_RT = dic_sum_total['PE_Total']
+                strIP = dic_sum_total['IP']
+                sansw_judge(int_total_RT, int_total_DB, strIP, sw_alias)
+    finally:
+        db.switch_insert(datetime.datetime.now(),dicAll[0], dicAll[1], dicAll[2])
 
 
 def warning_check():
     unconfirm_warning = db.get_unconfirm_warning()
     if unconfirm_warning:
-        print("unconfirm_warning:",unconfirm_warning)
-#         lstWarning = change_to_list(unconfirm_warning)
-#         print("unconfirm_warning:",unconfirm_warning)
         SE.send_warnmail(unconfirm_warning)
     else:
         print('No Unconfirm Warning Found...')
 
 # check status interval
-
 
 class haap_judge(object):
     """docstring for haap_judge"""
@@ -271,7 +268,7 @@ class haap_judge(object):
         self.statusDB = statusDB
         self.strTimeNow = s.time_now_to_show()
         self.lstWarningToSend = []
-#         print("3232323232332")
+
 
     def judge_AH(self, AHstatus_rt, AHstatus_db):
         str_engine_AH = 'Engine AH'
@@ -420,10 +417,10 @@ def get_switch_total_db(list_switch_alias):
     """
     @note: 获取数据库的Total
     """
-    list_switch = db.switch_last_info()
-    if list_switch:
-        list_switch = list_switch.sum_total
-        db_total = list_switch[list_switch_alias]["PE_Total"]
+    dicALL = db.switch_last_info()
+    if dicALL:
+        dicALL = dicALL.sum_total
+        db_total = dicALL[list_switch_alias]["PE_Total"]
         return db_total
 
 if __name__ == '__main__':
