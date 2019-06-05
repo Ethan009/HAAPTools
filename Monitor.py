@@ -344,7 +344,7 @@ def sansw_judge(total_RT, total_DB, sansw_IP, sansw_Alias):
         if intWarninglevel:
             msg = warning_message_sansw(intWarninglevel)
             db.insert_warning(strTimeNow, sansw_IP, intWarninglevel,
-                              'switch', msg)
+                              'switch', msg,0)
             SE.send_warnmail([[strTimeNow, sansw_IP,
                                sansw_Alias, intWarninglevel, msg]])
 
