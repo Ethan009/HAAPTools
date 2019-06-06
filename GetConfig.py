@@ -123,17 +123,21 @@ class EmailConfig(object):
     def email_host(self):
         return str(self.cfg.get('EmailSetting', 'host'))
 
-    def email_sender(self):
-        return str(self.cfg.get('EmailSetting', 'sender'))
+    # port of mail server 
+    def email_host_port(self):
+        return self.cfg.getint('EmailSetting', 'host_port')
 
     def email_password(self):
         return str(self.cfg.get('EmailSetting', 'password'))
 
+    def email_sender(self):
+        return str(self.cfg.get('EmailSetting', 'sender'))
+
     def email_receiver(self):
         return str(self.cfg.get('EmailSetting', 'receiver'))
-    #发送邮件的端口 
-    def email_host_port(self):
-        return self.cfg.getint('EmailSetting', 'host_port')
+    
+    def email_sub(self):
+        return str(self.cfg.get('EmailSetting', 'email_sub'))
 
 
 class Setting(object):
@@ -188,9 +192,4 @@ class Setting(object):
         return oddRegularTrace
 
 if __name__ == '__main__':
-    ec = EngineConfig()
-    print(ec.list_engines_alias())
-
-    sc = SwitchConfig()
-    print(sc.list_switch_ports())
     pass

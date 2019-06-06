@@ -10,19 +10,17 @@ import HAAP as haap
 import SANSW as sw
 import Source as s
 
-# read config and connet to the datebase
+# <<<read config >>>
 cfgDB = gc.DBConfig()
 strDBName = cfgDB.name()
-# print("strDBName:", strDBName)
 strDBHost = cfgDB.host()
-# print("strDBName:", strDBHost)
 intDBPort = cfgDB.port()
-# print("strDBName:", intDBPort)
+# <<<read config >>>
 
+# connet to the datebase
 connect(strDBName, host=strDBHost, port=intDBPort)
 
 
-# HAAP
 def haap_insert(time, origin, info):
     """
     @note: monitoHAAP数据插入
@@ -34,49 +32,6 @@ def haap_last_record():
     @note: HAAP最后一次所有的数据
     """
     return HAAP().query_last_record()
-
-
-# ## 你这里是X也没有写啊！！！真是坑
-def haap_judge_list():
-    '''
-[['1.1.1.1',0,8623,0,0],['1.1.1.1',0,8623,0,0]]
-    '''
-    dic_last = HAAP().query_last_record()
-
-    list_info = engine_info[haap_Alias]
-    list_status = list_info['status']
-    list_status_judge = [list_status[i] for i in [0, 1, 4, 5]]
-    list_status_judge.insert(2, list_status['up_sec'])
-    return list_status_judge
-    
-    pass
-
-
-def haap_judge_list_for_engineX(engineX):
-    '''
-['1.1.1.1',0,8623,0,0]
-    '''
-    # 找出engineX的index值，然后从judge_list()结果返回也可以
-    
-    pass
-
-
-def haap_web_show_list():
-    '''
-[['1.1.1.1',0,'8d 7h 20s',0,0,0],['1.1.1.1',0,8623,0,0,0]]
-    '''
-    dic_last = HAAP().query_last_record()
-
-    pass
-
-
-def haap_web_show_for_engineX(engineX):
-    '''
-['1.1.1.1',0,'8d 7h 20s',0,0,0]
-    '''
-    # XXXXXXXX
-    
-    pass
 
 
 # SANSW
@@ -91,14 +46,6 @@ def switch_last_info():
     @note: SANSW最后一次所有的数据
     """
     return SANSW().query_last_records()
-
-
-def sansw_web_show_list():
-    pass
-
-
-def sansw_total_list_or_dict():
-    pass
 
  
 # Warning 
@@ -150,14 +97,6 @@ class collWarning(Document):
     ip = StringField()
     warn_message = StringField()
     confirm = IntField()
-    '''
-time:'2019-05-20 15:20'
-level:2
-device: 'engine' or 'san switch'
-ip:'1.1.1.1'
-msg:'Engine Reboot 5 secends ago'
-confirm:1
-    '''
 
 
 class HAAP(object):
@@ -176,7 +115,6 @@ class HAAP(object):
 
 class SANSW(object):
 
-# ptes = port error show info formatted
     def insert(self, time, origin, sum_total, ptes):
         t = collSANSW(time=time, origin=origin, sum_total=sum_total, ptes=ptes,)
         t.save()
@@ -215,6 +153,5 @@ class Warning(object):
 
 
 if __name__ == '__main__':
-#     print(get_unconfirm_warning())
     pass
 

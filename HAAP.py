@@ -1,23 +1,17 @@
 # coding:utf-8
 
 from __future__ import print_function
-import ClassConnect
-import re
-from collections import OrderedDict
 import os
 import sys
 import time
 import re
+import Conn as conn
 import Source as s
-
 import GetConfig as gc
-
-
-#import DB
-
-objHAAPConfig = gc.EngineConfig()
+from collections import OrderedDict as odd
 
 # <<<Get Config Field>>>
+objHAAPConfig = gc.EngineConfig()
 haapcfg = gc.EngineConfig()
 list_engines_IP = haapcfg.list_engines_IP()
 list_engines_alias = haapcfg.list_engines_alias()
@@ -34,28 +28,24 @@ oddHAAPErrorDict = setting.oddRegularTrace()
 lstPCCommand = setting.PCEngineCommand()
 # <<<Get Config Field>>>
 
-# def lsthaap():
-#     
-#     lsthaap ={['10.203.1.221', 0, '1 Days 5 Hours 54 Minutes', 'M', None, 0, 107651],['10.203.1.221', 0, '1 Days 5 Hours 54 Minutes', 'M', None, 0, 107651]}
-#     return lsthaap
-
-
 
 def backup_config_all():
     folder = '%s/%s' % (strCFGFolder, s.time_now_folder())
     for ip in list_engines_IP:
         Action(ip, telnet_port, passwd, FTP_port).backup(folder)
 
+
 def backup_config(ip):
     folder = '%s/%s' % (strCFGFolder, s.time_now_folder())
     Action(ip, telnet_port, passwd, FTP_port).backup(folder)
 
+
 def change_firmware(ip, fw_file):
     Action(ip, telnet_port, passwd, FTP_port).change_FW(fw_file)
 
+
 def get_trace_all(trace_level):
     folder = '%s/%s' % (strTraceFolder, s.time_now_folder())
-    # try:
     if trace_level:
         for ip in list_engines_IP:
             Action(ip, telnet_port, passwd, FTP_port).get_trace(
@@ -64,8 +54,6 @@ def get_trace_all(trace_level):
         for ip in list_engines_IP:
             Action(ip, telnet_port, passwd, FTP_port).get_trace(
                 folder, trace_level_cfg)
-    # finally:
-    #     return folder
 
 
 def get_trace(ip, trace_level):
@@ -73,29 +61,35 @@ def get_trace(ip, trace_level):
     try:
         if trace_level:
             Action(ip, telnet_port, passwd, FTP_port).get_trace(
-                    folder, trace_level)
+                folder, trace_level)
         else:
             Action(ip, telnet_port, passwd, FTP_port).get_trace(
-                    folder, trace_level_cfg)
+                folder, trace_level_cfg)
     finally:
         return folder
+
 
 def analyse_trace_all(trace_level):
     s.TraceAnalyse(oddHAAPErrorDict, get_trace_all(trace_level))
 
+
 def analyse_trace(ip, trace_level):
     s.TraceAnalyse(oddHAAPErrorDict, get_trace(ip, trace_level))
+
 
 def execute_multi_commands(ip, command_file):
     Action(ip, telnet_port, passwd, FTP_port).auto_commands(command_file)
 
+
 tupDesc = ('Engine', 'AH', 'Uptime', 'Master', 'Cluster', 'Mirror')
 tupWidth = (18, 5, 15, 8, 9, 8)
+
 
 def _print_description():
     for i in range(len(tupDesc)):
         print(tupDesc[i].ljust(tupWidth[i]), end='')
     print()
+
 
 def _print_status_in_line(lstStatus):
     if not lstStatus[1]:
@@ -106,16 +100,18 @@ def _print_status_in_line(lstStatus):
         lstStatus[5] = 'OK'
     for i in range(len(lstStatus)):
         if lstStatus[i]:
-            print(lstStatus[i].ljust(tupWidth[i]), end ='')
+            print(lstStatus[i].ljust(tupWidth[i]), end='')
         else:
-            print(''.ljust(tupWidth[i]), end ='')
+            print(''.ljust(tupWidth[i]), end='')
     print()
+
 
 def show_stauts_all():
     _print_description()
     for ip in list_engines_IP:
         lstStatus = Status(ip, telnet_port, passwd, FTP_port).over_all()
         _print_status_in_line(lstStatus)
+
 
 def show_stauts(ip):
     _print_description()
@@ -127,12 +123,15 @@ def set_time_all():
     for ip in list_engines_IP:
         Action(ip, telnet_port, passwd, FTP_port).set_time()
 
+
 def set_time(ip):
     Action(ip, telnet_port, passwd, FTP_port).set_time()
+
 
 def show_time_all():
     for ip in list_engines_IP:
         Action(ip, telnet_port, passwd, FTP_port).show_time()
+
 
 def show_time(ip):
     Action(ip, telnet_port, passwd, FTP_port).show_time()
@@ -145,6 +144,7 @@ def periodically_check_all():
         Action(ip, telnet_port, passwd, FTP_port).periodic_check(
             lstPCCommand, strPCFolder, )
 
+
 def periodically_check(ip):
     PCFile_name = 'PC_%s_Engine_%s.log' % (
         s.time_now_folder(), ip)
@@ -152,23 +152,11 @@ def periodically_check(ip):
         lstPCCommand, strPCFolder, )
 
 
-
 def status_for_judging_realtime(ip):
     objEngine = Status(ip, telnet_port, passwd, FTP_port)
     lstStatus = objEngine.over_all_and_warning()
     intUpTimeSec = objEngine.uptime_second()
-    return lstStatus,intUpTimeSec
-
-# def list_status_for_realtime_show():
-#     '''
-# [['engine1', '1.1.1.1',0,'2d','M',0,0,0],['engine2', '1.1.1.1',0,'2d','M',0,1,2]]
-#     '''
-#     lstStatus = []
-#     for i in list_engines_alias:
-#         objEngine = Status(list_engines_IP[i], telnet_port, passwd, FTP_port)
-#         lstStatusWarning = list(objEngine.over_all_and_warning())
-#         lstStatus.append(lstStatusWarning.insert(0, list_engines_alias[i]))
-#     return lstStatus
+    return lstStatus, intUpTimeSec
 
 def list_status_for_realtime_show():
     '''
@@ -181,43 +169,6 @@ def list_status_for_realtime_show():
     return lstStatus
 
 
-# def haap_status_real(engine_IP):
-#     status=Status(engine_IP,telnet_port,passwd,FTP_port)
-#     web_status=status.over_all_and_warning()
-#     db_status=status.over_all_real()
-#     return web_status,db_status
-
-
-# def real_time_status():
-#     lstStatusAllEngnine = []
-#     for ip in list_engines_IP:
-#         lstStatusAllEngnine.append(Status(ip, telnet_port, passwd, FTP_port).over_all_real())
-#     return lstStatusAllEngnine
-
-# def real_time_status_show():
-#     lstStatusAllEngnine = []
-#     for ip in list_engines_IP:
-#         lstStatusAllEngnine.append(Status(ip, telnet_port, passwd, FTP_port).over_all_and_warning())
-#     return lstStatusAllEngnine
-
-# def real_time_status():
-#     lstStatusAllEngnine = []
-#     lstStatusAllEngnine_show = []
-#     for ip in list_engines_IP:
-#         status=Status(ip, telnet_port, passwd, FTP_port)
-#         lstStatusAllEngnine.append(status.over_all_real())
-#         lstStatusAllEngnine_show.append(status.over_all_and_warning())
-#     return lstStatusAllEngnine,lstStatusAllEngnine_show
-# ([[],[]],[[],[]])
-
-'''origin:{'engine1':{'ip': '1.1.1.1', 'vpd': 'xxxx','engine': 'yyyy', 'mirror': 'yyyy'},
-'engine2':{'ip': '1.1.1.1','vpd': 'xxxx','engine': 'yyyy', 'mirror': 'yyyy'}
-}
-info:{
-    'engine1':{'status':['1.1.1.1',0,'2d','M',0,0],'up_sec':7283,'level':0},
-    'engine2':{'status':['1.1.1.1',0,'2d','M',0,0],'up_sec':7283,'level':0}
-}
-'''
 
 
 def origin(haap_alias, objEngine):
@@ -225,15 +176,16 @@ def origin(haap_alias, objEngine):
     dicOrigin[haap_alias].update(objEngine.dictInfo)
     return dicOrigin
 
+
 def info(haap_alias, objEngine):
     lstStatus = objEngine.over_all_and_warning()
     intUpTimeSec = objEngine.uptime_second()
 
     dicInfo = {haap_alias: {'status': lstStatus[:-1],
-                           'up_sec': intUpTimeSec,
-                            'level':lstStatus[-1]}}
+                            'up_sec': intUpTimeSec,
+                            'level': lstStatus[-1]}}
     return dicInfo
-                    
+
 
 def data_for_db():
     dicInfo = {}
@@ -243,10 +195,6 @@ def data_for_db():
         dicInfo.update(info(list_engines_alias[i], objEngine))
         dicOrigin.update(origin(list_engines_alias[i], objEngine))
     return dicOrigin, dicInfo
-
-
-#[['1.1.1.1',0,'8d 7h 20s',0,0,0],['1.1.1.1',0,8623,0,0,0]]
-
 
 
 class Action():
@@ -274,10 +222,10 @@ st
         self.AHStatus = self._TN_Conn.is_AH()
 
     def _telnet_connect(self):
-        self._TN_Conn = ClassConnect.HAAPConn(self._host,
-                                              self._TNport,
-                                              self._password,
-                                              self._timeout)
+        self._TN_Conn = conn.HAAPConn(self._host,
+                                      self._TNport,
+                                      self._password,
+                                      self._timeout)
         self._TN_Connect_Status = self._TN_Conn
 
     @s.deco_Exception
@@ -286,11 +234,11 @@ st
             return self._TN_Conn.exctCMD(cmd)
 
     def _FTP_connect(self):
-        self._FTP_Conn = ClassConnect.FTPConn(self._host,
-                                              self._FTPport,
-                                              'adminftp',
-                                              self._password,
-                                              self._timeout)
+        self._FTP_Conn = conn.FTPConn(self._host,
+                                      self._FTPport,
+                                      'adminftp',
+                                      self._password,
+                                      self._timeout)
 
     def _ftp(self):
         if self._FTP_Conn:
@@ -354,7 +302,7 @@ st
         connFTP = self._ftp()
 
         def _get_oddCommand(intTraceLevel):
-            oddCMD = OrderedDict()
+            oddCMD = odd()
             if intTraceLevel == 1 or intTraceLevel == 2 or intTraceLevel == 3:
                 oddCMD['Trace'] = 'ftpprep trace'
                 if intTraceLevel == 2 or intTraceLevel == 3:
@@ -476,7 +424,9 @@ st
 
         if self._TN_Conn:
             if _exct_cmd():
-                print('\nSetting Time for Engine "%s" Completely...' % self._host)
+                print(
+                    '\nSetting Time for Engine "%s" Completely...' %
+                    self._host)
             else:
                 print('\nSetting Time for Engine "%s" Failed!!!' % self._host)
         else:
@@ -492,7 +442,7 @@ st
             try:
                 print(self._TN_Conn.exctCMD('rtc').replace(
                     '\nCLI>', '').replace('rtc\r\n', ''))
-            except:
+            except BaseException:
                 print('Get Time of Engine "%s" Failed' % self._host)
 
 
@@ -570,7 +520,6 @@ class Status(Action):
         self.dictInfo = self._get_info_to_dict()
         self.uptime = Uptime(self.dictInfo['vpd'])
 
-
     @s.deco_Exception
     def _get_info_to_dict(self):
         if self.AHStatus:
@@ -584,7 +533,7 @@ class Status(Action):
                 dictInfo[command] = self._executeCMD(command)
                 time.sleep(0.2)
             return dictInfo
-    
+
     def uptime_list(self):
         return self.uptime.uptime_list()
 
@@ -684,14 +633,6 @@ class Status(Action):
             lstStatus.append(0)
         return lstStatus
 
-    def status_for_judging(lstStatus,uptime_second):
-        lstAllStatus=lstStatus
-        lstStatus = [lstAllStatus[i] for i in [0,1,2,4,5]]
-        lstStatus[2]=uptime_second
-        return lstStatus
-
 
 if __name__ == '__main__':
-#     print(data_for_db()[1])
     pass
-

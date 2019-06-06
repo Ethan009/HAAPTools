@@ -21,9 +21,7 @@ logging.basicConfig()
 # <<<Get Config Field>>>
 setting = gc.Setting()
 error_level = setting.message_level()
-
 # <<<Get Config Field>>>
-
 
 
 def deco_OutFromFolder(func):
@@ -37,22 +35,28 @@ def deco_OutFromFolder(func):
             pass
         finally:
             os.chdir(strOriFolder)
+
     return _deco
 
 
 def deco_Exception(func):
+
     def _deco(self, *args, **kwargs):
         try:
             return func(self, *args, **kwargs)
         except Exception as E:
             print(func.__name__, E)
+
     return _deco
+
 
 def time_now_folder():
     return datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 
+
 def time_now_to_show():
     return datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
 
 def is_Warning(intValue, data):
     '''
@@ -69,11 +73,11 @@ def is_Warning(intValue, data):
             return 1
         else:
             return 0
-        # return judge_level(intValue, data)
 
 def is_trace_level(num):
-    if num in (1,2,3):
+    if num in (1, 2, 3):
         return True
+
 
 def is_IP(strIP):
     reIP = re.compile(
@@ -83,14 +87,17 @@ def is_IP(strIP):
     else:
         return False
 
+
 def is_IP_list(lstIP):
     return all(map(is_IP, lstIP))
+
 
 def is_file(strFileName):
     if os.path.isfile(strFileName):
         return True
     else:
         return False
+
 
 def is_port(intPortNum):
     if type(intPortNum) == int:
@@ -100,6 +107,7 @@ def is_port(intPortNum):
             if type(eval(intPortNum)) == int:
                 return True
     return False
+
 
 def ShowErr(*argvs):
     '''
@@ -132,7 +140,9 @@ def ShowErr(*argvs):
 
 '''.format(argvs[0], argvs[1], argvs[2], argvs[3])))
 
+
 def GotoFolder(strFolder):
+
     def _mkdir():
         if strFolder:
             if os.path.exists(strFolder):
@@ -155,6 +165,7 @@ def GotoFolder(strFolder):
 
 
 class Timing(object):
+
     def __init__(self):
         self.scdl = BlockingScheduler()
 
@@ -176,51 +187,30 @@ class Timing(object):
 
 
 class TimeNow(object):
+
     def __init__(self):
         self._now = time.localtime()
 
-    def y(self):    # Year
+    def y(self):  # Year
         return (self._now[0])
 
-    def mo(self):   # Month
+    def mo(self):  # Month
         return (self._now[1])
 
-    def d(self):    # Day
+    def d(self):  # Day
         return (self._now[2])
 
-    def h(self):    # Hour
+    def h(self):  # Hour
         return (self._now[3])
 
-    def mi(self):   # Minute
+    def mi(self):  # Minute
         return (self._now[4])
 
-    def s(self):    # Second
+    def s(self):  # Second
         return (self._now[5])
 
     def wd(self):  # Day of the Week
         return (self._now[6])
-
-
-
-# class store_in_MongoDB():
-#     def __init__(self, ):
-#         self.DBServer = strDBServer
-#         self.DBPort = intDBPort
-#         self.DBName = strDBName
-#         connect()
-#         self._DB = None
-#         self._connect()
-
-#     def _connect(self):
-#         dbConn = MongoClient(self.DBServer, self.DBPort)
-#         # db = dbConn.'%s' % self.strDBName
-#         dbName = self.DBName
-#         self._DB = dbConn.dbName
-
-#     def coll_insert(self, coll_name, value):
-#         if self._DB:
-#             locals()[coll_name] = self._DB.coll_name
-#             locals()[coll_name].insert(value)
 
 
 def TraceAnalyse(oddHAAPErrorDict, strTraceFolder):
@@ -260,7 +250,7 @@ def TraceAnalyse(oddHAAPErrorDict, strTraceFolder):
                         intErrFlag += 1
                     reErr = None
                 if intErrFlag > 0:
-                    openExcel.save('TraceAnalyse_' +
+                    openExcel.save('TraceAnalyse_' + 
                                    strFileName + '.xls')
                 else:
                     strOut = '--- No Error Find in "{}"'.format(strFileName)
@@ -281,5 +271,4 @@ def TraceAnalyse(oddHAAPErrorDict, strTraceFolder):
 if __name__ == '__main__':
 
     pass
-
 

@@ -9,14 +9,14 @@ import os
 import re
 import time
 
-from ClassConnect import *
+import Conn as conn
 import DB as db
 import GetConfig as gc
 import Source as s
 
-objSwitchConfig = gc.SwitchConfig()
 
 # <<<Get Config Field>>>
+objSwitchConfig = gc.SwitchConfig()
 swcfg = gc.SwitchConfig()
 list_sw_IP = swcfg.list_switch_IP()
 list_sw_alias = swcfg.list_switch_alias()
@@ -29,7 +29,6 @@ tuplThresholdTotal = swcfg.threshold_total()
 setting = gc.Setting()
 lstPCCommand = setting.PCEngineCommand()
 strPCFolder = setting.folder_PeriodicCheck()
-
 # <<<Get Config Field>>>
 
 def clear_all():
@@ -38,13 +37,6 @@ def clear_all():
 
 def clear_one_port(ip, sw_port):
     Action(ip, ssh_port, user, passwd, []).clear_one_port(sw_port)
-
-# def print_porterror_all():
-#     for ip in list_sw_IP:
-#         Action(ip, ssh_port, user, passwd, []).print_porterrshow()
-
-# def print_porterror(ip):
-#     Action(ip, ssh_port, user, passwd, []).print_porterrshow()
 
 def print_porterror_all_formated():
     for i in range(len(list_sw_IP)):
@@ -92,8 +84,6 @@ def periodically_check(ip):
     Action(ip, ssh_port, user, passwd, []).periodic_check(
         lstPCCommand, strPCFolder, PCFile_name)
 
-### prepare All info need store in database
-### initilize class InfoForDB()
 def get_info_for_DB():
     origin = {}
     sum_and_total = {}
@@ -124,7 +114,7 @@ class Action():
     @s.deco_Exception
     def _get_switch_info(self):
         try:
-            self._SWConn = SSHConn(self._host,
+            self._SWConn = conn.SSHConn(self._host,
                                    self._port,
                                    self._username,
                                    self._password,
@@ -207,15 +197,6 @@ class Status(Action):
         self._PutErrorToDict()
         self.strIP=strIP
 
-    '''
-    @author: Paul
-    @function:  
-    get_int输出一种Int值错误数
-    get_switch_status 输出一种类型错误在所有端口上的错误总数
-    get_switch_total  所有错误总数
-    get_switch_original 输入端口报错原始值 输出Int值
-    ·_switch_original 输入端口报错原始值 输出int 值
-    '''
 
     @s.deco_Exception
     def _PutErrorToDict(self):
@@ -290,7 +271,6 @@ class Status(Action):
         intWarningLevel = s.is_Warning(intTotal, tuplThresholdTotal)
         lstSumTotalWarning = lstSumTotal.append(intWarningLevel)
         return lstSumTotalWarning
-        # 代码还是要给人看的，不光给机器看。。。
 
     def print_porterror_formated(self):
         tuplDesc = ('Port', 'RX', 'RT', 'EncOut', 'DiscC3', 'LinkFail', 'LossSigle', 'LossSync')
@@ -303,12 +283,12 @@ class Status(Action):
 
         def _print_status_in_line(dicPE):
             if dicPE:
-                for port in range(len(dicPE)):
-                    #dicPE.keys() means port number
-                    #dicPE.values() means port error list
-                    print(str(dicPE.keys()[port]).ljust(tuplWidth[0]), end='')
-                    for i in range(len(dicPE.values()[port])):
-                        print(dicPE.values()[port][i].ljust(tuplWidth[i+1]), end='')
+                for i_port in range(len(dicPE)):
+                    lstPortNum = dicPE.keys()
+                    lstPortErrorList = dicPE.values()
+                    print(str(lstPortNum[i_port]).ljust(tuplWidth[0]), end='')
+                    for i_type in range(len(lstPortErrorList[i_port])):
+                        print(lstPortErrorList[i_port][i_type].ljust(tuplWidth[i_type+1]), end='')
                     print()
 
         print('\nPort Error Show for SAN Switch "%s":\n' % self._host)
@@ -370,44 +350,5 @@ class InfoForDB(object):
                         'PE_Sum': None,
                         'PE_Total': None}}
 
-
-
-
 if __name__ == '__main__':
     pass
-#     import pprint
-#     print(get_dic_all_sw()[1])
-#     print(get_dic_all_sw()[0])
-#     db.switch_insert(datetime.datetime.now(),get_dic_all_sw()[0],
-#                      get_dic_all_sw()[1],get_dic_all_sw()[2])
-#     pprint.pprint(get_info_for_DB())
-#     print("ok")
-# {'switch1': {'IP': '10.203.1.212', 'PE': {1: ['0', '0', '0', '0', '0', '0', '1'], 2: ['1.1m', '131.2k', '0', '0', '10', '18', '19'], 3: ['168', '158', '0', '0', '9', '10', '11'], 4: ['2.6k', '6.4k', '0', '0', '10', '11', '12'], 5: ['187', '177', '0', '0', '9', '10', '11'], 6: ['0', '0', '0', '0', '0', '0', '1']}}, 
-# 'switch0': {'IP': '10.203.1.211', 'PE': {1: ['0', '0', '0', '0', '0', '0', '1'], 2: ['802', '922', '0', '0', '10', '11', '12'], 3: ['175.1k', '1.1m', '3', '11', '9', '10', '11'], 4: ['505.4k', '84.1k', '0', '0', '10', '11', '12'], 5: ['118.6k', '522.5k', '0', '1', '9', '10', '11'], 6: ['0', '0', '0', '0', '0', '0', '1']}}}
-# 
-# 
-# 
-# 
-# 
-#     swcfg = gc.SwitchConfig()
-#     list_sw_IP = swcfg.list_switch_IP()
-#     list_sw_alias = swcfg.list_switch_alias()
-
-    # xx = InfoForDB(list_sw_alias[0], list_sw_IP[1])
-    #print(get_info_for_DB())
-    # ssh_port = swcfg.SSH_port()
-    # user = swcfg.username()
-    # passwd = swcfg.password()
-    # list_sw_ports = swcfg.list_switch_ports()
-
-
-    # print(get_dic_all_sw())
-
-    #dic = Status(list_sw_IP[0], ssh_port, user, passwd, list_sw_ports[0])
-    #print(get_Portershow(dic))
-
-
-    #ben
-    #print(Status(list_sw_IP[0], ssh_port, user, passwd, list_sw_ports[0]).print_porterror_formated)
-
-
