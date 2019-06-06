@@ -26,6 +26,7 @@ def haap_insert(time, origin, info):
     @note: monitoHAAP数据插入
     """
     HAAP().insert(time, origin, info)
+    #HAAP().insert(time, origin, info)
     
 def haap_last_record():
     """

@@ -24,9 +24,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                      {% for me in error_message %}
+                      {% for lstWarning in lstWarningList %}
                                 <tr class="success">
-                             {% for status in me %}
+                             {% for status in lstWarning %}
                                   <td>{{ status }}</td>
                          {% endfor %}
                         </tr>
