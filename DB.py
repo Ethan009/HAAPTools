@@ -26,7 +26,6 @@ def haap_insert(time, origin, info):
     @note: monitoHAAP数据插入
     """
     HAAP().insert(time, origin, info)
-    #HAAP().insert(time, origin, info)
     
 def haap_last_record():
     """
@@ -41,6 +40,7 @@ def switch_insert(time, origin, sum_total, dicPEFormated):
     @note: SANSW数据插入
     """
     SANSW().insert(time, origin, sum_total, dicPEFormated)
+
     
 def switch_last_info():
     """
@@ -50,11 +50,11 @@ def switch_last_info():
 
  
 # Warning 
-def insert_warning(time,ip, level, device,warn_message, confirm):
+def insert_warning(time, ip, level, device, warn_message, confirm):
     """
     @note: warning数据插入
     """
-    Warning().insert(time ,ip, level, device,
+    Warning().insert(time , ip, level, device,
                         warn_message, confirm)
 
 

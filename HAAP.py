@@ -142,14 +142,14 @@ def periodically_check_all():
         PCFile_name = 'PC_%s_Engine_%s.log' % (
             s.time_now_folder(), ip)
         Action(ip, telnet_port, passwd, FTP_port).periodic_check(
-            lstPCCommand, strPCFolder, )
+            lstPCCommand, strPCFolder,)
 
 
 def periodically_check(ip):
     PCFile_name = 'PC_%s_Engine_%s.log' % (
         s.time_now_folder(), ip)
     Action(ip, telnet_port, passwd, FTP_port).periodic_check(
-        lstPCCommand, strPCFolder, )
+        lstPCCommand, strPCFolder,)
 
 
 def status_for_judging_realtime(ip):
@@ -157,6 +157,7 @@ def status_for_judging_realtime(ip):
     lstStatus = objEngine.over_all_and_warning()
     intUpTimeSec = objEngine.uptime_second()
     return lstStatus, intUpTimeSec
+
 
 def list_status_for_realtime_show():
     '''
@@ -167,8 +168,6 @@ def list_status_for_realtime_show():
         objEngine = Status(list_engines_IP[i], telnet_port, passwd, FTP_port)
         lstStatusWarning = list(objEngine.over_all_and_warning())
     return lstStatus
-
-
 
 
 def origin(haap_alias, objEngine):
@@ -425,7 +424,7 @@ st
         if self._TN_Conn:
             if _exct_cmd():
                 print(
-                    '\nSetting Time for Engine "%s" Completely...' %
+                    '\nSetting Time for Engine "%s" Completely...' % 
                     self._host)
             else:
                 print('\nSetting Time for Engine "%s" Failed!!!' % self._host)
@@ -607,7 +606,7 @@ class Status(Action):
                 if reNoMirror.search(strMirror):
                     return -1  # -1 means no mirror defined
                 else:
-                    print('Get Mirror Status Failed for Engine "%s"' %
+                    print('Get Mirror Status Failed for Engine "%s"' % 
                           self._host)
 
     def over_all(self):
