@@ -261,7 +261,6 @@ def main():
     elif sys.argv[1] == 'ec':
         if len(sys.argv) != 4:
             print(strECHelp)
-            return
         else:
             ip = sys.argv[2]
             command_file = sys.argv[3]
@@ -270,6 +269,18 @@ def main():
             if not s.is_file(command_file):
                 print('File Not Exists. Please Provide Correct File...')
             haap.execute_multi_commands(ip, command_file)
+
+    elif sys.argv[1] == 'fw':
+        if len(sys.argv) != 4:
+            print(strFWHelp)
+        else:
+            ip = sys.argv[2]
+            fw_file = sys.argv[3]
+            if not s.is_IP(ip):
+                print('Please Provide Correct Engine IP...')
+            if not s.is_file(fw_file):
+                print('File Not Exists. Please Provide Correct File...')
+            haap.change_firmware(ip, fw_file)
 
     elif sys.argv[1] == 'sts':
         num_argv = len(sys.argv)
