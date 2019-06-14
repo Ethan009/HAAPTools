@@ -19,6 +19,7 @@ setting = gc.Setting()
 strCFGFolder = setting.folder_cfgbackup()
 strTraceFolder = setting.folder_trace()
 
+
 # <<<Get Config Field>>>
 
 
@@ -203,7 +204,7 @@ def main():
         if num_argv > 3:
             trace_level = sys.argv[3]
         if num_argv == 2 or num_argv > 4:
-            print(strGTLHelp)
+            print(strGTHelp)
         elif sys.argv[2] == 'all':
             if num_argv > 3:
                 if s.is_trace_level(trace_level):
@@ -253,7 +254,7 @@ def main():
         if num_argv == 2 or num_argv > 3:
             print(strATHelp)
         else:
-            if s.is_file(sys.argv[2]):
+            if s.is_folder(sys.argv[2]):
                 s.TraceAnalyse(sys.argv[2])
             else:
                 print('Please Provide Correct Trace Folder')
@@ -309,7 +310,7 @@ def main():
     elif sys.argv[1] == 'stm':
         num_argv = len(sys.argv)
         if num_argv == 2 or num_argv > 3:
-            print(strSTMSHelp)
+            print(strSTMHelp)
         elif sys.argv[2] == 'all':
             haap.show_time_all()
         else:

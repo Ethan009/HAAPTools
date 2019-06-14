@@ -8,6 +8,8 @@ import re
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
+from collections import OrderedDict as odd
+
 try:
     import configparser as cp
 except Exception:
@@ -21,6 +23,9 @@ logging.basicConfig()
 # <<<Get Config Field>>>
 setting = gc.Setting()
 error_level = setting.message_level()
+
+oddHAAPErrorDict = setting.oddRegularTrace()
+
 # <<<Get Config Field>>>
 
 
@@ -94,6 +99,12 @@ def is_IP_list(lstIP):
 
 def is_file(strFileName):
     if os.path.isfile(strFileName):
+        return True
+    else:
+        return False
+    
+def is_folder(strDirName):
+    if os.path.isdir(strDirName):
         return True
     else:
         return False
@@ -213,7 +224,7 @@ class TimeNow(object):
         return (self._now[6])
 
 
-def TraceAnalyse(oddHAAPErrorDict, strTraceFolder):
+def TraceAnalyse(strTraceFolder):
     import xlwt
 
     def _read_file(strFileName):
