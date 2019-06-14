@@ -291,7 +291,7 @@ def main():
             haap.show_stauts_all()
         else:
             if s.is_IP(sys.argv[2]):
-                haap.show_stauts_all()
+                haap.show_stauts(sys.argv[2])
             else:
                 print('Please Provide Correct Engine IP...')
 
