@@ -170,11 +170,12 @@ class Action():
             return True
         except Exception as E:
             print('Clear Error Count Failed!!!')
-
+    
+    @s.deco_OutFromFolder
     def periodic_check(self, lstCommand, strResultFolder, strResultFile):
         s.GotoFolder(strResultFolder)
         if self._SWConn:
-            if self._SWConn.exctCMD('\n'):
+            if self._SWConn.exctCMD('chassisshow'):
                 with open(strResultFile, 'w') as f:
                     for strCMD in lstCommand:
                         time.sleep(0.2)

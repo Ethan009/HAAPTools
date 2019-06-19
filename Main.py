@@ -348,7 +348,7 @@ def main():
                     else:
                         print('Please Provide Correct SAN Switch IP...')
             else:
-                strPTCLHelp
+                print(strPCHelp)
 
     elif sys.argv[1] == 'mnt':
         num_argv = len(sys.argv)
