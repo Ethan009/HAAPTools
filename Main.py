@@ -325,7 +325,8 @@ def main():
     elif sys.argv[1] == 'pc':
         num_argv = len(sys.argv)
         if num_argv == 2 or num_argv > 4:
-            print(strPTCLHelp)
+            print(strPCHelp)
+#             print(strPTCLHelp) 原
         elif num_argv > 2:
             if sys.argv[2] == 'all':
                 haap.periodically_check_all()
@@ -342,8 +343,8 @@ def main():
                 if num_argv == 3:
                     sw.periodically_check_all()
                 elif num_argv > 3:
-                    if s.is_IP(sys.argv[2]):
-                        sw.periodically_check(sys.argv[2])
+                    if s.is_IP(sys.argv[3]):
+                        sw.periodically_check(sys.argv[3])
                     else:
                         print('Please Provide Correct SAN Switch IP...')
             else:

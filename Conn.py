@@ -187,7 +187,7 @@ class SSHConn(object):
         if self.SSHConnection:
             return True
         else:
-            print('Connect Retry for Engine "%s" ...' % self._host)
+            print('Connect Retry for SAN Switch "%s" ...' % self._host)
             self._connect()
 
     def ssh_connect(self):

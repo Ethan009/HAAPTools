@@ -142,14 +142,14 @@ def periodically_check_all():
         PCFile_name = 'PC_%s_Engine_%s.log' % (
             s.time_now_folder(), ip)
         Action(ip, telnet_port, passwd, FTP_port).periodic_check(
-            lstPCCommand, strPCFolder,)
+            lstPCCommand, strPCFolder,PCFile_name)
 
 
 def periodically_check(ip):
     PCFile_name = 'PC_%s_Engine_%s.log' % (
         s.time_now_folder(), ip)
     Action(ip, telnet_port, passwd, FTP_port).periodic_check(
-        lstPCCommand, strPCFolder,)
+        lstPCCommand, strPCFolder,PCFile_name)
 
 
 def status_for_judging_realtime(ip):

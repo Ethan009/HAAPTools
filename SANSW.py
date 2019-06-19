@@ -27,7 +27,7 @@ list_sw_ports = swcfg.list_switch_ports()
 tuplThresholdTotal = swcfg.threshold_total()
 
 setting = gc.Setting()
-lstPCCommand = setting.PCEngineCommand()
+lstPCCommand = setting.PCSANSwitchCommand()
 strPCFolder = setting.folder_PeriodicCheck()
 # <<<Get Config Field>>>
 
@@ -73,13 +73,13 @@ def print_switchshow(ip):
 
 def periodically_check_all():
     for ip in list_sw_IP:
-        PCFile_name = 'PC_%s_Engine_%s.log' % (
+        PCFile_name = 'PC_%s_SANSwitch_%s.log' % (
             s.time_now_folder(), ip)
         Action(ip, ssh_port, user, passwd, []).periodic_check(
             lstPCCommand, strPCFolder, PCFile_name)
 
 def periodically_check(ip):
-    PCFile_name = 'PC_%s_Engine_%s.log' % (
+    PCFile_name = 'PC_%s_SANSwitch_%s.log' % (
         s.time_now_folder(), ip)
     Action(ip, ssh_port, user, passwd, []).periodic_check(
         lstPCCommand, strPCFolder, PCFile_name)
@@ -162,8 +162,9 @@ class Action():
         try:
             print('Start Clear Port {} For SAN Switch "{}"...'.format(
                 str(intSWPort), self._host))
-            self._SWConn.exctCMD(
-                'portstatsclear {}'.format(str(intSWPort)))
+            #self._SWConn.exctCMD(
+                #'portstatsclear {}'.format(str(intSWPort)))
+            self._SWConn.exctCMD('portstatsclear %s' % str(intSWPort))
             print('Clear Error Count of Port {} for SW "{}" Completely...\
                 '.format(str(intSWPort), self._host))
             return True
