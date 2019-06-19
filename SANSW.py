@@ -33,7 +33,7 @@ strPCFolder = setting.folder_PeriodicCheck()
 
 def clear_all():
     for ip in list_sw_IP:
-        Action(ip, ssh_port, user, passwd, []).clear_all_port()
+        Action(ip, ssh_port, user, passwd, []).clear_all_port()  #初始化ip，端口数，用户名，密码，然后再调用方法
 
 def clear_one_port(ip, sw_port):
     Action(ip, ssh_port, user, passwd, []).clear_one_port(sw_port)
@@ -145,11 +145,11 @@ class Action():
             print(self.strSwitchshow)
 
     @s.deco_Exception
-    def clear_all_port(self):
+    def clear_all_port(self):#
         try:
             print('\nStart Clear ALL Error Count For SAN Switch "{}"...'.format(
                 self._host))
-            self._SWConn.exctCMD('statsclear')
+            self._SWConn.exctCMD('statsclear') #
             time.sleep(0.5)
             print('Clear Error Count for SW "{}" Completely...'.format(
                 self._host))
@@ -158,7 +158,7 @@ class Action():
 
 
     @s.deco_Exception
-    def clear_one_port(self, intSWPort):
+    def clear_one_port(self, intSWPort):#参数
         try:
             print('Start Clear Port {} For SAN Switch "{}"...'.format(
                 str(intSWPort), self._host))

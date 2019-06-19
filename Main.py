@@ -142,8 +142,8 @@ strMNTHelp = '''
 
 
 def main():
-    if len(sys.argv) == 1:
-        print(strHelp)
+    if len(sys.argv) == 1:#第一个参数是否是本身，如果是
+        print(strHelp)#打印帮助
 
     elif sys.argv[1] == 'ptes':
         num_argv = len(sys.argv)
@@ -157,22 +157,23 @@ def main():
             else:
                 print('Please Provide Correct Switch IP...')
 
-    elif sys.argv[1] == 'ptcl':
-        num_argv = len(sys.argv)
-        if num_argv == 2 or num_argv > 4:
-            print(strPTCLHelp)
-        elif sys.argv[2] == 'all':
-            sw.clear_all()
-        elif s.is_IP(sys.argv[2]):
-            if num_argv == 4:
-                if _isPort(sys.argv[3]):
-                    sw.clear_one_port(sys.argv[2], sys.argv[3])
+    elif sys.argv[1] == 'ptcl':#判断执行参数是否为ptcl
+        num_argv = len(sys.argv)  #获取参数的个数
+        if num_argv == 2 or num_argv > 4:#如果是2个或者大于4个
+            print(strPTCLHelp) #打印提示信息
+        elif sys.argv[2] == 'all': #如果是3个参数是 all
+            sw.clear_all() #调用清除所有交换机端口错误函数
+        elif s.is_IP(sys.argv[2]):#如果第3个参数是ip的话
+            if num_argv == 4:   #判断是否有第4个参数，如果有
+                #if _isPort(sys.argv[3]):   错误
+                if s.is_port(sys.argv[3]):   #在判断第4个参数是否是正确的端口      
+                    sw.clear_one_port(sys.argv[2], sys.argv[3])#调用清除具体ip，端口错误
                 else:
-                    print('Please Provide Correct Port Number...')
+                    print('Please Provide Correct Port Number...') #请提供正确端口号
             else:
-                print(strPTCLHelp)
+                print(strPTCLHelp) #打印提示
         else:
-            print('Please Provide Correct Switch IP...')
+            print('Please Provide Correct Switch IP...')#请提供正确的交换机ip
 
     elif sys.argv[1] == 'sws':
         num_argv = len(sys.argv)
@@ -185,6 +186,7 @@ def main():
                 sw.print_switchshow(sys.argv[2])
             else:
                 print('Please Provide Correct Switch IP...')
+
 
     elif sys.argv[1] == 'bc':
         num_argv = len(sys.argv)
@@ -199,6 +201,7 @@ def main():
                 print('Please Provide Correct Engine IP...')
 
     # get engines' trace files under TraceFolder based on Trace levels
+    #trace、primary、seaond
     elif sys.argv[1] == 'gt':
         num_argv = len(sys.argv)
         if num_argv > 3:
