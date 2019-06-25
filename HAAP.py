@@ -622,6 +622,7 @@ class Status(Action):
             lstOverAll.append(self.is_master())
             lstOverAll.append(self.cluster_status())
             lstOverAll.append(self.get_mirror_status())
+        print("over_all:",lstOverAll)
         return lstOverAll
 
     def over_all_and_warning(self):
