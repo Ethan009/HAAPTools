@@ -280,6 +280,5 @@ def TraceAnalyse(strTraceFolder):
 
 
 if __name__ == '__main__':
-
     pass
 

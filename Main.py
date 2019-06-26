@@ -205,7 +205,7 @@ def main():
     elif sys.argv[1] == 'gt':
         num_argv = len(sys.argv)
         if num_argv > 3:
-            trace_level = sys.argv[3]
+            trace_level = int(sys.argv[3])
         if num_argv == 2 or num_argv > 4:
             print(strGTHelp)
         elif sys.argv[2] == 'all':
