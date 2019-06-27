@@ -83,6 +83,7 @@ def start_web(mode):
     '''
 tlu = Time Last Update
     '''
+
     app = Flask(__name__)
 
     @app.route("/", methods=['GET', 'POST'])
@@ -199,7 +200,6 @@ def check_all_sansw():
 def warning_check():
     unconfirm_warning = db.get_unconfirm_warning()
     if unconfirm_warning:
-
         se.send_warnmail(unconfirm_warning)
     else:
         print('No Unconfirm Warning Found...')
@@ -365,4 +365,5 @@ def get_switch_total_db(list_switch_alias):
 
 
 if __name__ == '__main__':
+    monitor_db_4_thread()
     pass

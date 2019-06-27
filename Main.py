@@ -53,7 +53,7 @@ strPTESHelp = '''
 '''
 
 strPTCLHelp = '''
-    Clear Port Error Counter('statsclear' or '')
+    Clear Port Error Counter('statsclear' or 'portstatsclear')
     ptcl <SW_IP Port> | all
         SW_IP Port  - for defined Port of defined SAN Switch
         all         - for All SAN Switchs defined in Conf.ini
@@ -142,7 +142,7 @@ strMNTHelp = '''
 
 
 def main():
-    if len(sys.argv) == 1:#第一个参数是否是本身，如果是
+    if len(sys.argv) == 1:#用户输入参数是否是本身，如果是
         print(strHelp)#打印帮助
     #OK
     elif sys.argv[1] == 'ptes':
@@ -163,7 +163,7 @@ def main():
             print(strPTCLHelp) #打印提示信息
         elif sys.argv[2] == 'all': #如果是3个参数是 all
             sw.clear_all() #调用清除所有交换机端口错误函数
-        elif s.is_IP(sys.argv[2]):#如果第3个参数是ip的话
+        elif s.is_IP(sys.argv[2]):#如果第3个参数是ip的话,判断是不是ip
             if num_argv == 4:   #判断是否有第4个参数，如果有
                 #if _isPort(sys.argv[3]):   错误
                 if s.is_port(sys.argv[3]):   #在判断第4个参数是否是正确的端口      

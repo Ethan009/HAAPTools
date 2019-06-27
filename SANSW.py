@@ -149,7 +149,7 @@ class Action():
         try:
             print('\nStart Clear ALL Error Count For SAN Switch "{}"...'.format(
                 self._host))
-            self._SWConn.exctCMD('statsclear') #
+            self._SWConn.exctCMD('statsclear') #命令行命令
             time.sleep(0.5)
             print('Clear Error Count for SW "{}" Completely...'.format(
                 self._host))
