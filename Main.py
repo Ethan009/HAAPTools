@@ -286,7 +286,7 @@ def main():
             if not s.is_file(fw_file):
                 print('File Not Exists. Please Provide Correct File...')
             haap.change_firmware(ip, fw_file)
-    #OK
+    #OK-
     elif sys.argv[1] == 'sts':
         num_argv = len(sys.argv)
         if num_argv == 2 or num_argv > 3:
