@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<meta http-equiv="refresh" content="10" >
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link href="{{ url_for('static',filename='bootstrap.css') }}" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+
+
+
+<div class="container">
+
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+
+            <nav class="navbar navbar-default" role="navigation">
+                <div class="navbar-header">
+                     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button> <a class="navbar-brand" href="#">Loxoll</a>
+                </div>
+
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li class="active">
+                             <a href="#">&nbsp;</a>
+                        </li>
+                        <li>
+                             <a href="#">E-Mail Notify</a>
+                        </li>
+                        <li class="dropdown">
+                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">About<strong class="caret"></strong></a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                     <a href="#">Action</a>
+                                </li>
+                                <li>
+                                     <a href="#">Another action</a>
+                                </li>
+                                <li>
+                                     <a href="#">Something else here</a>
+                                </li>
+                                <li class="divider">
+                                </li>
+                                <li>
+                                     <a href="#">Separated link</a>
+                                </li>
+                                <li class="divider">
+                                </li>
+                                <li>
+                                     <a href="#">One more separated link</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <form class="navbar-form navbar-left" role="search">
+                        <div class="form-group">
+                            <input type="text" class="form-control" />
+                        </div> <button type="submit" class="btn btn-default">Search</button>
+                    </form>
+                    <ul class="nav navbar-nav navbar-right">
+
+                        <li class="dropdown">
+                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Language<strong class="caret"></strong></a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                     <a href="#">English</a>
+                                </li>
+                                <li>
+                                     <a href="#">中文</a>
+                                </li>
+                                <li>
+                                     <a href="#">Something else here</a>
+                                </li>
+                                <li class="divider">
+                                </li>
+                                <li>
+                                     <a href="#">Separated link</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            {% if status_warning %}
+            <div class="alert alert-warning">
+                <a href="{{ url_for('warning') }}" target="" class="close" data-dismiss="alert">
+                    Check the details
+                </a>
+                <strong>Warning!</strong>Appear error messages, please deal with it immediately.
+            </div>
+            {% endif %}
+
+            <div class="row clearfix">
+                <div class="col-md-12 column">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <h3 class="text-left text-info">Engine Status</h3>
+                                </th>
+                                <th>
+                                    <h4>Last Update:&nbsp; {{ tlu_haap }} </h4>
+                                </th>
+                                <th>
+                                    <a class="btn btn-primary btn-large" href="javascript:location.reload();">Refresh</a>
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row clearfix">
+                <div class="col-md-12 column">
+                    {% if status_haap %}
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    {% for tielehaap in Title_HAAP %}
+                                    <th>{{tielehaap}}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for engine in status_haap %}
+                                {% if engine[-1]==0 %}
+                                    <tr class="success">
+                                        {% for status in engine[:-1] %}
+                                            <td>{{ status }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                {% elif engine[-1]==1 %}
+                                    <tr class="warning">
+                                        {% for status in engine[:-1] %}
+                                            <td>{{ status }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                {% elif engine[-1]==2 %}
+                                    <tr class="danger">
+                                        {% for status in engine[:-1] %}
+                                            <td>{{ status}}</td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>No Data to Show...</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="row clearfix">
+                <div class="col-md-12 column">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <h3 class="text-left text-info">Switch Status</h3>
+                                </th>
+                                <th>
+                                    <h4>Last Update:&nbsp; {{ tlu_sansw }} </h4>
+                                </th>
+                                <th>
+                                    <a class="btn btn-primary btn-large" href="javascript:location.reload();">Refresh</a>
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row clearfix">
+                <div class="col-md-12 column">
+                    {% if status_sansw %}
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    {% for titlesansw in Title_SANSW %}
+                                        <th>{{ titlesansw }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for sw in status_sansw %}
+                                    {% if sw[-1] == 0 %}
+                                        <tr class="success">
+                                            {% for status in sw[:-1] %}
+                                                <td>{{ status }}</td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% elif sw[-1]==1 %}
+                                        <tr class="warning">
+                                            {% for status in sw[:-1] %}
+                                                <td>{{ status}}</td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% elif sw[-1]==2 %}
+                                        <tr class="danger">
+                                            {% for status in sw[:-1] %}
+                                                <td>{{ status }}</td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                    <p>No Data to Show...</p>
+                    {% endif %}
+                </div>
+            </div>
+
+
+            <div class="progress progress-striped">
+                <div class="progress-bar progress-success">
+                </div>
+            </div>
+            <p>
+                 Engine Status shows that Status & Uptime of every engine.<br>
+                 Mirror Alarm means that one or more mirror degrade or rebuilding; Path Warning means that one or more path of drive（or engine） missing.<br>
+                 Color Description：
+            </p>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="success">
+                            Green
+                        </th>
+                        <th class="danger">
+                            Red
+                        </th>
+                        <th class="warning">
+                            Yellow
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="info">
+                        <td>
+                            Normal
+                        </td>
+                        <td>
+                            Alarm
+                        </td>
+                        <td>
+                            Warning
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="progress progress-striped">
+                <div class="progress-bar progress-success">
+                    
+                </div>
+            </div> 
+        </div>
+    </div>
+</div>
+             
+        </tbody>
+        </table>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <p class="text-muted">Copyright © Loxoll</p>
+    </div>
+</footer>
+</body>
+</html>

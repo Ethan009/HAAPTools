@@ -265,7 +265,7 @@ st
             time.sleep(0.25)
 
     @s.deco_Exception
-    def change_firmware(self, strFWFile):
+    def change_FW(self, strFWFile):
         connFTP = self._ftp()
         time.sleep(0.25)
         connFTP.PutFile('/mbflash', './', 'fwimage', strFWFile)

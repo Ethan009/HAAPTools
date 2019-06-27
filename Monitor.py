@@ -83,8 +83,7 @@ def start_web(mode):
     '''
 tlu = Time Last Update
     '''
-    app = Flask(__name__, template_folder='./web/templates',
-                static_folder='./web/static', static_url_path='')
+    app = Flask(__name__)
 
     @app.route("/", methods=['GET', 'POST'])
     def home():
@@ -201,7 +200,7 @@ def warning_check():
     unconfirm_warning = db.get_unconfirm_warning()
     if unconfirm_warning:
 
-        SE.send_warnmail(unconfirm_warning)
+        se.send_warnmail(unconfirm_warning)
     else:
         print('No Unconfirm Warning Found...')
 

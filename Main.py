@@ -144,7 +144,7 @@ strMNTHelp = '''
 def main():
     if len(sys.argv) == 1:#第一个参数是否是本身，如果是
         print(strHelp)#打印帮助
-
+    #OK
     elif sys.argv[1] == 'ptes':
         num_argv = len(sys.argv)
         if num_argv == 2 or num_argv > 3:
@@ -156,7 +156,7 @@ def main():
                 sw.print_porterror_formated(sys.argv[2])
             else:
                 print('Please Provide Correct Switch IP...')
-
+    #OK
     elif sys.argv[1] == 'ptcl':#判断执行参数是否为ptcl
         num_argv = len(sys.argv)  #获取参数的个数
         if num_argv == 2 or num_argv > 4:#如果是2个或者大于4个
@@ -174,7 +174,7 @@ def main():
                 print(strPTCLHelp) #打印提示
         else:
             print('Please Provide Correct Switch IP...')#请提供正确的交换机ip
-
+    #OK
     elif sys.argv[1] == 'sws':
         num_argv = len(sys.argv)
         if num_argv == 2 or num_argv > 3:
@@ -187,7 +187,7 @@ def main():
             else:
                 print('Please Provide Correct Switch IP...')
 
-
+    #OK
     elif sys.argv[1] == 'bc':
         num_argv = len(sys.argv)
         if num_argv == 2 or num_argv > 3:
@@ -202,10 +202,11 @@ def main():
 
     # get engines' trace files under TraceFolder based on Trace levels
     #trace、primary、seaond
+    #OK git Trace   NOT have Primary
     elif sys.argv[1] == 'gt':
         num_argv = len(sys.argv)
         if num_argv > 3:
-            trace_level = sys.argv[3]
+            trace_level = int(sys.argv[3])
         if num_argv == 2 or num_argv > 4:
             print(strGTHelp)
         elif sys.argv[2] == 'all':
@@ -251,7 +252,7 @@ def main():
     #             haap.analyse_trace(sys.argv[2], 0)
     #     else:
     #         print('Please Provide Correct Engine IP...')
-
+    #OK python Main.py at Trace\2019-00-00
     elif sys.argv[1] == 'at':
         num_argv = len(sys.argv)
         if num_argv == 2 or num_argv > 3:
@@ -261,7 +262,7 @@ def main():
                 s.TraceAnalyse(sys.argv[2])
             else:
                 print('Please Provide Correct Trace Folder')
-
+    #OK  python Main.py ec 10.203.1.223 cmd.txt
     elif sys.argv[1] == 'ec':
         if len(sys.argv) != 4:
             print(strECHelp)
@@ -273,7 +274,7 @@ def main():
             if not s.is_file(command_file):
                 print('File Not Exists. Please Provide Correct File...')
             haap.execute_multi_commands(ip, command_file)
-
+    #OK  python Main.py fw 10.203.1.223 FW15.9.7.7_OR.bin
     elif sys.argv[1] == 'fw':
         if len(sys.argv) != 4:
             print(strFWHelp)
@@ -285,7 +286,7 @@ def main():
             if not s.is_file(fw_file):
                 print('File Not Exists. Please Provide Correct File...')
             haap.change_firmware(ip, fw_file)
-
+    #OK
     elif sys.argv[1] == 'sts':
         num_argv = len(sys.argv)
         if num_argv == 2 or num_argv > 3:
@@ -297,7 +298,7 @@ def main():
                 haap.show_stauts(sys.argv[2])
             else:
                 print('Please Provide Correct Engine IP...')
-
+    #OK
     elif sys.argv[1] == 'st':
         num_argv = len(sys.argv)
         if num_argv == 2 or num_argv > 3:
@@ -309,7 +310,7 @@ def main():
                 haap.set_time(sys.argv[2])
             else:
                 print('Please Provide Correct Engine IP...')
-
+    #OK    
     elif sys.argv[1] == 'stm':
         num_argv = len(sys.argv)
         if num_argv == 2 or num_argv > 3:
@@ -321,7 +322,7 @@ def main():
                 haap.show_time(sys.argv[2])
             else:
                 print('Please Provide Correct Engine IP...')
-
+    #OK
     elif sys.argv[1] == 'pc':
         num_argv = len(sys.argv)
         if num_argv == 2 or num_argv > 4:
@@ -349,7 +350,7 @@ def main():
                         print('Please Provide Correct SAN Switch IP...')
             else:
                 print(strPCHelp)
-
+    #OK
     elif sys.argv[1] == 'mnt':
         num_argv = len(sys.argv)
         if num_argv == 2 or num_argv > 4:
