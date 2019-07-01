@@ -81,8 +81,8 @@ def execute_multi_commands(ip, command_file):
     Action(ip, telnet_port, passwd, FTP_port).auto_commands(command_file)
 
 
-tupDesc = ('Engine', 'AH', 'Uptime', 'Master', 'Cluster', 'Mirror')
-tupWidth = (18, 5, 15, 8, 9, 8)
+tupDesc = ('Engine', 'Status', 'Uptime', 'Master', 'Cluster', 'Mirror')
+tupWidth = (18, 15, 15, 8, 9, 8)
 
 
 def _print_description():
@@ -599,7 +599,7 @@ class Status(Action):
                             error_line += line + "\n"
                 if error_line:
                     # print('mirror:',error_line)
-                    return error_line  # means mirror not okay
+                    return 1 # means mirror not okay
                 else:
                     return 0  # 0 means mirror all okay
             else:
@@ -613,16 +613,19 @@ class Status(Action):
         '''list of over all'''
         lstOverAll = []
         lstOverAll.append(self._host)
-        lstOverAll.append(self.AHStatus)
-        if self.AHStatus:
+        if self.AHStatus == None:
+            lstOverAll.append("AH")
             for i in range(4):
                 lstOverAll.append('--')
         else:
+            lstOverAll.append("OK")
             lstOverAll.append(self.uptime_to_show())
             lstOverAll.append(self.is_master())
             lstOverAll.append(self.cluster_status())
-            lstOverAll.append(self.get_mirror_status())
-        print("over_all:",lstOverAll)
+            if self.get_mirror_status() == 1:
+                lstOverAll.append('Not OK')
+            else:
+                lstOverAll.append(str(self.get_mirror_status()))
         return lstOverAll
 
     def over_all_and_warning(self):
