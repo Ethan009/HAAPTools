@@ -295,7 +295,7 @@ st
     def get_trace(self, strBaseFolder, intTraceLevel):
         if self.AHStatus:
             print("Engine '%s' is at AH Status(AH Code %d)"
-                  % (self.host, self.AHStatus))
+                  % (self._host, self.AHStatus))
             return
         tn = self._TN_Conn
         connFTP = self._ftp()
