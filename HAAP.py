@@ -624,8 +624,10 @@ class Status(Action):
             lstOverAll.append(self.cluster_status())
             if self.get_mirror_status() == 1:
                 lstOverAll.append('Not OK')
+            elif self.get_mirror_status() == 0:
+                lstOverAll.append('OK')
             else:
-                lstOverAll.append(str(self.get_mirror_status()))
+                lstOverAll.append('Not Find')
         return lstOverAll
 
     def over_all_and_warning(self):
