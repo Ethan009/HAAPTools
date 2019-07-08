@@ -250,7 +250,7 @@ class haap_judge(object):
 
     def judge_Mirror(self, MirrorStatus_rt, MirrorStatus_db):
         str_engine_mirror = 'Engine mirror not ok'
-        if MirrorStatus_rt:
+        if MirrorStatus_rt != 'OK':
             if MirrorStatus_rt != MirrorStatus_db:
                 db.insert_warning(self.strTimeNow, self.host,
                                   2, 'engine', str_engine_mirror, 0)
