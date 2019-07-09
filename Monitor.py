@@ -35,7 +35,7 @@ lst_haap_alias = oddEngines.keys()
 # <<<Get Config Field>>>
 
 # <<web show table title>>
-lstDescHAAP = ('Engine', 'IP', 'AH Status', 'Uptime',
+lstDescHAAP = ('Engine', 'IP', 'Status', 'Uptime',
                'Master', 'Cluster', 'Mirror')
 lstDescSANSW = ('Switch', 'IP', 'Encout', 'DiscC3',
                 'LinkFail', 'LossSigle', 'LossSync', 'Total')

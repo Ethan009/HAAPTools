@@ -629,7 +629,6 @@ class Status(Action):
                 lstOverAll.append('OK')
             else:
                 lstOverAll.append('Not Find')
-        print("lstOverAll:",lstOverAll)
         return lstOverAll
 
     def over_all_and_warning(self):
