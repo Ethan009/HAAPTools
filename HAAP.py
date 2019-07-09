@@ -142,14 +142,14 @@ def periodically_check_all():
         PCFile_name = 'PC_%s_Engine_%s.log' % (
             s.time_now_folder(), ip)
         Action(ip, telnet_port, passwd, FTP_port).periodic_check(
-            lstPCCommand, strPCFolder,PCFile_name)
+            lstPCCommand, strPCFolder, PCFile_name)
 
 
 def periodically_check(ip):
     PCFile_name = 'PC_%s_Engine_%s.log' % (
         s.time_now_folder(), ip)
     Action(ip, telnet_port, passwd, FTP_port).periodic_check(
-        lstPCCommand, strPCFolder,PCFile_name)
+        lstPCCommand, strPCFolder, PCFile_name)
 
 
 def status_for_judging_realtime(ip):
@@ -599,7 +599,7 @@ class Status(Action):
                             error_line += line + "\n"
                 if error_line:
                     # print('mirror:',error_line)
-                    return 1 # means mirror not okay
+                    return 1  # means mirror not okay
                 else:
                     return 0  # 0 means mirror all okay
             else:
@@ -608,7 +608,8 @@ class Status(Action):
                 else:
                     print('Get Mirror Status Failed for Engine "%s"' % 
                           self._host)
-    #update lststatus
+
+    # update lststatus
     def over_all(self):
         '''list of over all'''
         lstOverAll = []
@@ -624,8 +625,11 @@ class Status(Action):
             lstOverAll.append(self.cluster_status())
             if self.get_mirror_status() == 1:
                 lstOverAll.append('Not OK')
+            elif self.get_mirror_status() == 0:
+                lstOverAll.append('OK')
             else:
-                lstOverAll.append(str(self.get_mirror_status()))
+                lstOverAll.append('Not Find')
+        print("lstOverAll:",lstOverAll)
         return lstOverAll
 
     def over_all_and_warning(self):
