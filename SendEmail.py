@@ -77,7 +77,7 @@ def send_warnmail(warninfo_email):
         send_smtp.login(email_sender, email_password)
         send_smtp.sendmail(email_sender, email_receiver_list, msg.as_string())
         send_smtp.close()
-    except  send_smtp.SMTPException:
+    except :
         print "Send mail failed!"
 
 

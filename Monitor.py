@@ -96,8 +96,8 @@ tlu = Time Last Update
             error = 0
 
         if mode == 'rt':
-            StatusHAAP = haap.real_time_status()
-            StatusSANSW = sw.real_time_status()
+            StatusHAAP = real_time_status_haap()
+            StatusSANSW = real_time_status_sansw()
             tlu_haap = s.time_now_to_show()
             tlu_sansw = s.time_now_to_show()
             status_warning = 0
@@ -220,7 +220,7 @@ class haap_judge(object):
 
     def judge_AH(self, AHstatus_rt, AHstatus_db):
         str_engine_AH = 'Engine AH'
-        if AHstatus_rt:
+        if AHstatus_rt != 'OK':
             if AHstatus_rt != AHstatus_db:
                 db.insert_warning(self.strTimeNow, self.host,
                                   2, 'engine', str_engine_AH, 0)
@@ -231,8 +231,6 @@ class haap_judge(object):
 
     def judge_reboot(self, uptime_second_rt, uptime_second_db):
         str_engine_restart = 'Engine Reboot %d secends ago'
-        print("rt:", uptime_second_rt)
-        print("db:", uptime_second_db)
         if uptime_second_rt <= uptime_second_db:
             db.insert_warning(self.strTimeNow, self.host, 2,
                               'engine', str_engine_restart % (uptime_second_rt), 0)
@@ -241,7 +239,7 @@ class haap_judge(object):
 
     def judge_Status(self, Status_rt, Status_db):
         str_engine_status = 'Engine offline'
-        if Status_rt:
+        if Status_rt != 'OK':
             if Status_rt != Status_db:
                 db.insert_warning(self.strTimeNow, self.host,
                                   2, 'engine', str_engine_status, 0)

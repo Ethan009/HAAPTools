@@ -92,12 +92,6 @@ def _print_description():
 
 
 def _print_status_in_line(lstStatus):
-    if not lstStatus[1]:
-        lstStatus[1] = 'OK'
-    if not lstStatus[4]:
-        lstStatus[4] = 'OK'
-    if not lstStatus[5]:
-        lstStatus[5] = 'OK'
     for i in range(len(lstStatus)):
         if lstStatus[i]:
             print(lstStatus[i].ljust(tupWidth[i]), end='')
@@ -109,13 +103,13 @@ def _print_status_in_line(lstStatus):
 def show_stauts_all():
     _print_description()
     for ip in list_engines_IP:
-        lstStatus = Status(ip, telnet_port, passwd, FTP_port).over_all()
+        lstStatus = Status(ip, telnet_port, passwd, FTP_port).status_to_show()
         _print_status_in_line(lstStatus)
 
 
 def show_stauts(ip):
     _print_description()
-    lstStatus = Status(ip, telnet_port, passwd, FTP_port).over_all()
+    lstStatus = Status(ip, telnet_port, passwd, FTP_port).status_to_show()
     _print_status_in_line(lstStatus)
 
 
@@ -176,8 +170,10 @@ def origin(haap_alias, objEngine):
     return dicOrigin
 
 
+
 def info(haap_alias, objEngine):
-    lstStatus = objEngine.over_all_and_warning()
+    lstStatus = objEngine.status_to_show_and_warning()
+
     intUpTimeSec = objEngine.uptime_second()
 
     dicInfo = {haap_alias: {'status': lstStatus[:-1],
@@ -545,12 +541,12 @@ class Status(Action):
     @s.deco_Exception
     def _is_master(self, strEngine):
         if strEngine is None:
-            return
+            return 0
         if re.search(r'>>', strEngine):
             reMaster = re.compile(r'(>>)\s*\d*\s*(\(M\))')
             objReMaster = reMaster.search(strEngine)
             if objReMaster:
-                return 'M'
+                return 1
 
     @s.deco_Exception
     def is_master(self):
@@ -560,7 +556,9 @@ class Status(Action):
     def cluster_status(self):
         if self.dictInfo['engine']:
             if 'offline' in self.dictInfo['engine']:
-                return True
+                return 1
+            else:
+                return 0
 
     def get_version(self):
         if self.dictInfo['vpd'] is None:
@@ -614,30 +612,57 @@ class Status(Action):
         '''list of over all'''
         lstOverAll = []
         lstOverAll.append(self._host)
-        if self.AHStatus == None:
-            lstOverAll.append("AH")
+    
+        if self.AHStatus:
+            lstOverAll.append(self.AHStatus)
             for i in range(4):
                 lstOverAll.append('--')
         else:
-            lstOverAll.append("OK")
+            lstOverAll.append(0)
             lstOverAll.append(self.uptime_to_show())
             lstOverAll.append(self.is_master())
             lstOverAll.append(self.cluster_status())
-            if self.get_mirror_status() == 1:
-                lstOverAll.append('Not OK')
-            elif self.get_mirror_status() == 0:
-                lstOverAll.append('OK')
-            else:
-                lstOverAll.append('Not Find')
+            lstOverAll.append(self.get_mirror_status())
         return lstOverAll
 
-    def over_all_and_warning(self):
+    def status_to_show(self):
+        lstStatus = self.over_all()
+        if lstStatus[1] > 0:
+            pass
+        elif lstStatus[1] == 0:
+            lstStatus[1] = 'OK'
+
+        # lstStatus[4] means Master Status
+        if lstStatus[3]:
+            lstStatus[3] = 'M'
+        else:
+            lstStatus[3] = ''
+
+        #cluster_status = lstStatus[5]
+        if lstStatus[4]:
+            lstStatus[4] = 'Warning'
+        else:
+            lstStatus[4] = 'OK'
+
+        #mirror_status = lstStatus[6]
+        if lstStatus[5] == 1:
+            lstStatus[5] = 'Warning'
+        elif lstStatus[5] == -1:
+            lstStatus[5] = 'No Mirror'
+        else:
+            lstStatus[5] = 'OK'
+        return lstStatus
+
+    def status_to_show_and_warning(self):
+        satatus_to_show = self.status_to_show()
         lstStatus = self.over_all()
         if any([lstStatus[i] for i in [1, 4, 5]]):
-            lstStatus.append(2)
+            satatus_to_show.append(2)
+        elif not self._TN_Connect_Status:
+            satatus_to_show.append(1)
         else:
-            lstStatus.append(0)
-        return lstStatus
+            satatus_to_show.append(0)
+        return satatus_to_show
 
 
 if __name__ == '__main__':

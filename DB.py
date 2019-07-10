@@ -71,8 +71,8 @@ def get_unconfirm_warning():
     """
     lstAllUCW = []
     for warning in Warning().get_all_unconfirm_warning():
-        lstAllUCW.append([warning.time, warning.level, warning.device,
-            warning.ip, warning.warn_message])
+        lstAllUCW.append([warning.time, warning.ip, warning.device,
+            warning.level, warning.warn_message])
     if lstAllUCW:
         return lstAllUCW
 
