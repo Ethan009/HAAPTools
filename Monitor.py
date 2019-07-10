@@ -96,19 +96,19 @@ tlu = Time Last Update
             error = 0
 
         if mode == 'rt':
-            StatusHAAP = haap.real_time_status()
+            StatusHAAP = haap.list_status_for_realtime_show()
             StatusSANSW = sw.real_time_status()
             tlu_haap = s.time_now_to_show()
             tlu_sansw = s.time_now_to_show()
             status_warning = 0
 
         elif mode == 'db':
-            haap = haap_info_to_show()
+            engine = haap_info_to_show()
             sansw = sansw_info_to_show()
             status_warning = db.get_unconfirm_warning()
-            if haap:
-                tlu_haap = haap[0]
-                StatusHAAP = haap[1]
+            if engine:
+                tlu_haap = engine[0]
+                StatusHAAP = engine[1]
                 
             else:
                 tlu_haap = s.time_now_to_show()
@@ -365,5 +365,5 @@ def get_switch_total_db(list_switch_alias):
 
 
 if __name__ == '__main__':
-    monitor_db_4_thread()
+
     pass
