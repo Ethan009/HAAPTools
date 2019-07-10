@@ -486,6 +486,8 @@ class Uptime(object):
             if s:
                 intSecond += s
             return intSecond
+        else:
+            return 0
 
     def uptime_to_show(self):
         uptime_list = self.uptime_list()

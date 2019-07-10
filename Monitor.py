@@ -231,6 +231,9 @@ class haap_judge(object):
 
     def judge_reboot(self, uptime_second_rt, uptime_second_db):
         str_engine_restart = 'Engine Reboot %d secends ago'
+        print('---------------------------------------------------------------------')
+        print(uptime_second_rt,uptime_second_db)
+        print('---------------------------------------------------------------------')
         if uptime_second_rt <= uptime_second_db:
             db.insert_warning(self.strTimeNow, self.host, 2,
                               'engine', str_engine_restart % (uptime_second_rt), 0)
@@ -256,17 +259,27 @@ class haap_judge(object):
                                self.alias, 2, str_engine_mirror])
 
     def all_judge(self):
-        try:
-            if self.statusDB:
-                if self.judge_AH(self.statusRT[1], self.statusDB[1]):
-                    self.judge_reboot(self.statusRT[2], self.statusDB[2])
-                    self.judge_Status(self.statusRT[3], self.statusDB[3])
-                    self.judge_Mirror(self.statusRT[4], self.statusDB[4])
-        except:
-            raise('error')
-        finally:
-            if self.lstWarningToSend:
-                se.send_warnmail(self.lstWarningToSend)
+        # try:
+        #     if self.statusDB:
+        #         if self.judge_AH(self.statusRT[1], self.statusDB[1]):
+        #             self.judge_reboot(self.statusRT[2], self.statusDB[2])
+        #             self.judge_Status(self.statusRT[3], self.statusDB[3])
+        #             self.judge_Mirror(self.statusRT[4], self.statusDB[4])
+        # except:
+        #     raise('error')
+        # finally:
+        #     if self.lstWarningToSend:
+        #         se.send_warnmail(self.lstWarningToSend)
+
+        
+        if self.statusDB:
+            if self.judge_AH(self.statusRT[1], self.statusDB[1]):
+                self.judge_reboot(self.statusRT[2], self.statusDB[2])
+                self.judge_Status(self.statusRT[3], self.statusDB[3])
+                self.judge_Mirror(self.statusRT[4], self.statusDB[4])
+
+        if self.lstWarningToSend:
+            se.send_warnmail(self.lstWarningToSend)
 
 
 
