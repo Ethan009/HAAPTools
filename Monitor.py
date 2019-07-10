@@ -96,8 +96,8 @@ tlu = Time Last Update
             error = 0
 
         if mode == 'rt':
-            StatusHAAP = haap.list_status_for_realtime_show()
-            StatusSANSW = sw.real_time_status()
+            StatusHAAP = haap_rt_info_to_show()
+            StatusSANSW = sansw_rt_info_to_show()
             tlu_haap = s.time_now_to_show()
             tlu_sansw = s.time_now_to_show()
             status_warning = 0
@@ -220,7 +220,7 @@ class haap_judge(object):
 
     def judge_AH(self, AHstatus_rt, AHstatus_db):
         str_engine_AH = 'Engine AH'
-        if AHstatus_rt:
+        if AHstatus_rt != 'OK':
             if AHstatus_rt != AHstatus_db:
                 db.insert_warning(self.strTimeNow, self.host,
                                   2, 'engine', str_engine_AH, 0)
@@ -231,8 +231,6 @@ class haap_judge(object):
 
     def judge_reboot(self, uptime_second_rt, uptime_second_db):
         str_engine_restart = 'Engine Reboot %d secends ago'
-        print("rt:", uptime_second_rt)
-        print("db:", uptime_second_db)
         if uptime_second_rt <= uptime_second_db:
             db.insert_warning(self.strTimeNow, self.host, 2,
                               'engine', str_engine_restart % (uptime_second_rt), 0)
@@ -241,7 +239,7 @@ class haap_judge(object):
 
     def judge_Status(self, Status_rt, Status_db):
         str_engine_status = 'Engine offline'
-        if Status_rt:
+        if Status_rt != 'OK':
             if Status_rt != Status_db:
                 db.insert_warning(self.strTimeNow, self.host,
                                   2, 'engine', str_engine_status, 0)
@@ -363,7 +361,45 @@ def get_switch_total_db(list_switch_alias):
         db_total = dicALL[list_switch_alias]["PE_Total"]
         return db_total
 
+def sansw_rt_info_to_show():
+    """
+    @note: SANSW要展示的即时内容（status）
+    """
+    switch_total = sw.get_info_for_DB()[1]
+    print("lst_switch:",switch_total)
+    lst_sansw_to_show = []
+    if switch_total:
+        for sansw_alias in switch_total.keys():
+            ip = switch_total[sansw_alias]["IP"]
+            PE_sum = switch_total[sansw_alias]["PE_Sum"]
+            if PE_sum == None:
+                PE_sum = []
+            PE_total = switch_total[sansw_alias]["PE_Total"]
+            warning_level = s.is_Warning(PE_total, tuplThresholdTotal)
+            PE_sum.insert(0, ip)
+            PE_sum.append(PE_total)
+            PE_sum.insert(0, sansw_alias)
+            PE_sum.append(warning_level)
+            lst_sansw_to_show.append(PE_sum)
+            lst_sansw_to_show.sort(key=operator.itemgetter(0))
+        print("lst_sansw_to_show:",lst_sansw_to_show)
+        return lst_sansw_to_show
+
+
+def haap_rt_info_to_show():
+    """
+    @note: HAAP网页展示即时数据(status)
+    """
+    dicALL = haap.data_for_db()[1]
+    lstHAAPToShow = []
+    if dicALL:
+        for engine_alias in dicALL.keys():
+            info_status = dicALL[engine_alias]['status']
+            info_status.insert(0, engine_alias)
+            info_status.append(dicALL[engine_alias]['level'])
+            lstHAAPToShow.append(info_status)
+        print("lstHAAPToShow:",lstHAAPToShow)
+        return  lstHAAPToShow
 
 if __name__ == '__main__':
-
     pass
