@@ -88,12 +88,7 @@ tlu = Time Last Update
 
     @app.route("/", methods=['GET', 'POST'])
     def home():
-        lstWarningList = db.get_unconfirm_warning()
-        if request.method == 'GET' and lstWarningList:
-            error = 1
-        else:
-            db.update_warning()
-            error = 0
+        
 
         if mode == 'rt':
             StatusHAAP = haap_rt_info_to_show()
@@ -103,6 +98,13 @@ tlu = Time Last Update
             status_warning = 0
 
         elif mode == 'db':
+            lstWarningList = db.get_unconfirm_warning()
+            if request.method == 'GET' and lstWarningList:
+                error = 1
+            else:
+                db.update_warning()
+                error = 0
+
             engine = haap_info_to_show()
             sansw = sansw_info_to_show()
             status_warning = db.get_unconfirm_warning()
