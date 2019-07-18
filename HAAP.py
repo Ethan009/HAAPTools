@@ -32,7 +32,7 @@ lstPCCommand = setting.PCEngineCommand()
 def backup_config_all():
     folder = '%s/%s' % (strCFGFolder, s.time_now_folder())
     for ip in list_engines_IP:
-        Action(ip, telnet_port, passwd, FTP_port).backup(folder)
+         Action(ip, telnet_port, passwd, FTP_port).backup(folder)
 
 
 def backup_config(ip):
@@ -166,7 +166,10 @@ def list_status_for_realtime_show():
 
 def origin(haap_alias, objEngine):
     dicOrigin = {haap_alias: {'ip': objEngine._host}}
-    dicOrigin[haap_alias].update(objEngine.dictInfo)
+    if objEngine.dictInfo:
+        dicOrigin[haap_alias].update(objEngine.dictInfo)
+    else:
+        pass
     return dicOrigin
 
 
@@ -289,10 +292,6 @@ st
 
     @s.deco_OutFromFolder
     def get_trace(self, strBaseFolder, intTraceLevel):
-        if self.AHStatus:
-            print("Engine '%s' is at AH Status(AH Code %d)"
-                  % (self._host, self.AHStatus))
-            return
         tn = self._TN_Conn
         connFTP = self._ftp()
 
@@ -306,7 +305,7 @@ st
                         oddCMD['Secondary'] = 'ftpprep coredump secondary all'
                 return oddCMD
             else:
-                print('Trace Level: 1 or 2 or 3')
+                print('Trace Level Must Be: 1 or 2 or 3, Please Refer "Config.ini" ')
 
         def _get_trace_file(command, strTraceDes):
 
@@ -515,13 +514,16 @@ class Status(Action):
                         intFTPPort, intTimeout)
         # self._telnet_connect()
         self.dictInfo = self._get_info_to_dict()
-        self.uptime = Uptime(self.dictInfo['vpd'])
+        if self.dictInfo:
+            self.objUpTime = Uptime(self.dictInfo['vpd'])
+        else:
+            self.objUpTime = None
 
     @s.deco_Exception
     def _get_info_to_dict(self):
         if self.AHStatus:
-            print("Engine '%s' is at AH Status(AH Code %d)"
-                  % (self._host, self.AHStatus))
+            # print("Engine '%s' is at AH Status(AH Code %d)"
+            #       % (self._host, self.AHStatus))
             return
         lstCommand = ['vpd', 'engine', 'mirror']
         dictInfo = {}
@@ -532,13 +534,18 @@ class Status(Action):
             return dictInfo
 
     def uptime_list(self):
-        return self.uptime.uptime_list()
+        if self.objUpTime:
+            return self.objUpTime.uptime_list()
 
     def uptime_second(self):
-        return self.uptime.uptime_second()
+        if self.objUpTime:
+            return self.objUpTime.uptime_second()
+        else:
+            return 0
 
     def uptime_to_show(self):
-        return self.uptime.uptime_to_show()
+        if self.objUpTime:
+            return self.objUpTime.uptime_to_show()
 
     @s.deco_Exception
     def _is_master(self, strEngine):
@@ -616,7 +623,7 @@ class Status(Action):
         lstOverAll.append(self._host)
     
         if self.AHStatus:
-            lstOverAll.append(self.AHStatus)
+            lstOverAll.append(str(self.AHStatus))
             for i in range(4):
                 lstOverAll.append('--')
         else:
@@ -634,20 +641,26 @@ class Status(Action):
         elif lstStatus[1] == 0:
             lstStatus[1] = 'OK'
 
-        # lstStatus[4] means Master Status
-        if lstStatus[3]:
+        # lstStatus[3] means Master Status
+        if lstStatus[3] == '--':
+            pass
+        elif lstStatus[3]:
             lstStatus[3] = 'M'
         else:
             lstStatus[3] = ''
 
-        #cluster_status = lstStatus[5]
-        if lstStatus[4]:
+        # cluster_status = lstStatus[4]
+        if lstStatus[4] == '--':
+            pass
+        elif lstStatus[4]:
             lstStatus[4] = 'Warning'
         else:
             lstStatus[4] = 'OK'
 
-        #mirror_status = lstStatus[6]
-        if lstStatus[5] == 1:
+        #mirror_status = lstStatus[5]
+        if lstStatus[5] == '--':
+            pass
+        elif lstStatus[5] == 1:
             lstStatus[5] = 'Warning'
         elif lstStatus[5] == -1:
             lstStatus[5] = 'No Mirror'

@@ -228,15 +228,11 @@ class haap_judge(object):
                                   2, 'engine', str_engine_AH, 0)
                 self.lstWarningToSend.append([self.strTimeNow, self.host,
                                self.alias, 2, str_engine_AH])
-                return
-        return True
+            return True
 
     def judge_reboot(self, uptime_second_rt, uptime_second_db):
         str_engine_restart = 'Engine Reboot %d secends ago'
-        print('---------------------------------------------------------------------')
-        print(uptime_second_rt,uptime_second_db)
-        print('---------------------------------------------------------------------')
-        if uptime_second_rt <= uptime_second_db:
+        if uptime_second_rt < uptime_second_db:
             db.insert_warning(self.strTimeNow, self.host, 2,
                               'engine', str_engine_restart % (uptime_second_rt), 0)
             self.lstWarningToSend.append([self.strTimeNow, self.host,
@@ -276,6 +272,8 @@ class haap_judge(object):
         
         if self.statusDB:
             if self.judge_AH(self.statusRT[1], self.statusDB[1]):
+                pass
+            else:
                 self.judge_reboot(self.statusRT[2], self.statusDB[2])
                 self.judge_Status(self.statusRT[3], self.statusDB[3])
                 self.judge_Mirror(self.statusRT[4], self.statusDB[4])
