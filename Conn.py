@@ -239,7 +239,7 @@ class HAAPConn(object):
         self._strAHPrompt = 'AH_CLI>'
         self._strCLIConflict = 'Another session owns the CLI'
         self.Connection = None
-        self.telnet_connect()
+        self.flag = self.telnet_connect()
 
     def _connect(self):
         try:
@@ -268,8 +268,9 @@ class HAAPConn(object):
             self._connect()
 
     def telnet_connect(self):
-        self._connect()
-        self._connect_retry()
+        flag = self._connect()
+        flag = self._connect_retry()
+        return flag
 
     def _get_connection_status(self):
         if self.Connection:

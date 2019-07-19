@@ -224,7 +224,7 @@ st
                                       self._TNport,
                                       self._password,
                                       self._timeout)
-        self._TN_Connect_Status = self._TN_Conn
+        self._TN_Connect_Status = self._TN_Conn.flag
 
     @s.deco_Exception
     def _executeCMD(self, cmd):
@@ -621,19 +621,23 @@ class Status(Action):
         '''list of over all'''
         lstOverAll = []
         lstOverAll.append(self._host)
-    
-        if self.AHStatus:
-            lstOverAll.append(str(self.AHStatus))
-            for i in range(4):
-                lstOverAll.append('--')
+        if self._TN_Connect_Status:
+            if self.AHStatus:
+                lstOverAll.append(str(self.AHStatus))
+                for i in range(4):
+                    lstOverAll.append('--')
+            else:
+                lstOverAll.append(0)
+                lstOverAll.append(self.uptime_to_show())
+                lstOverAll.append(self.is_master())
+                lstOverAll.append(self.cluster_status())
+                lstOverAll.append(self.get_mirror_status())
+            return lstOverAll
         else:
-            lstOverAll.append(0)
-            lstOverAll.append(self.uptime_to_show())
-            lstOverAll.append(self.is_master())
-            lstOverAll.append(self.cluster_status())
-            lstOverAll.append(self.get_mirror_status())
-        return lstOverAll
-
+            for i in range(5):
+                lstOverAll.append('--')
+            return lstOverAll
+        
     def status_to_show(self):
         lstStatus = self.over_all()
         if lstStatus[1] > 0:
