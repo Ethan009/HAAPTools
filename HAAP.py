@@ -224,7 +224,7 @@ st
                                       self._TNport,
                                       self._password,
                                       self._timeout)
-        self._TN_Connect_Status = self._TN_Conn.flag
+        self._TN_Connect_Status = self._TN_Conn.get_connection_status()
 
     @s.deco_Exception
     def _executeCMD(self, cmd):
@@ -676,7 +676,10 @@ class Status(Action):
         satatus_to_show = self.status_to_show()
         lstStatus = self.over_all()
         if any([lstStatus[i] for i in [1, 4, 5]]):
-            satatus_to_show.append(2)
+            if lstStatus[1] == '--':
+                satatus_to_show.append(1)
+            else:
+                satatus_to_show.append(2)
         elif not self._TN_Connect_Status:
             satatus_to_show.append(1)
         else:

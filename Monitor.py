@@ -336,10 +336,10 @@ def sansw_info_to_show():
             ip = switch_total[sansw_alias]["IP"]
             PE_sum = switch_total[sansw_alias]["PE_Sum"]
             if PE_sum == None:
-                PE_sum = ['-','-','-','-','-']
+                PE_sum = ['--','--','--','--','--']
             PE_total = switch_total[sansw_alias]["PE_Total"]
             if PE_total == None:
-                PE_total = '-'
+                PE_total = '--'
             warning_level = s.is_Warning(PE_total, tuplThresholdTotal)
             PE_sum.insert(0, ip)
             PE_sum.append(PE_total)

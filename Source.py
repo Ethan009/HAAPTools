@@ -138,7 +138,7 @@ def ShowErr(*argvs):
 
 '''.format(argvs[2], argvs[3])))
     elif error_level == 2:
-        return ShowErr_level2(argvs)
+        pass
     elif error_level == 3:
         print(str('''
 ----------------------------------------------------------------------------
