@@ -268,9 +268,7 @@ class HAAPConn(object):
             self._connect()
 
     def telnet_connect(self):
-        if self._connect():
-            pass
-        else:
+        if not self._connect():
             self._connect_retry()
 
     def get_connection_status(self):
