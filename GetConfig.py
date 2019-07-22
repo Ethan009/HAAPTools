@@ -138,6 +138,11 @@ class EmailConfig(object):
     
     def email_sub(self):
         return str(self.cfg.get('EmailSetting', 'email_sub'))
+    
+    #Whether to Turn off Mail Function
+    def email_enable(self):
+        return self.cfg.get('EmailSetting','enable')
+    
 
 
 class Setting(object):
@@ -192,4 +197,5 @@ class Setting(object):
         return oddRegularTrace
 
 if __name__ == '__main__':
+    print(EmailConfig().email_enable())
     pass

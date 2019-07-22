@@ -18,6 +18,7 @@ except Exception:
 #read config
 emailcfg = gc.EmailConfig()
 email_host_port = emailcfg.email_host_port()
+email_enable = emailcfg.email_enable()
 email_host = emailcfg.email_host()
 email_password = emailcfg.email_password()
 email_sender = emailcfg.email_sender()
@@ -26,7 +27,7 @@ email_receiver_list = email_receiver.split(',')
 email_sub = emailcfg.email_sub()
 
 def send_warnmail(warninfo_email):
-    if email_enalbe == 'no':
+    if email_enable == 'no':
         return
     msg = MIMEMultipart()
     msg['Subject'] = email_sub
