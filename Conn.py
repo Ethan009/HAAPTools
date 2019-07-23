@@ -5,7 +5,7 @@ import telnetlib
 import sys
 import paramiko
 import re
-import Source as s
+import Sundry as s
 
 
 class FTPConn(object):
