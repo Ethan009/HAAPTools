@@ -185,8 +185,8 @@ def check_all_haap():
     
 
 def check_all_sansw():
+    dicAll = sw.get_info_for_DB()
     try:
-        dicAll = sw.get_info_for_DB()
         if dicAll:
             for sw_alias in lst_sansw_alias:
                 int_total_DB = get_switch_total_db(sw_alias)
@@ -222,13 +222,14 @@ class haap_judge(object):
 
     def judge_AH(self, AHstatus_rt, AHstatus_db):
         str_engine_AH = 'Engine AH'
-        if AHstatus_rt != 'OK':
+        if AHstatus_rt == '--':
+            pass
+        elif  AHstatus_rt != 'OK':
             if AHstatus_rt != AHstatus_db:
                 db.insert_warning(self.strTimeNow, self.host,
                                   2, 'engine', str_engine_AH, 0)
                 self.lstWarningToSend.append([self.strTimeNow, self.host,
                                self.alias, 2, str_engine_AH])
-            return True
 
     def judge_reboot(self, uptime_second_rt, uptime_second_db):
         str_engine_restart = 'Engine Reboot %d secends ago'
@@ -285,7 +286,7 @@ class haap_judge(object):
 
 def sansw_judge(total_RT, total_DB, sansw_IP, sansw_Alias):
     strTimeNow = s.time_now_to_show()
-    if total_DB:
+    if (total_DB != None) and (total_RT != None):
         intErrorIncrease = total_RT - total_DB
         intWarninglevel = s.is_Warning(intErrorIncrease, tuplThresholdTotal)
         if intWarninglevel:

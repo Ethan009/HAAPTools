@@ -6,7 +6,7 @@ try:
 except Exception:
     import ConfigParser as cp
     
-name_of_config_file = 'Conf2.ini'
+name_of_config_file = 'Config.ini'
 
 
 def read_config_file():

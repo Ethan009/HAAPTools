@@ -125,9 +125,6 @@ def ShowErr(*argvs):
     Four argv:
     ClassName, FunctionName, MessageGiven, MessageRaised
     '''
-    if len(argvs) == 3:
-        argvs[3] = ''
-
     if error_level == 1:
         print(str('''
 ----------------------------------------------------------------------------
@@ -135,8 +132,7 @@ def ShowErr(*argvs):
 |    Error Message: {:<55}|
 |        {:<66}|
 ----------------------------------------------------------------------------\
-
-'''.format(argvs[2], argvs[3])))
+'''.format(argvs[2], err_msg = (argvs[3] if argvs[3] else '' ))))
     elif error_level == 2:
         pass
     elif error_level == 3:
@@ -149,7 +145,7 @@ def ShowErr(*argvs):
 |        {:<66}|
 ----------------------------------------------------------------------------\
 
-'''.format(argvs[0], argvs[1], argvs[2], argvs[3])))
+'''.format(argvs[0], argvs[1], argvs[2], err_msg = (argvs[3] if argvs[3] else '' ))))
 
 
 def GotoFolder(strFolder):

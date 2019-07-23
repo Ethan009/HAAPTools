@@ -113,26 +113,25 @@ class Action():
         self._get_switch_info()
 
 
-    @s.deco_Exception
+    #@s.deco_Exception
     def _get_switch_info(self):
-        try:
-            self._SWConn = conn.SSHConn(self._host,
-                                   self._port,
-                                   self._username,
-                                   self._password,
-                                   self._timeout)
+        self._SWConn = conn.SSHConn(self._host,
+                               self._port,
+                               self._username,
+                               self._password,
+                               self._timeout)
+        if self._SWConn.SSHConnection:
             self.strPorterrshow = self._SWConn.exctCMD(
                 'porterrshow')
             time.sleep(0.25)
             self.strSwitchshow = self._SWConn.exctCMD(
                 'switchshow')
             return True
-        except Exception as E:
-            s.ShowErr(self.__class__.__name__,
-                      sys._getframe().f_code.co_name,
-                      'Get PortErrorInfo for "{}" Fail with Error:'.format(
-                          self._host),
-                      '"%s"' % E)
+        else:
+            self.strPorterrshow = None
+            self.strSwitchshow = None
+
+
 
     @s.deco_Exception
     def print_porterrshow(self):

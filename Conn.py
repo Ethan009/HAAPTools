@@ -145,13 +145,10 @@ class SSHConn(object):
                                  password=self._password,
                                  timeout=self._timeout)
             self.SSHConnection = objSSHClient
-            return True
-        except Exception as E:
-            s.ShowErr(self.__class__.__name__,
-                      sys._getframe().f_code.co_name,
-                      'SSH Connect to "{}" Failed with Error:'.format(
-                          self._host),
-                      '"%s"' % E)
+        except:
+            pass
+
+        
 
     # def download(self, remotepath, localpath):
     #     def _download():
@@ -183,16 +180,11 @@ class SSHConn(object):
     #         print(__name__, E)
     #         print('Upload Failed ...')
 
-    def _connect_retry(self):
-        if self.SSHConnection:
-            return True
-        else:
-            print('Connect Retry for SAN Switch "%s" ...' % self._host)
-            self._connect()
-
     def ssh_connect(self):
         self._connect()
-        self._connect_retry()
+        if not self.SSHConnection:
+            print('Connect Retry for SAN Switch "%s" ...' % self._host)
+            self._connect()
 
 
     def exctCMD(self, command):
