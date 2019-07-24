@@ -61,9 +61,9 @@ TraceRegular2 = [['abts_received',
                  ['unwanted_hba',
                      "r'.*(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday), (.*) - (Port) (A1|A2|B1|B2) (reports initiator arrived:)\s.*(Unwanted initiator at Port ID) (0x.{6}), (WWPN) = (.{16})'"],
                  ['link_error',
-                     'r"(\d{2}:\d{2}\.\d{3}\_\d{3}) (P0|P1|P2|P3): (Link error)(.*)"'],
+                     "r'(\d{2}:\d{2}\.\d{3}\_\d{3}) (P0|P1|P2|P3): (Link error)(.*)'"],
                  ['from_unwant_hba',
-                     'r"(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday), (.*), (.*) - (Port) (A1|A2|B1|B2) (reports ABTS received):\s.*(From unwanted initiator at Port ID) (.{8})"'],
+                     "r'(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday), (.*), (.*) - (Port) (A1|A2|B1|B2) (reports ABTS received):\s.*(From unwanted initiator at Port ID) (.{8})'"],
                  ['lost_connection',
                      "r'\s*(\w{3,6}day), (\d{1,2}/\d{1,2}/20\d{1,2}), (\d{1,2}:\d{1,2}:\d{1,2}) - (Port) (A1|A2|B1|B2) (\w+) (\d+) (bytes of) (\w+) (data):\s+(From drive connection) (\d+) = (drive) #(\d+) (at Port ID) (0x\d{6})'"]]
 

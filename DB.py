@@ -50,11 +50,11 @@ def switch_last_info():
 
  
 # Warning 
-def insert_warning(time, ip, level, device, warn_message, confirm):
+def insert_warning(time, ip,device, level,  warn_message, confirm):
     """
     @note: warning数据插入
     """
-    Warning().insert(time , ip, level, device,
+    Warning().insert(time , ip,  device,level,
                         warn_message, confirm)
 
 
@@ -130,8 +130,8 @@ class SANSW(object):
 
 class Warning(object):
     
-    def insert(self, time_now, lstip, lstdj, device, lstSTS, confirm):
-        t = collWarning(time=time_now, ip=lstip, level=lstdj, device=device,
+    def insert(self, time_now, lstip, device, lstdj, lstSTS, confirm):
+        t = collWarning(time=time_now, ip=lstip,  device=device,level=lstdj,
                         warn_message=lstSTS, confirm=confirm)
         t.save()
     

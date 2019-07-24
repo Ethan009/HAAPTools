@@ -223,19 +223,20 @@ class haap_judge(object):
     def judge_AH(self, AHstatus_rt, AHstatus_db):
         str_engine_AH = 'Engine AH'
         if AHstatus_rt == '--':
-            pass
+            return True
         elif  AHstatus_rt != 'OK':
             if AHstatus_rt != AHstatus_db:
                 db.insert_warning(self.strTimeNow, self.host,
-                                  2, 'engine', str_engine_AH, 0)
+                                  'engine', 2, str_engine_AH, 0)
                 self.lstWarningToSend.append([self.strTimeNow, self.host,
                                self.alias, 2, str_engine_AH])
+            return True    
 
     def judge_reboot(self, uptime_second_rt, uptime_second_db):
         str_engine_restart = 'Engine Reboot %d secends ago'
         if uptime_second_rt < uptime_second_db:
-            db.insert_warning(self.strTimeNow, self.host, 2,
-                              'engine', str_engine_restart % (uptime_second_rt), 0)
+            db.insert_warning(self.strTimeNow, self.host,
+                              'engine', 2, str_engine_restart % (uptime_second_rt), 0)
             self.lstWarningToSend.append([self.strTimeNow, self.host,
                            self.alias, 2, str_engine_restart % (uptime_second_rt)])
 
@@ -244,7 +245,7 @@ class haap_judge(object):
         if Status_rt != 'OK':
             if Status_rt != Status_db:
                 db.insert_warning(self.strTimeNow, self.host,
-                                  2, 'engine', str_engine_status, 0)
+                                  'engine', 2, str_engine_status, 0)
                 self.lstWarningToSend.append([self.strTimeNow, self.host,
                                self.alias, 2, str_engine_status])
 
@@ -253,7 +254,7 @@ class haap_judge(object):
         if MirrorStatus_rt != 'OK':
             if MirrorStatus_rt != MirrorStatus_db:
                 db.insert_warning(self.strTimeNow, self.host,
-                                  2, 'engine', str_engine_mirror, 0)
+                                  'engine', 2, str_engine_mirror, 0)
                 self.lstWarningToSend.append([self.strTimeNow, self.host,
                                self.alias, 2, str_engine_mirror])
 
@@ -291,8 +292,8 @@ def sansw_judge(total_RT, total_DB, sansw_IP, sansw_Alias):
         intWarninglevel = s.is_Warning(intErrorIncrease, tuplThresholdTotal)
         if intWarninglevel:
             msg = warning_message_sansw(intWarninglevel)
-            db.insert_warning(strTimeNow, sansw_IP, intWarninglevel,
-                              'switch', msg, 0)
+            db.insert_warning(strTimeNow, sansw_IP, 'switch', 
+                              intWarninglevel, msg, 0)
             se.send_warnmail([[strTimeNow, sansw_IP,
                                sansw_Alias, intWarninglevel, msg]])
 
