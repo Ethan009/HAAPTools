@@ -28,7 +28,7 @@ strHelp = '''
         Command   Description
 
         ptes    : Port Error Show for SAN Switch(s)('porterrshow')
-        ptcl    : Clear Port Error Counter('statsclear' or '')
+        ptcl    : Clear Port Error Counter('statsclear' or 'portstatsclear')
         sws     : Print SAN Switch Info('switchshow')
 
         gt      : Get Trace of HA-AP Engine(s)
