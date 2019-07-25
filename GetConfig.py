@@ -37,12 +37,12 @@ PCEngineCommand_list = ['vpd',
                         'sfp all']
 
 # PCSANSwitchCommand
-PCSANSwitchCommand_list = ['switchstatusshow',
+PCSANSwitchCommand_list = ['ipaddrshow',
+                           'switchstatusshow',
                            'switchshow',
-                           'portshow',
                            'porterrshow',
                            'nsshow',
-                           'zone',
+                           'zoneshow',
                            'cfgshow']
 
 # TraceRegular
